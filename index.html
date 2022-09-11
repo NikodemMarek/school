@@ -42,7 +42,7 @@
       range(i => { if (i <= 15 || i >= 25) { write(i); nl(); } }, 10, 40, -1); nl();
 
       write('Zadanie 3'); nl();
-      let uin = prompt('Daj swoją liczbę (i dorzuć jakiś floating point (użyj , a nie .))')
+      let uin = prompt('Daj swoją liczbę (i dorzuć jakiś floating point (użyj . a nie ,))')
       if (isNaN(uin)) alert('Prosiłem o liczbę')
       else {
         let pin = parseFloat(Math.round(uin))
@@ -118,15 +118,33 @@
           }, pin, 1);
         }, pin, 1);
         write('<table>' + tab + '</tr></table>')
-
-        nl = () => console.log('')
-        write = console.log.bind(document)
-
-        write('Zadanie 2');
-        range(i => { if (i < 3 || i >= 30) { write(i); } }, 39, -39, 2); nl();
-        range(i => { if (i <= 5 || i >= 10) { write(i); } }, 18, -20, 2); nl();
-        range(i => { if (i <= -28 || i >= 14) { write(i); } }, 35, -98, 7); nl();
       }
+
+      const regon = prompt('REGON');
+      const isRegonValid = (regon) => {
+        const weight = (regon, weights) => weights.reduce((all, weight, i) => all + weight * regon[i]);
+
+        let weights;
+        if (regon.length === 9) weights = [ 8, 9, 2, 3, 4, 5, 6, 7 ];
+        else if (regon.length === 14) weights = [ 2, 4, 8, 5, 0, 9, 7, 3, 6, 1, 2, 4, 8 ];
+        else return false;
+
+        const weighted = weight(regon, weights) % 11;
+        return weighted === regon[regon.length - 1] || weighted === 10 && regon[regon.length - 1] === 0;
+      }
+
+      const splicedRegon = regon.split('').map(digit => parseInt(digit));
+      const isValid = isRegonValid(splicedRegon);
+      if (isValid) alert('Regon poprawny');
+      else alert('Zły regon!');
+
+      nl = () => console.log('')
+      write = console.log.bind(document)
+
+      write('Zadanie 2');
+      range(i => { if (i < 3 || i >= 30) { write(i); } }, 39, -39, 2); nl();
+      range(i => { if (i <= 5 || i >= 10) { write(i); } }, 18, -20, 2); nl();
+      range(i => { if (i <= -28 || i >= 14) { write(i); } }, 35, -98, 7);
     </script>
   </body>
 </html>
