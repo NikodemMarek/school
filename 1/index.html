@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <style>
+      * {
+        font-family: monospace;
+      }
+
+      table {
+        border-collapse: collapse;
+        table-layout: fixed;
+        width: 50px;
+      }
+
+      th,
+      td {
+        border: 1px solid;
+        width: 50px;
+        height: 50px;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+
+  <body>
+    <script defer>
+      const range = (exec, to, from = 0, by = 1) => {
+        if (from <= to) for (let i = from; i <= to; i += by) exec(i);
+        else for (let i = from; i >= to; i += -5) exec(i);
+      }
+
+      let nl = () => {}
+      let write = () => {}
+
+      nl = () => document.write('<br>')
+      write = document.write.bind(document)
+
+      write('Zadanie 1'); nl();
+      write('<b>Witaj JavaScript</b>'); nl(); nl();
+      range(i => { write(i); nl(); }, 21, -22); nl();
+      range(i => { write(i, '&nbsp;'); }, -10, 55, -5); nl(); nl();
+      range(i => { if (i <= 15 || i >= 25) { write(i); nl(); } }, 10, 40, -1); nl();
+
+      write('Zadanie 3'); nl();
+      let uin = prompt('Daj swoją liczbę (i dorzuć jakiś floating point (użyj , a nie .))')
+      if (isNaN(uin)) alert('Prosiłem o liczbę')
+      else {
+        let pin = parseFloat(Math.round(uin))
+
+        // line
+        range(_ => write('#'), pin - 1); nl(); nl();
+
+        // square
+        range(_ => write('&nbsp;#'), pin - 1); nl();
+        if (pin > 2) {
+          range(_ => {
+            write('&nbsp;#');
+            range(_ => write('&nbsp;&nbsp;'), pin - 3);
+            write('&nbsp;#');
+            nl();
+          }, pin - 3);
+        }
+        if (pin > 1) range(_ => write('&nbsp;#'), pin - 1);
+        nl(); nl();
+        
+        // triangle 1
+        range(i => {
+          range(_ => write('&nbsp;'), pin - i);
+          write('#');
+          if (i > 1) {
+            if (i > 2) {
+              if (i === pin) range(_ => write('#'), pin - 3);
+              else range(_ => write('&nbsp;'), i - 3);
+            }
+            write('#');
+          }
+          nl();
+        }, pin, 1); nl();
+        
+        // triangle 2
+        range(i => {
+          write('&nbsp;');
+          range(i => write(i + 1), i);
+          nl();
+        }, pin - 1); nl();
+
+        // triangle 3
+        range(i => {
+          range(_ => write('&nbsp;'), pin - i);
+          range(j => write(i - j), i - 1);
+          nl();
+        }, pin, 1); nl(); nl();
+        
+        // factorial
+        let fac = 1;
+        range(i => fac *= i, pin, 1);
+        write(fac); nl(); nl();
+
+        // sum to 0
+        let sum = 0;
+        range(i => sum += i, pin);
+        write(sum); nl();
+
+        // is prime
+        let prime = true;
+        if (pin > 1) range(i => pin % i === 0? prime = false: null, Math.ceil(pin / 2), 2);
+        else prime = false;
+        alert(`liczba ${prime? '': 'nie '}jest pierwsza`);
+
+        let tab = ''
+        tab += '<tr><th></th>'
+        range(i => tab += `<th style='background-color: cyan;'>${i}</th>`, pin, 1); nl();
+        range(i => {
+          tab += `</tr><tr><th style='background-color: cyan;'>${i}</th>`
+          range(j => {
+            if (i === j) tab += `<th style='background-color: brown;'>${i * j}</th>`
+            else tab += `<th>${i * j}</th>`
+          }, pin, 1);
+        }, pin, 1);
+        write('<table>' + tab + '</tr></table>')
+
+        nl = () => console.log('')
+        write = console.log.bind(document)
+
+        write('Zadanie 2');
+        range(i => { if (i < 3 || i >= 30) { write(i); } }, 39, -39, 2); nl();
+        range(i => { if (i <= 5 || i >= 10) { write(i); } }, 18, -20, 2); nl();
+        range(i => { if (i <= -28 || i >= 14) { write(i); } }, 35, -98, 7); nl();
+      }
+    </script>
+  </body>
+</html>
