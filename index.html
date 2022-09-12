@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <style>
+      * {
+        font-family: monospace;
+        font-size: xx-large;
+      }
+    </style>
+  </head>
+
+  <body>
+    <script>
+      const write = document.write.bind(document);
+      const nl = () => write('<br>');
+
+      const toComp = (dna) => dna
+          .replace(/a/g, 'u')
+          .replace(/c/g, 'g')
+          .replace(/t/g, 'a')
+          .replace(/g/g, 'c')
+
+      const dna = prompt("Enter DNA sequence");
+      // const dna = 'tgcatttatctggaatcgggagggctggatctgcgcagtaagacgaaccacaactaaaggtgtgaatttcacgtcgtctcttaaggaaccaaagggaagccacaggtcggccgctagcggcattattacccacccggagctgttggcttcgctactctcaggatagttttcaactacacgccgcaggaacacctactattaatgaaatctttttactctaagattacctcgtaggattggaccaagacatagaattcataaggaatgaggagcattttatcttcacatgcaatcccgccggcgtcctgaaccgccggcttatcacttgccacctatgccaagtgagcaaccggacctcggggtaatccccgttgtgttggattctacaactctagtccaccaggcgataaaccctggactaggggactgttgttatctggtgattcttattacagatcagcaaggcgccctgatcaccttttcggtttaacattgcgctagctacactaattaataaggacctcacgggagcttgcctacacctggcccgtcctcactatatccctatttatggatcgccggcacttacgtgcaaccgaactgttctccgttgccttatgtcaccttcggtgggcggctgttcatcacttacttgcaacgaactctcggtctcaaacgcccttggcacccgatcctacagaggctctaacttaatgtcgaaggacccatcgtacgtaagtatgccagaaaaccacctgtgggagcgtccaaaggagggtcggtgtagtagcgctcacttacgcgaacccgttgctgattcgagctgatctcatgacttctggctacagcgcctatgctagacgagccgaccgagtcgcaatatatagccgtacacgggtctgtggcgctgtcgaccccagttcctgatcatgacacaacccaaggcgtacttttcacagggctaggcccgctagggtatccaaacgccatatataaaaagcggagtatggtcagtacaaatagtctaggctattggtcctcccagagagatacctggaggcaacatgtaacatgtccaaatgaacagtgtacctatgggaggcggggggattagacaaaggcgtttagggacgtttagatccccacgaggaagccatgaggtagatagccgttcgttcttttcggcgctgctggagcgcagcaacatccgacgcataagctgtgaggagcagtatcccaggtccccgtttctttcatcgcatggacccagcgtggttctaactaagagttttaacttctaccgataatatttaacacaggagtgccaaaccctctgcagctaatatacgctctccacagaccccgttggtgctgggttcatgtttataacctgagtacagagcgacaaaataggacctatgtgtattctaaacaggtagaaggattatgttttcgcgaccgaattccatgccagttcttacttttagtcgctaatagttctgttttccccagaggctctttcatagggtaatgcgccgccgtacgttttatccgtcagtatttggcccatttgtacagaagaagcaaagagcaggctgggaatcaatagcagatcggtccacactcaattgggggggacatagtgggacctgtgggtcctatcccagacgctattcagtcaaattcccctggtgacagccctagctagctaacgcataagtgactgtgagctgaaaatccgggcacaagggataaattgtaacctgatgcaacggggcacagagccaacagtgtcggggctgtcgaaatctttgttgagactaaattgttagattgtcccaaatatttgctttcctcaggacatatatcccaaacacggtaccatcggggatagtataactgaccccagcacctcgcttgtgtttatgctatgctattcgcacggttcctccccacaactatggataccgtgggacttgtaaatgatacacactcaacacagctagcagaattccccctaaatactctaactaactgttccgtaccccgtctgacgctcaaagtgagcgacagttcctgctagggtcgggcccctcagat';
+      const comp = toComp(dna);
+
+      const format = (dna) => dna
+          .toUpperCase()
+          .match(/.{1,3}/g)
+          .join(' ') // esthetics
+          .replace(/ATG/g, '<span style="color: green; font-weight: bold;">ATG</span>')
+          .replace(/TAA/g, '<span style="background-color: yellow;">TAA</span>')
+          .replace(/TAG/g, '<span style="background-color: yellow;">TAG</span>')
+          .replace(/TGA/g, '<span style="background-color: yellow;">TGA</span>');
+
+      const stat = (dna) => {
+        const statistics = {
+          'ATA': 0,
+          'TGA': 0,
+          'ACT': 0,
+          'ATG': 0,
+          'AGT': 0,
+          'TTA': 0,
+          'GGA': 0,
+          'TAC': 0,
+          'GCA': 0,
+          'AAA': 0,
+          'TGT': 0,
+          'TAA': 0,
+          'AGC': 0,
+          'TAT': 0,
+          'GTT': 0,
+          'TAG': 0,
+          'CCC': 0,
+        }
+
+        Object.keys(statistics).forEach(key => statistics[key] = (dna.toUpperCase().match(new RegExp(key, 'g')) || []).length);
+        return statistics;
+      }
+
+      write(format(dna));
+      nl(); nl();
+      write(format(comp));
+
+      const statistics = stat(dna);
+      nl(); nl();
+      let color = 'red';
+      write(... Object.keys(statistics).map((key, index) => {
+        if (index % 5 === 0) color = Math.floor(Math.random() * 16777215).toString(16);
+        return `<span style="background-color: #${color}">${key} - ${statistics[key]}</span><br>`
+      }));
+    </script>
+  </body>
+</html>
