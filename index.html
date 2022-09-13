@@ -16,9 +16,11 @@
 
       const toComp = (dna) => dna
           .replace(/a/g, 'u')
-          .replace(/c/g, 'g')
           .replace(/t/g, 'a')
-          .replace(/g/g, 'c')
+          .replace(/u/g, 't')
+          .replace(/g/g, 'u')
+          .replace(/c/g, 'g')
+          .replace(/u/g, 'c')
 
       const dna = prompt("Enter DNA sequence");
       // const dna = 'tgcatttatctggaatcgggagggctggatctgcgcagtaagacgaaccacaactaaaggtgtgaatttcacgtcgtctcttaaggaaccaaagggaagccacaggtcggccgctagcggcattattacccacccggagctgttggcttcgctactctcaggatagttttcaactacacgccgcaggaacacctactattaatgaaatctttttactctaagattacctcgtaggattggaccaagacatagaattcataaggaatgaggagcattttatcttcacatgcaatcccgccggcgtcctgaaccgccggcttatcacttgccacctatgccaagtgagcaaccggacctcggggtaatccccgttgtgttggattctacaactctagtccaccaggcgataaaccctggactaggggactgttgttatctggtgattcttattacagatcagcaaggcgccctgatcaccttttcggtttaacattgcgctagctacactaattaataaggacctcacgggagcttgcctacacctggcccgtcctcactatatccctatttatggatcgccggcacttacgtgcaaccgaactgttctccgttgccttatgtcaccttcggtgggcggctgttcatcacttacttgcaacgaactctcggtctcaaacgcccttggcacccgatcctacagaggctctaacttaatgtcgaaggacccatcgtacgtaagtatgccagaaaaccacctgtgggagcgtccaaaggagggtcggtgtagtagcgctcacttacgcgaacccgttgctgattcgagctgatctcatgacttctggctacagcgcctatgctagacgagccgaccgagtcgcaatatatagccgtacacgggtctgtggcgctgtcgaccccagttcctgatcatgacacaacccaaggcgtacttttcacagggctaggcccgctagggtatccaaacgccatatataaaaagcggagtatggtcagtacaaatagtctaggctattggtcctcccagagagatacctggaggcaacatgtaacatgtccaaatgaacagtgtacctatgggaggcggggggattagacaaaggcgtttagggacgtttagatccccacgaggaagccatgaggtagatagccgttcgttcttttcggcgctgctggagcgcagcaacatccgacgcataagctgtgaggagcagtatcccaggtccccgtttctttcatcgcatggacccagcgtggttctaactaagagttttaacttctaccgataatatttaacacaggagtgccaaaccctctgcagctaatatacgctctccacagaccccgttggtgctgggttcatgtttataacctgagtacagagcgacaaaataggacctatgtgtattctaaacaggtagaaggattatgttttcgcgaccgaattccatgccagttcttacttttagtcgctaatagttctgttttccccagaggctctttcatagggtaatgcgccgccgtacgttttatccgtcagtatttggcccatttgtacagaagaagcaaagagcaggctgggaatcaatagcagatcggtccacactcaattgggggggacatagtgggacctgtgggtcctatcccagacgctattcagtcaaattcccctggtgacagccctagctagctaacgcataagtgactgtgagctgaaaatccgggcacaagggataaattgtaacctgatgcaacggggcacagagccaacagtgtcggggctgtcgaaatctttgttgagactaaattgttagattgtcccaaatatttgctttcctcaggacatatatcccaaacacggtaccatcggggatagtataactgaccccagcacctcgcttgtgtttatgctatgctattcgcacggttcctccccacaactatggataccgtgggacttgtaaatgatacacactcaacacagctagcagaattccccctaaatactctaactaactgttccgtaccccgtctgacgctcaaagtgagcgacagttcctgctagggtcgggcccctcagat';
@@ -58,9 +60,11 @@
         return statistics;
       }
 
+      write(dna); nl();
       write(format(dna));
       nl(); nl();
-      write(format(comp));
+      write(format(comp)); nl();
+      write(comp);
 
       const statistics = stat(dna);
       nl(); nl();
