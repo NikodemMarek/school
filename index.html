@@ -1,16 +1,70 @@
 <!DOCTYPE html>
-<html lang="pl-PL">
+<html lang="en">
   <head>
-    <title>CHANGEME</title>
-    
-    <script src="./lib/jq.js"></script>
+    <title>init</title>
   </head>
 
   <body>
+    <center>
+      <h1 id="info" style="color: blue;">T: jQuery - zdarzenia</h1>
+      
+      <button id="on-off" style="width: 200px; height: 100px; font-size: large; border: none; background-color: grey;">DODAJ / USUŃ</button>
+      <div id="hover-div" style="margin-top: 10px; width: 500px; height: 500px; background-color: grey;"></div>
+    </center>
+
+    <script src="./lib/jq.js"></script>
     <script>
       $(document).ready(() => {
-        
+        let on = false
+
+        $('#on-off').on('click', () => {
+          on = !on
+          
+          $('#info').html(`obsługa zdarzeń ${on? 'dodana': 'usunięta'}`)
+          $('#on-off')
+            .css('background', on? 'red': 'grey')
+            .css('border', '2px solid black')
+            .css('border-radius', '5px')
+        })
+              
+        $('#hover-div')
+          .on('mouseover', () => {
+            if (on) $('#hover-div')
+              .css('background', 'red')
+              .css('font-size', '80px')
+              .css('color', 'white')
+              .html('<center><b>text bold</b><br><i>text italic</i></center>')
+          })
+          .on('mouseout', () => $('#hover-div').css('background', 'grey').html(''))
       })
     </script>
+
+    <!-- <button id="click-btn">CLick</button>
+    <button id="confirm-btn">Confirm</button>
+    <button id="css-btn">Change css</button>
+    <button id="disable-btn">Disable btn3</button>
+
+    <div id="css-d">heiweshdfjka</div>
+    
+    <script>
+      $(document).ready(() => {
+        console.log("objecxxxt");
+      })
+
+      $('#click-btn').on('click', () => alert('ok'))
+      $('#confirm-btn').on('click', () => {
+        const ok = confirm('ok?')
+
+        if (ok) console.log('OK');
+        else console.log('Not ok');
+      })
+      $('#css-btn').on('click', () => {
+        $('#css-d')
+          .css('background', 'green')
+          .width(100)
+          .html('<b>hhhhhhh</b>')
+      })
+      $('#disable-btn').on('click', () => $('#css-btn').off('click'))
+    </script> -->
   </body>
 </html>
