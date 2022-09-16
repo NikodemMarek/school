@@ -22,8 +22,11 @@
           .replace(/c/g, 'g')
           .replace(/u/g, 'c')
 
-      const dna = prompt("Enter DNA sequence");
-      // const dna = 'tgcatttatctggaatcgggagggctggatctgcgcagtaagacgaaccacaactaaaggtgtgaatttcacgtcgtctcttaaggaaccaaagggaagccacaggtcggccgctagcggcattattacccacccggagctgttggcttcgctactctcaggatagttttcaactacacgccgcaggaacacctactattaatgaaatctttttactctaagattacctcgtaggattggaccaagacatagaattcataaggaatgaggagcattttatcttcacatgcaatcccgccggcgtcctgaaccgccggcttatcacttgccacctatgccaagtgagcaaccggacctcggggtaatccccgttgtgttggattctacaactctagtccaccaggcgataaaccctggactaggggactgttgttatctggtgattcttattacagatcagcaaggcgccctgatcaccttttcggtttaacattgcgctagctacactaattaataaggacctcacgggagcttgcctacacctggcccgtcctcactatatccctatttatggatcgccggcacttacgtgcaaccgaactgttctccgttgccttatgtcaccttcggtgggcggctgttcatcacttacttgcaacgaactctcggtctcaaacgcccttggcacccgatcctacagaggctctaacttaatgtcgaaggacccatcgtacgtaagtatgccagaaaaccacctgtgggagcgtccaaaggagggtcggtgtagtagcgctcacttacgcgaacccgttgctgattcgagctgatctcatgacttctggctacagcgcctatgctagacgagccgaccgagtcgcaatatatagccgtacacgggtctgtggcgctgtcgaccccagttcctgatcatgacacaacccaaggcgtacttttcacagggctaggcccgctagggtatccaaacgccatatataaaaagcggagtatggtcagtacaaatagtctaggctattggtcctcccagagagatacctggaggcaacatgtaacatgtccaaatgaacagtgtacctatgggaggcggggggattagacaaaggcgtttagggacgtttagatccccacgaggaagccatgaggtagatagccgttcgttcttttcggcgctgctggagcgcagcaacatccgacgcataagctgtgaggagcagtatcccaggtccccgtttctttcatcgcatggacccagcgtggttctaactaagagttttaacttctaccgataatatttaacacaggagtgccaaaccctctgcagctaatatacgctctccacagaccccgttggtgctgggttcatgtttataacctgagtacagagcgacaaaataggacctatgtgtattctaaacaggtagaaggattatgttttcgcgaccgaattccatgccagttcttacttttagtcgctaatagttctgttttccccagaggctctttcatagggtaatgcgccgccgtacgttttatccgtcagtatttggcccatttgtacagaagaagcaaagagcaggctgggaatcaatagcagatcggtccacactcaattgggggggacatagtgggacctgtgggtcctatcccagacgctattcagtcaaattcccctggtgacagccctagctagctaacgcataagtgactgtgagctgaaaatccgggcacaagggataaattgtaacctgatgcaacggggcacagagccaacagtgtcggggctgtcgaaatctttgttgagactaaattgttagattgtcccaaatatttgctttcctcaggacatatatcccaaacacggtaccatcggggatagtataactgaccccagcacctcgcttgtgtttatgctatgctattcgcacggttcctccccacaactatggataccgtgggacttgtaaatgatacacactcaacacagctagcagaattccccctaaatactctaactaactgttccgtaccccgtctgacgctcaaagtgagcgacagttcctgctagggtcgggcccctcagat';
+      let dna = '';
+      do {
+        dna = prompt("Enter a DNA sequence");
+      } while (!/^([atgc]{3})+$/.test(dna));
+
       const comp = toComp(dna);
 
       const format = (dna) => dna
@@ -36,27 +39,16 @@
           .replace(/TGA/g, '<span style="background-color: yellow;">TGA</span>');
 
       const stat = (dna) => {
-        const statistics = {
-          'ATA': 0,
-          'TGA': 0,
-          'ACT': 0,
-          'ATG': 0,
-          'AGT': 0,
-          'TTA': 0,
-          'GGA': 0,
-          'TAC': 0,
-          'GCA': 0,
-          'AAA': 0,
-          'TGT': 0,
-          'TAA': 0,
-          'AGC': 0,
-          'TAT': 0,
-          'GTT': 0,
-          'TAG': 0,
-          'CCC': 0,
-        }
+        const statistics = { }
+        
+        dna
+          .toUpperCase()
+          .match(/.{1,3}/g)
+          .forEach(tri => {
+            if (tri in statistics) statistics[tri] ++
+            else statistics[tri] = 1
+          })
 
-        Object.keys(statistics).forEach(key => statistics[key] = (dna.toUpperCase().match(new RegExp(key, 'g')) || []).length);
         return statistics;
       }
 
