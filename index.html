@@ -3,13 +3,151 @@
   <head>
     <title>CHANGEME</title>
     
+    <style>
+      #heading {
+        color: blue;
+      }
+      
+      .leaf {
+        height: 50px;
+        width: 402px;
+        margin-bottom: 2px;
+      }
+      .leaf-text {
+        height: 50px;
+        width: 300px;
+        background-color: lightgray;
+        font-size: xx-large;
+        color: black;
+        padding-left: 30px;
+        box-sizing: border-box;
+      }
+      .x {
+        height: 50px;
+        width: 50px;
+        background-color: blue;
+        margin-left: 2px;
+        font-size: xx-large;
+        color: white;
+        text-align: center;
+      }
+      .add {
+        height: 50px;
+        width: 50px;
+        background-color: green;
+        color: white;
+        font-size: xx-large;
+        text-align: center;
+      }
+    </style>
+
     <script src="./lib/jq.js"></script>
   </head>
 
   <body>
+    <h1 id="heading">T: Pętla for, dynamiczne tworzenie i usuwanie html-a, cz1</h1>
+    
+    <button id="mk-menu" style="padding: 10px;">UTWÓRZ MENU</button>
+    <button id="rm-menu" style="padding: 10px;">USUŃ MENU</button>
+    
+    <select name="menu-size" id="menu-size" style="padding: 10px;"></select>
+    
+    <div id="menu"></div>
+
     <script>
       $(document).ready(() => {
-        
+        // select options
+        $('#menu-size').html(Array.from(Array(6).keys()).reduce((all, key) => `${all}<option value='${key}'>${key}</option>`))
+
+        $('#mk-menu').on('click', () => {
+          const menuSize = parseInt($('#menu-size').val())
+
+          const menu = $('#menu')
+          Array.from(Array(menuSize).keys()).forEach(key => {
+            const mainLeaf = $('<div>')
+                  .css('clear', 'both')
+                  .addClass('leaf')
+                  .append(
+                    // leaf name and number
+                    $('<div>')
+                      .addClass('leaf-text')
+                      .css('float', 'left')
+                      .text(`parent ${key}`)
+                  )
+                  .append(
+                    // leaf add button
+                    $('<div>')
+                      .css('float', 'left')
+                      .addClass('add')
+                      .text('+')
+                      .on('click', function() {
+                        const add = $(this)
+                        const leaf = add.parent().parent()
+                        leaf
+                          .height(leaf.height() + 52)
+                          .append(
+                            $('<div>')
+                              .css('clear', 'both')
+                              .addClass('leaf')
+                              .append(
+                                // secondary leaf
+                                $('<div>')
+                                  .css('float', 'left')
+                                  .css('margin-left', '50px')
+                                  .addClass('leaf-text')
+                                  .text('child')
+                              )
+                              .append(
+                                // secondary leaf remove button
+                                $('<div>')
+                                  .width(50).height(50)
+                                  .css('float', 'left')
+                                  .addClass('x')
+                                  .text('x')
+                                  .on('click', function() {
+                                    const leaf = $(this).parent()
+
+                                    leaf.parent()
+                                      .height(leaf.parent().height() - 52)
+
+                                    add
+                                      .text(leaf.parent().height() / 52 - 1)
+
+                                    leaf
+                                      .remove()
+                                  })
+                              )
+                          )
+
+                          add
+                            .text(leaf.height() / 52 - 1)
+                      })
+                  )
+                  .append(
+                    // main leaf remove button
+                    $('<div>')
+                      .css('float', 'left')
+                      .addClass('x')
+                      .text('x')
+                      .on('click', function() {
+                        const leaf = $(this).parent().parent()
+
+                        leaf
+                          .height(leaf.height() - 52)
+                        leaf
+                          .remove()
+                      })
+                  )
+
+            const branch = $('<div>')
+              .width(402).height(52)
+              .append(mainLeaf)
+
+            menu.append(branch)
+          })
+        })
+
+        $('#rm-menu').on('click', () => $('#menu').html(''))
       })
     </script>
   </body>
