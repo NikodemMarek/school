@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pl-PL">
+  <head>
+    <title>split</title>
+    
+    <style>
+      html, body {
+        height: 100%;
+        display: flex;
+        flex-direction: row;
+        padding: 0;
+        margin: 0;
+      }
+
+      #a {
+        background-color: lightgray;
+        font-size: 80px;
+        height: 100%;
+        text-align: center;
+      }
+      #b {
+        background-color: yellow;
+        font-size: 80px;
+        height: 100%;
+        text-align: center;
+      }
+      
+      #split {
+        background-color: blue;
+        width: 10px;
+        height: 100%;
+        cursor: ew-resize;
+      }
+    </style>
+
+    <script src="./lib/jq.js"></script>
+  </head>
+
+  <body>
+    <div id="a">A</div>
+    <div id="split"></div>
+    <div id="b">B</div>
+    
+    <script>
+      $(document).ready(function() {
+        let width = $(window).width() - 10
+        
+        const a = $('#a')
+        const b = $('#b')
+
+        const updatePos = x => {
+          a.width(x - 5)
+          b.width(width - x + 5)
+        }
+
+        $('#split')
+          .on('mousedown', () => 
+            $(this).on('mousemove', event =>
+              updatePos(event.pageX)))
+          .on('mouseup', () => $(this).unbind('mousemove'))
+
+        $(window).on('resize', () => {
+          width = $(window).width() - 10
+          updatePos(width * 0.2)
+        })
+
+        updatePos(width * 0.2)
+      })
+    </script>
+  </body>
+</html>
