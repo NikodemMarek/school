@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>d</title>
+    <script src="./lib/jq.js"></script>
+    
+    <style>
+      html, body {
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      #counter {
+        width: 100px;
+        height: 100px;
+        font-size: xx-large;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: red;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="counter"></div>
+    
+    <script>
+      $(document).ready(() => {
+        let count = 0
+
+        $('#counter')
+          .on('mouseenter', function() {
+            $(this)
+              .text(count ++ % 5 + 1)
+              .width(2 ** Math.floor(count / 5) * 100)
+              .height(2 ** Math.floor(count / 5) * 100)
+          })
+          .on('mouseleave', function() { $(this).text('') })
+      })
+    </script>
+  </body>
+</html>
