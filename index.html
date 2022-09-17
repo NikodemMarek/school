@@ -61,10 +61,13 @@
       const statistics = stat(dna);
       nl(); nl();
       let color = 'red';
-      write(... Object.keys(statistics).map((key, index) => {
-        if (index % 5 === 0) color = Math.floor(Math.random() * 16777215).toString(16);
-        return `<span style="background-color: #${color}">${key} - ${statistics[key]}</span><br>`
-      }));
+      write(... Object.keys(statistics)
+        .map(key => { return { tri: key, quantity: statistics[key] } })
+        .sort((a, b) => b.quantity - a.quantity)
+        .map((tri, index) => {
+          if (index % 5 === 0) color = Math.floor(Math.random() * 16777215).toString(16);
+          return `<span style="background-color: #${color}">${tri.tri} - ${tri.quantity}</span><br>`
+        }));
     </script>
   </body>
 </html>
