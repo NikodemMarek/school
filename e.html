@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>e</title>
+    <script src="./lib/jq.js"></script>
+    
+    <style>
+      html, body {
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      #counter {
+        width: 500px;
+        height: 500px;
+        font-size: xx-large;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: red;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="counter">1</div>
+    
+    <script>
+      $(document).ready(() => {
+        let count = 1
+
+        $('#counter')
+          .on('click', function() {
+            $(this)
+              .text(++ count)
+              .css('background', count % 2 === 0? 'green': 'red')
+          })
+      })
+    </script>
+  </body>
+</html>
