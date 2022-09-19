@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>spadające punkty</title>
+  </head>
+
+  <body>
+    <h3>Punkty lecą z nieba?</h3>
+    <textarea style="overflow: hidden;" id="ar" cols="30" rows="20"></textarea>
+    
+    <script>
+      const ar = document.getElementById('ar');
+
+      const arWidth = 37
+      const lines = [
+        'text uno',
+        'secondo texto',
+        'mamma mia texto tria',
+        'vier text}'
+      ]
+      
+      let preLines = 0
+      setInterval(() => {
+        ar.value = `${Array(preLines ++).join('\n')}${lines.map(t => `${Array(Math.ceil((arWidth - t.length) / 2)).join('.')}${t}${Array(Math.floor((arWidth - t.length) / 2)).join('.')}`).join('\n')}`
+      }, 300);
+    </script>
+  </body>
+</html>

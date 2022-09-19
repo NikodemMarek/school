@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>guma</title>
+  </head>
+
+  <body>
+    <div>
+      <img id="guma" src="./guma.png">
+    </div>
+    
+    <script>
+      const guma = document.getElementById('guma');
+
+      let scale = 0.1
+      let size = {
+        width: 200,
+        height: 50
+      }
+      let scaleUp = true
+      setInterval(() => {
+        if (scale >= 1) scaleUp = false
+        else if (scale <= 0.25) scaleUp = true
+
+        scale += 0.005 * (scaleUp? 1: -1)
+
+        guma.style.width = size.width * scale + 'px'
+        guma.style.height = size.height * scale + 'px'
+      }, 10);
+    </script>
+  </body>
+</html>

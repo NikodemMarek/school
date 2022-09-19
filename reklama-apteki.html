@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>lecący tekst</title>
+  </head>
+
+  <body>
+    <input id="inp" type="text">
+    
+    <script>
+      const inp = document.getElementById('inp');
+
+      
+      const text = 'Ciekawe czy uda ci się to zrobić         '
+      inp.value = text
+      setInterval(() => inp.value = inp.value.slice(1) + inp.value[0], 100);
+    </script>
+  </body>
+</html>
