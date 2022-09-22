@@ -16,11 +16,10 @@
   <body>
     <div style="height: 100%;">
       <img id="wheel" style="position: absolute; width: 100px; height: 30px;" src="./guma.png">
+      <img id="earth" style="position: absolute; width: 100px; height: 30px;" src="./guma.png">
     </div>
     
     <script>
-      const wheel = document.getElementById('wheel');
-
       const rotatePoint = (point, angle) => {
         return {
           x: point.x * Math.cos(angle) - point.y * Math.sin(angle),
@@ -28,23 +27,42 @@
         }
       }
       
-      const update = () => {
-        wheel.style.left = `${pos.x + origin.x}px`
-        wheel.style.top = `${pos.y + origin.y}px`
+      const draw = (obj) => {
+        obj.html.style.left = `${obj.pos.x + origin.x}px`
+        obj.html.style.top = `${obj.pos.y + origin.y}px`
+              
+        obj.html.style.transform = `rotate(${obj.rotation}deg)`
       }
 
       const origin = {
         x: 300,
         y: 300
       }
-      let pos = {
-        x: 100,
-        y: 100
+      const nasa = {
+        html: document.getElementById('wheel'),
+        pos: {
+          x: 100,
+          y: 100
+        },
+        rotation: 0
+      }
+      const earth = {
+        html: document.getElementById('earth'),
+        pos: {
+          x: 200,
+          y: 200
+        },
+        rotation: 0
       }
       
       setInterval(() => {
-        update()
-        pos = rotatePoint(pos, 0.01)
+        draw(nasa)
+        nasa.rotation += 3
+        nasa.pos = rotatePoint(nasa.pos, 0.01)
+
+        draw(earth)
+        earth.rotation += 5
+        earth.pos = rotatePoint(earth.pos, 0.02)
       }, 10);
     </script>
   </body>
