@@ -1,0 +1,13 @@
+{
+  "name": "school",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "Nikodem Marek",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.1"
+  }
+}
