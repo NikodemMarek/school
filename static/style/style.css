@@ -1,0 +1,29 @@
+.koty {
+  color: red;
+  background-color: black;
+  padding: 10px;
+  margin: 10px;
+}
+
+.auta {
+  color: yellow;
+  background-color: black;
+  padding: 10px;
+  margin: 10px;
+}
+
+.drzewa {
+  color: green;
+  background-color: black;
+  padding: 10px;
+  margin: 10px;
+}
+
+.prod-img {
+  height: 300px;
+  width: 100px;
+}
+.prod-label {
+  color: aqua;
+  font-size: large;
+}
