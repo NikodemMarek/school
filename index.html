@@ -1,15 +1,159 @@
 <!DOCTYPE html>
 <html lang="pl-PL">
   <head>
-    <title>CHANGEME</title>
+    <title>Labirynt</title>
     
     <script src="./lib/jq.js"></script>
+
+    <style>
+      #dice {
+        background-color: gray;
+        color: white;
+
+        width: 100px;
+        height: 100px;
+
+        margin: 10px;
+
+        font-size: xx-large;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+    </style>
   </head>
 
   <body>
+    <div>
+      <button id="start">start game</button>
+      <button id="next" disabled>next move</button>
+      <button id="reset" disabled>reset game</button>
+
+      <div id="dice">0</div>
+    </div>
+
+    <br>
+
+    <div id='lab'></div>
+
     <script>
+      const size = 50
+      const space = 1
+      const diceTimes = 10
+
       $(document).ready(() => {
+        let obs = []
+        let bluePos = -1
+        let greenPos = -1
+        let blue = true
+
+        let start = false
         
+        const createBoard = (x, y) => {
+          const divs = []
+          Array(x).fill(null).forEach((_, posX) =>
+            Array(y).fill(null).forEach((_, posY) => {
+              const isPath = obs.filter(value => value.x === posX && value.y === posY).length > 0
+              divs.push(
+                $('<div>')
+                  .css('position', 'absolute')
+                  .width(size).height(size)
+                  .css('left', `${posX * size + (posX + 1) * space}px`)
+                  .css('top', `${posY * size + (posY + 1) * space}px`)
+                  .css('background', `${isPath? 'yellow': 'white'}`)
+                  .append(
+                    isPath
+                    && bluePos > -1
+                    && obs[bluePos].x === posX
+                    && obs[bluePos].y === posY
+                      ? $('<img>').attr('src', './static/blue.png')
+                      : '',
+                    isPath
+                    && greenPos > -1
+                    && obs[obs.length - greenPos - 1].x === posX
+                    && obs[obs.length - greenPos - 1].y === posY
+                      ? $('<img>').attr('src', './static/green.png')
+                      : ''
+                  )
+                  .on('click', () => {
+                    if (!isPath)
+                      obs.push({ x: posX, y: posY })
+
+                    createBoard(x, y)
+                  })
+                )
+              },
+            ),
+          )
+
+          $('#lab')
+            .css('position', 'relative')
+            .css('background', 'black')
+            .width(x * (size + space) + space)
+            .height(y * (size + space) + space)
+            .append(divs)
+        }
+
+        const bSize = 9
+        $('#start').on('click', () => {
+          if (obs < 4) alert('za krótki labirynt')
+          else {
+            bluePos = 0
+            greenPos = 0
+
+            start = true
+
+            $('#next').attr('disabled', false)
+            $('#reset').attr('disabled', false)
+            createBoard(bSize, bSize)
+          }
+        })
+        $('#next').on('click', () => {
+          if (start) {
+            const dicy = setInterval(() => {
+              $('#dice').text(Math.ceil(Math.random() * 6))
+            }, 250);
+
+            setTimeout(() => {
+              clearInterval(dicy)
+
+              howMany = Math.ceil(Math.random() * 6)
+              $('#dice').text(howMany)
+
+              blue
+                ? bluePos += howMany
+                : greenPos += howMany
+              
+              if (bluePos >= obs.length - 1 || greenPos >= obs.length - 1) {
+                blue
+                  ? bluePos == obs.length - 1
+                  : greenPos == obs.length - 1
+
+                start = false
+
+                $('#next').attr('disabled', true)
+                $('#reset').attr('disabled', true)
+              }
+
+              blue = !blue
+              createBoard(bSize, bSize)
+            }, 250 * diceTimes);
+          }
+        })
+
+        $('#reset').on('click', () => {
+          obs = []
+          bluePos = -1
+          greenPos = -1
+          start = false
+          blue = true
+
+          $('#next').attr('disabled', true)
+          $('#reset').attr('disabled', true)
+          createBoard(bSize, bSize)
+        })
+
+        createBoard(bSize, bSize)
       })
     </script>
   </body>
