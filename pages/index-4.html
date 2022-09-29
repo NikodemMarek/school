@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pl-PL">
+  <head>
+    <title>01</title>
+    
+    <script src="./lib/jq.js"></script>
+    
+    <style>
+      #sec {
+        width: 500px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <input type="range" name="main" id="main">
+    <br>
+    <input type="range" name="sec" id="sec">
+
+    <script>
+      $(document).ready(() => {
+        $('#main').on('mousemove', () => {
+          $.ajax({
+            url: '/post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+              x: $('#main').val(),
+            }),
+            type: 'POST',
+            success: data => {
+              $('#sec').val(JSON.parse(data).x)
+            },
+            error: (xhr, status, err) => console.log('err: ', err),
+          })
+        })
+      })
+    </script>
+  </body>
+</html>

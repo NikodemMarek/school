@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pl-PL">
+  <head>
+    <title>01</title>
+    
+    <script src="./lib/jq.js"></script>
+    
+    <style>
+      #clickme {
+        background-color: blue;
+        color: white;
+        height: 100px;
+        width: 100px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <input type="text" id="x" name="x">
+    <br>
+    <input type="text" id="y" name="y">
+    <br>
+
+    <div id="clickme">klik</div>
+
+    <script>
+      $(document).ready(() => {
+        $('#clickme').on('click', () => {
+          $.ajax({
+            url: '/post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+              x: $('#x').val(),
+              y: $('#y').val(),
+            }),
+            type: 'POST',
+            success: data => {
+              var out = JSON.parse(data)
+              alert(`suma: ${out.sum}, iloczyn: ${out.multi}`)
+            },
+            error: (xhr, status, err) => console.log('err: ', err),
+          })
+        })
+      })
+    </script>
+  </body>
+</html>

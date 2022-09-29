@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pl-PL">
+  <head>
+    <title>01</title>
+    
+    <script src="./lib/jq.js"></script>
+    
+    <style>
+      #in, #out {
+        width: 400px;
+        height: 500px;
+        
+        position: relative;
+      }
+      #in {
+        background-color: yellow;
+      }
+      #out {
+        background-color: green;
+      }
+      
+      .outCircle {
+        background-color: black;
+        color: white;
+        width: 50px;
+        height: 50px;
+        border: 2px solid whitesmoke;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .inCircle {
+        background-color: red;
+        color: white;
+        width: 50px;
+        height: 50px;
+        border: 2px solid whitesmoke;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div style="display: flex;">
+      <div id="in"></div>
+      <div id="out"></div>
+    </div>
+
+    <script>
+      $(document).ready(() => {
+        $('#in').on('mousemove', event => {
+          $('#in').append(
+            $('<div>')
+              .addClass('inCircle')
+              .css('position', 'absolute')
+              .css('left', `${event.offsetX - 25}px`)
+              .css('top', `${event.offsetY - 25}px`)
+              .html(`${event.offsetX - 25}<br>${event.offsetY - 25}`)
+          )
+
+          $.ajax({
+            url: '/post',
+            contentType: 'application/json',
+            data: JSON.stringify({
+              x: event.offsetX,
+              y: event.offsetY,
+              startTime: Date.now()
+            }),
+            type: 'POST',
+            success: data => {
+              const out = JSON.parse(data)
+              $('#out').append(
+                $('<div>')
+                  .addClass('outCircle')
+                  .css('position', 'absolute')
+                  .css('left', `${out.x - 25}px`)
+                  .css('top', `${out.y - 25}px`)
+                  .text(Date.now() - out.startTime)
+              )
+            },
+            error: (xhr, status, err) => console.log('err: ', err),
+          })
+        })
+      })
+    </script>
+  </body>
+</html>
