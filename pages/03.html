@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>04 - 01</title>
+    
+    <style>
+      #mf {
+        background-color: lightgreen;
+        border-radius: 20px;
+        
+        padding: 20px;
+
+        display: flex;
+        flex-direction: column;
+      }
+    </style>
+  </head>
+
+  <body>
+    <form id="mf" action="/res" method="POST" enctype="multipart/form-data">
+      <label for="date">date: </label>
+      <input type="date" name="date" id="date">
+      
+      <br>
+      <label for="name">name: </label>
+      <input type="text" name="name" id="name">
+      
+      <br>
+      <label for="img">img: </label>
+      <input type="file" name="img" id="img" accept="image/*" multiple>
+      
+      <br>
+      <button type="submit">submit</button>
+    </form>
+  </body>
+</html>

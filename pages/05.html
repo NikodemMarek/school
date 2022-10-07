@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>04 - 01</title>
+    
+    <style>
+      #table {
+        display: none;
+      }
+      .me {
+        width: 50px;
+        height: 50px;
+        background-color: gray;
+        margin: 5px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <button id="pf">post fetch</button>
+    <button id="mktab">make table</button>
+    
+    <div id="table">
+      <div>
+        <div class="me"></div>
+        <div class="me"></div>
+        <div class="me"></div>
+      </div>
+      <div>
+        <div class="me"></div>
+        <div class="me"></div>
+        <div class="me"></div>
+      </div>
+      <div>
+        <div class="me"></div>
+        <div class="me"></div>
+        <div class="me"></div>
+      </div>
+    </div>
+    
+    <script defer>
+      const fetchPost = (endpoint, body) => fetch(endpoint, {
+          method: 'post',
+          body: JSON.stringify(body),
+          headers: {
+            "Content-Type": "application/json"
+          },
+        })
+
+      const pf = document.querySelector('#pf')
+      const mktab = document.querySelector('#mktab')
+
+      const tab = document.querySelector('#table')
+      
+      pf.addEventListener('click', event => {
+        fetchPost('/pf', {
+          x: 0,
+          y: 0,
+          start: Date.now()
+        }).then(res => res.json())
+        .then(res => {
+          const { x, y, start } = res
+          console.log({
+            x, y,
+            time: Date.now() - start,
+          });
+        })
+      })
+      
+      mktab.addEventListener('click', event => {
+        tab.style.display = 'flex'
+        document.querySelectorAll('.me')
+          .forEach((e, i) => {
+            e.addEventListener('click', event => {
+              fetchPost('/pf', {
+                x: Math.floor(i / 3),
+                y: i % 3,
+                start: Date.now()
+              }).then(res => res.json())
+              .then(res => {
+                const { x, y, start } = res
+                console.log({
+                  x, y,
+                  time: Date.now() - start,
+                });
+                
+                document.querySelectorAll('.me')
+                  .forEach(e => e.style.backgroundColor = 'gray')
+                e.style.backgroundColor = 'orange'
+              })
+            })
+          })
+      })
+    </script>
+  </body>
+</html>
