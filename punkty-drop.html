@@ -6,7 +6,7 @@
 
   <body>
     <h3>Punkty lecą z nieba?</h3>
-    <textarea style="overflow: hidden;" id="ar" cols="30" rows="20"></textarea>
+    <textarea style="overflow: hidden; resize: none;" id="ar" cols="30" rows="20"></textarea>
     
     <script>
       const ar = document.getElementById('ar');
@@ -15,13 +15,16 @@
       const lines = [
         'text uno',
         'secondo texto',
-        'mamma mia texto tria',
-        'vier text}'
+        'mamma mia texto drita',
+        'vier text',
       ]
       
-      let preLines = 0
+      let preLines = -lines.length + 1
+      const maxL = 20
       setInterval(() => {
-        ar.value = `${Array(preLines ++).join('\n')}${lines.map(t => `${Array(Math.ceil((arWidth - t.length) / 2)).join('.')}${t}${Array(Math.floor((arWidth - t.length) / 2)).join('.')}`).join('\n')}`
+        if (preLines > maxL) preLines = -lines.length + 1
+        ar.value = `${Array(preLines > 0? preLines + 1: 0).join('\n')}${(preLines > 0? lines: lines.slice(- preLines, lines.length)).map(t => `${Array(Math.ceil((arWidth - t.length) / 2)).join('.')}${t}${Array(Math.floor((arWidth - t.length) / 2)).join('.')}`).join('\n')}`
+        preLines ++
       }, 300);
     </script>
   </body>

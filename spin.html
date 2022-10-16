@@ -16,7 +16,6 @@
   <body>
     <div style="height: 100%;">
       <img id="wheel" style="position: absolute; width: 100px; height: 30px;" src="./guma.png">
-      <img id="earth" style="position: absolute; width: 100px; height: 30px;" src="./guma.png">
     </div>
     
     <script>
@@ -46,23 +45,11 @@
         },
         rotation: 0
       }
-      const earth = {
-        html: document.getElementById('earth'),
-        pos: {
-          x: 200,
-          y: 200
-        },
-        rotation: 0
-      }
       
       setInterval(() => {
         draw(nasa)
         nasa.rotation += 3
         nasa.pos = rotatePoint(nasa.pos, 0.01)
-
-        draw(earth)
-        earth.rotation += 5
-        earth.pos = rotatePoint(earth.pos, 0.02)
       }, 10);
     </script>
   </body>
