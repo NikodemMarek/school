@@ -24,7 +24,11 @@
 
       let dna = '';
       do {
-        dna = prompt("Enter a DNA sequence");
+        dna = prompt("Enter a valid DNA sequence")
+          .replace(/\n/g, '')
+          .replace(/\r/g, '')
+          .replace(/\s/g, '')
+          .toLowerCase()
       } while (!/^([atgc]{3})+$/.test(dna));
 
       const comp = toComp(dna);
@@ -33,6 +37,7 @@
           .toUpperCase()
           .match(/.{1,3}/g)
           .join(' ') // esthetics
+      const colorify = (dna) => dna
           .replace(/ATG/g, '<span style="color: green; font-weight: bold;">ATG</span>')
           .replace(/TAA/g, '<span style="background-color: yellow;">TAA</span>')
           .replace(/TAG/g, '<span style="background-color: yellow;">TAG</span>')
@@ -53,7 +58,7 @@
       }
 
       write(dna); nl();
-      write(format(dna));
+      write(colorify(format(dna)));
       nl(); nl();
       write(format(comp)); nl();
       write(comp);
