@@ -68,27 +68,50 @@ document.addEventListener('keydown', e => {
   game.addAction((g, delta) => {
     switch (e.key) {
       case 'ArrowUp':
-        head.velocity.x = 0
-        head.velocity.y = -g.ext.snakeSpeed
+      case 'w':
+      case 'W':
+      case 'k':
+      case 'K':
+        if (head.velocity.y === 0) {
+          head.velocity.x = 0
+          head.velocity.y = -g.ext.snakeSpeed
+        }
         break
       case 'ArrowDown':
-        head.velocity.x = 0
-        head.velocity.y = g.ext.snakeSpeed
+      case 's':
+      case 'S':
+      case 'j':
+      case 'J':
+        if (head.velocity.y === 0) {
+          head.velocity.x = 0
+          head.velocity.y = g.ext.snakeSpeed
+        }
         break
       case 'ArrowLeft':
-        head.velocity.y = 0
-        head.velocity.x = -g.ext.snakeSpeed
+      case 'a':
+      case 'A':
+      case 'h':
+      case 'H':
+        if (head.velocity.x === 0) {
+          head.velocity.y = 0
+          head.velocity.x = -g.ext.snakeSpeed
+        }
         break
       case 'ArrowRight':
-        head.velocity.y = 0
-        head.velocity.x = g.ext.snakeSpeed
+      case 'd':
+      case 'D':
+      case 'l':
+      case 'L':
+        if (head.velocity.x === 0) {
+          head.velocity.y = 0
+          head.velocity.x = g.ext.snakeSpeed
+        }
       break
     }
   })
 })
 
 game.update = composeUpdate((g, delta) => {
-  console.log(g.objects.dynamic);
   food.forEach(f => {
     if (f.position.x === head.position.x && f.position.y === head.position.y) {
       const lastBody = g.objects.dynamic.find(o => o.data.fromHead === g.ext.fromHead)
