@@ -27,6 +27,7 @@ const { game } = init(
   },
 )
 game.ext.fromHead = 0
+game.ext.snakeSpeed = 5
 
 const head = new GameObject({
   position: {
@@ -34,7 +35,7 @@ const head = new GameObject({
     y: 10,
   },
   points: [ elementSize ],
-  velocity: { x: 1 },
+  velocity: { x: game.ext.snakeSpeed },
   style: {
     'background-color': 'red',
     'box-sizing': 'border-box',
@@ -65,39 +66,38 @@ game.objects.static.push(... food)
 
 document.addEventListener('keydown', e => {
   game.addAction((g, delta) => {
-    const p = g.objects.dynamic.find(o => o?.data?.fromHead === 0 || false)
-
     switch (e.key) {
       case 'ArrowUp':
-        p.velocity.x = 0
-        p.velocity.y = -1
+        head.velocity.x = 0
+        head.velocity.y = -g.ext.snakeSpeed
         break
       case 'ArrowDown':
-        p.velocity.x = 0
-        p.velocity.y = 1
+        head.velocity.x = 0
+        head.velocity.y = g.ext.snakeSpeed
         break
       case 'ArrowLeft':
-        p.velocity.y = 0
-        p.velocity.x = -1
+        head.velocity.y = 0
+        head.velocity.x = -g.ext.snakeSpeed
         break
       case 'ArrowRight':
-        p.velocity.y = 0
-        p.velocity.x = 1
+        head.velocity.y = 0
+        head.velocity.x = g.ext.snakeSpeed
       break
     }
   })
 })
 
 game.update = composeUpdate((g, delta) => {
+  console.log(g.objects.dynamic);
   food.forEach(f => {
     if (f.position.x === head.position.x && f.position.y === head.position.y) {
+      const lastBody = g.objects.dynamic.find(o => o.data.fromHead === g.ext.fromHead)
       const tail = new GameObject({
         position: {
-          x: head.position.x - head.velocity.x,
-          y: head.position.y - head.velocity.y,
+          x: lastBody.position.x,
+          y: lastBody.position.y,
         },
         points: [ elementSize ],
-        velocity: head.velocity,
         style: {
           'background-color': 'red',
           'box-sizing': 'border-box',
@@ -115,10 +115,20 @@ game.update = composeUpdate((g, delta) => {
       f.position.y = Math.floor(Math.random() * gameSize.y)
     }
   })
+
+  const bodyParts = g.objects.dynamic
+    .sort((a, b) => b.data.fromHead - a.data.fromHead)
+  bodyParts
+    .slice(0, bodyParts.length - 1)
+    .forEach((o, i) =>
+      o.setPosition(
+        bodyParts[i + 1].position.x,
+        bodyParts[i + 1].position.y
+      ))
   
   g.ext.render.objects = getRendered(g)
 })
-game.FPS = 1
+game.FPS = game.ext.snakeSpeed
 
 game.start()
 
