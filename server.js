@@ -1,4 +1,5 @@
 const express = require('express')
+const path = require('path')
 
 const PORT = 3000
 const app = express()
@@ -8,5 +9,5 @@ app.get('/', (req, res) => {
 })
 
 app.listen(PORT, () => {
-  req.send(`server listening on port ${PORT}`)
+  console.log(`server listening on port ${PORT}`)
 })
