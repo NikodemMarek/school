@@ -1,0 +1,39 @@
+<div>
+  <form action="/add" method="post">
+    <table>
+      <tr>
+        <td style="border: 1px solid black"><label for="ubez">ubezpieczony:</label></td>
+        <td style="border: 1px solid black"><input type="checkbox" name="ubez" id="ubez"></td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid black"><label for="benz">benzyna: </label></td>
+        <td style="border: 1px solid black"><input type="checkbox" name="benz" id="benz"></td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid black"><label for="benz">uszkodzony: </label></td>
+        <td style="border: 1px solid black"><input type="checkbox" name="uszk" id="uszk"></td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid black"><label for="benz">napęd 4x4: </label></td>
+        <td style="border: 1px solid black"><input type="checkbox" name="4k" id="4k"></td>
+      </tr>
+    </table>
+    
+    <button style="margin: 10px;" type="submit">DODAJ DO BAZY</button>
+  </form>
+
+  <table>
+    <tr>
+      <td style="border: 1px solid black;">ubezpieczony</td>
+      <td style="border: 1px solid black;">benzyna</td>
+      <td style="border: 1px solid black;">uszkodzony</td>
+      <td style="border: 1px solid black;">napęd 4x4</td>
+    </tr>
+
+    <form action="/" method="post">
+      {{#each cars}}
+        {{> car}}
+      {{/each}}
+    </form>
+  </table>
+</div>

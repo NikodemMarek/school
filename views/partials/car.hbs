@@ -1,0 +1,32 @@
+<tr>
+  <input type="text" name="_id" id="_id" value="{{_id}}" style="display: none;">
+
+  <div id="normal">
+    <td style="border: 1px solid red;"><button formaction="/remove" type="submit">delete</button></td>
+    <td style="border: 1px solid blue;"><button id="ed">edit</button></td>
+
+    <td style="border: 1px solid black;">{{ubez}}</td>
+    <td style="border: 1px solid black;">{{benz}}</td>
+    <td style="border: 1px solid black;">{{uszk}}</td>
+    <td style="border: 1px solid black;">{{4k}}</td>
+  </div>
+
+  <div id="edit" style="display: none;">
+    <td style="border: 1px solid red;"><button formaction="/update" type="submit">update</button></td>
+    <td style="border: 1px solid blue;"><button id="cancel">cancel</button></td>
+  </div>
+
+  <script>
+    let edit = false
+    document.querySelector('#ed').onclick = () => {
+      edit = !edit
+      if (edit) {
+        document.querySelector('#normal').style.display = 'none'
+        document.querySelector('#edit').style.display = 'block'
+      } else {
+        document.querySelector('#normal').style.display = 'block'
+        document.querySelector('#edit').style.display = 'none'
+      }
+    }
+  </script>
+</tr>
