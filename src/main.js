@@ -21,8 +21,8 @@ const randomSprite = cat =>
 
 const init = () => {
   const gameSize = {
-    x: 10,
-    y: 10,
+    x: 15,
+    y: 15,
   }
   const elementSize = {
     x: 25,
@@ -56,8 +56,8 @@ const init = () => {
 
   const head = new GameObject({
     position: {
-      x: 3,
-      y: 3,
+      x: Math.floor(Math.random() * game.ext.gameSize.x),
+      y: Math.floor(Math.random() * game.ext.gameSize.y),
     },
     points: [ elementSize ],
     style: {
@@ -118,6 +118,11 @@ const init = () => {
   })
 
   game.update = composeUpdate((game) => {
+    if (game.ext.fromHead >= game.ext.gameSize.x * game.ext.gameSize.y) {
+      game.stop()
+      alert('You Won!')
+      return
+    }
     if (isSnakeBody(game, (game.objects.head[0].position))) {
       game.stop()
       alert("You ate yourself!")
@@ -208,7 +213,6 @@ const init = () => {
       else if (tail.x > beforeTail.x)
         tailO.style['background-image'] = `url(${Sprite.TAIL['LEFT']})`
       else {
-        console.log('damn', tail, beforeTail)
         tailO.style['background-image'] = randomSprite(Sprite.TAIL)
       }
 
