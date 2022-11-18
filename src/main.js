@@ -38,6 +38,14 @@ const init = () => {
           'background-color': 'midnightblue',
         },
       },
+      renderSize:  {
+        x: gameSize.x + 2,
+        y: gameSize.y + 2,
+      },
+      renderOrigin:  {
+        x: -1,
+        y: -1,
+      },
       container: document.querySelector('#game'),
       allowNavigation: false,
     },
