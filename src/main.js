@@ -70,7 +70,8 @@ const init = () => {
   game.objects.food = []
   game.objects.food.push(newFood(game))
 
-  document.addEventListener('keydown', e => {
+  document.addEventListener('keyup', e => {
+    game.addAction(game => {
       switch (e.key) {
         case 'ArrowUp':
         case 'w':
@@ -105,6 +106,7 @@ const init = () => {
             game.ext.headDirection = 1
         break
       }
+    })
   })
 
   game.update = composeUpdate((game) => {
