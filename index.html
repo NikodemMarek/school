@@ -11,6 +11,7 @@
     <div style="display: relative;">
       <canvas id="lines" style="top: 20px; left: 20px; border: 1px solid red;" width="500" height="500"></canvas>
       <canvas id="arcs" style="top: 10px; left: 520px; border: 1px solid green;" width="500" height="500"></canvas>
+      <canvas id="bounce" style="top: 10px; left: 1040px; border: 1px solid blue;" width="500" height="500"></canvas>
     </div>
 
     <script defer>
@@ -30,8 +31,18 @@
           ctx.moveTo(this.start.x, this.start.y)
           ctx.lineTo(this.end.x, this.end.y)
           ctx.stroke()
-        }
+        },
       })
+      const lineCtx = document.querySelector('#lines').getContext('2d')
+      setInterval(() => {
+        const l = line()
+        l.new(
+          { x: 250, y: 250 },
+          { x: Math.ceil(Math.random() * 500), y: Math.ceil(Math.random() * 500)},
+        )
+        l.draw(lineCtx)
+      }, 100)
+
       const arc = () => ({
         new: function (position, end, color) {
           this.position = position
@@ -51,18 +62,8 @@
             start + Math.random() * Math.PI,
           )
           ctx.stroke()
-        }
+        },
       })
-
-      const lineCtx = document.querySelector('#lines').getContext('2d')
-      setInterval(() => {
-        const l = line()
-        l.new(
-          { x: 250, y: 250 },
-          { x: Math.ceil(Math.random() * 500), y: Math.ceil(Math.random() * 500)},
-        )
-        l.draw(lineCtx)
-      }, 100)
 
       const arcCanvas = document.querySelector('#arcs')
       const arcCtx = arcCanvas.getContext('2d')
@@ -73,6 +74,7 @@
           const a = arc()
           a.new(arcPos)
           a.draw(arcCtx)
+console.log(a);
         }
 
         setTimeout(doit, Math.ceil(Math.random() * 100))
@@ -81,6 +83,58 @@
       arcCanvas.onmouseenter = (e) => { drawArc = true }
       arcCanvas.onmouseleave = (e) => { drawArc = false }
       setTimeout(doit, Math.ceil(Math.random() * 100))
+
+      const bouncyBoi = {
+        position: {
+          x: Math.ceil(Math.random() * 500),
+          y: Math.ceil(Math.random() * 500),
+        },
+        size: {
+          x: 30,
+          y: 30,
+        },
+        speed: [ 1, 2, 3 ][Math.floor(Math.random() * 3)],
+        angle: [ 45, 135, 225, 315 ][Math.floor(Math.random() * 4)],
+        img: (() => {
+          const i = new Image()
+          i.src = [ './ghost-cold.png', './ghost-red-right.png', './pacman-half.png' ][Math.floor(Math.random() * 3)]
+          return i
+        })(),
+        draw: function (ctx) {
+          ctx.drawImage(this.img, this.position.x, this.position.y)
+        },
+        update: function (delta) {
+          if (this.position.x + this.size.x > 500)
+            if (this.angle === 45)
+              this.angle = 135
+            else if (this.angle === 315)
+              this.angle = 225
+          if (this.position.x < 0)
+            if (this.angle === 135)
+              this.angle = 45
+            else if (this.angle === 225)
+              this.angle = 315
+          if (this.position.y + this.size.y > 500)
+            if (this.angle === 45)
+              this.angle = 315
+            else if (this.angle === 135)
+              this.angle = 225
+          if (this.position.y < 0)
+            if (this.angle === 225)
+              this.angle = 135
+            else if (this.angle === 315)
+              this.angle = 45
+
+          this.position.x = this.position.x + Math.cos(this.angle * Math.PI / 180) * this.speed * delta
+          this.position.y = this.position.y + Math.sin(this.angle * Math.PI / 180) * this.speed * delta
+        },
+      }
+      const bounceCtx = document.querySelector('#bounce').getContext('2d')
+      setInterval(() => {
+        bounceCtx.clearRect(0, 0, 500, 500)
+        bouncyBoi.draw(bounceCtx)
+        bouncyBoi.update(1)
+      }, 10)
     </script>
   </body>
 </html>
