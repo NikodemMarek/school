@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linie</title>
+  </head>
+
+  <body>
+    <canvas id="lines" style="border: 1px solid black;" width="500" height="500"></canvas>
+
+    <script defer>
+      const canvas = document.querySelector('#lines')
+      const ctx = canvas.getContext('2d')
+
+      const randomColor = () =>
+        `#${Math.floor(Math.random() * 0xffffff).toString(16)}`
+
+      const newLine = () => ({
+        new: function (start, end, color) {
+          this.start = start
+          this.end = end
+          this.color = color || randomColor()
+        },
+        drawLine: function (ctx) {
+          ctx.beginPath()
+          ctx.moveTo(this.start.x, this.start.y)
+          ctx.lineTo(this.end.x, this.end.y)
+          ctx.strokeStyle = this.color
+          ctx.stroke()
+        }
+      })
+
+      setInterval(() => {
+        const line = newLine()
+        line.new(
+          { x: 250, y: 250 },
+          { x: Math.ceil(Math.random() * 500), y: Math.ceil(Math.random() * 500)},
+        )
+        line.drawLine(ctx)
+      }, 100)
+    </script>
+  </body>
+</html>
