@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linie</title>
+  </head>
+
+  <body>
+    <div style="display: relative;">
+      <canvas id="lines" style="top: 20px; left: 20px; border: 1px solid red;" width="500" height="500"></canvas>
+      <canvas id="arcs" style="top: 10px; left: 520px; border: 1px solid green;" width="500" height="500"></canvas>
+    </div>
+
+    <script defer>
+      const randomColor = () =>
+        `#${Math.floor(Math.random() * 0xffffff).toString(16)}`
+
+      const line = () => ({
+        new: function (start, end, color) {
+          this.start = start
+          this.end = end
+          this.color = color || randomColor()
+        },
+        draw: function (ctx) {
+          ctx.strokeStyle = this.color
+
+          ctx.beginPath()
+          ctx.moveTo(this.start.x, this.start.y)
+          ctx.lineTo(this.end.x, this.end.y)
+          ctx.stroke()
+        }
+      })
+      const arc = () => ({
+        new: function (position, end, color) {
+          this.position = position
+          this.color = color || randomColor()
+        },
+        draw: function (ctx) {
+          ctx.strokeStyle = this.color
+          ctx.globalAlpha = 0.1
+
+          ctx.beginPath()
+          const start = (Math.random() * 2) * Math.PI
+          ctx.arc(
+            this.position.x,
+            this.position.y,
+            45,
+            start,
+            start + Math.random() * Math.PI,
+          )
+          ctx.stroke()
+        }
+      })
+
+      const lineCtx = document.querySelector('#lines').getContext('2d')
+      setInterval(() => {
+        const l = line()
+        l.new(
+          { x: 250, y: 250 },
+          { x: Math.ceil(Math.random() * 500), y: Math.ceil(Math.random() * 500)},
+        )
+        l.draw(lineCtx)
+      }, 100)
+
+      const arcCanvas = document.querySelector('#arcs')
+      const arcCtx = arcCanvas.getContext('2d')
+      let arcPos = { x: 0, y: 0 }
+      let drawArc = false
+      const doit = () => {
+        if (drawArc) {
+          const a = arc()
+          a.new(arcPos)
+          a.draw(arcCtx)
+        }
+
+        setTimeout(doit, Math.ceil(Math.random() * 100))
+      }
+      arcCanvas.onmousemove = (e) => { arcPos = { x: e.clientX - 520, y: e.clientY } }
+      arcCanvas.onmouseenter = (e) => { drawArc = true }
+      arcCanvas.onmouseleave = (e) => { drawArc = false }
+      setTimeout(doit, Math.ceil(Math.random() * 100))
+    </script>
+  </body>
+</html>
