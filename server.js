@@ -19,12 +19,50 @@ app.engine(
 app.set('view engine', 'hbs')
 app.use('/icons', express.static(path.join(__dirname, 'icons')))
 
+const getFiles = () => fileDB.getAllData()
+
+const getFile = async (id) =>
+    await new Promise((resolve, reject) => {
+        fileDB.findOne({_id: id}, (e, doc) => {
+            if (e || doc === null) reject()
+            resolve(doc)
+        })
+    })
+const addFiles = async (files) =>
+    await new Promise((resolve, reject) => {
+        fileDB.insert(
+            files.map((file) => ({
+                ...file,
+                _id: `${nextId++}`,
+                savedate: Date.now(),
+            })),
+            (e, docs) => {
+                if (e || docs === null) reject()
+                resolve(docs)
+            }
+        )
+    })
+const deleteFile = async (id) =>
+    await new Promise((resolve, reject) => {
+        fileDB.remove({_id: id}, (e, doc) => {
+            if (e || doc === null) reject()
+            resolve(doc)
+        })
+    })
+const clearFiles = async () =>
+    await new Promise((resolve, reject) => {
+        fileDB.remove({}, {multi: true}, (e, docs) => {
+            if (e || docs === null) reject()
+            resolve(docs)
+        })
+    })
+
 const fileDB = new Datastore({
     filename: path.join('db', 'files.db'),
     autoload: true,
 })
 
-const files = fileDB.getAllData()
+const files = getFiles()
 let nextId = files.length > 0 ? files[files.length - 1]._id + 1 : 0
 
 const FileIcons = {
@@ -39,33 +77,30 @@ app.get('/', (req, res) => {
     res.render('upload.hbs', {})
 })
 
-app.post('/upload', (req, res) => {
+app.post('/upload', async (req, res) => {
     let form = formidable({})
 
     form.multiples = true
     form.keepExtensions = true
     form.uploadDir = path.join(__dirname, 'db', 'files')
 
-    form.parse(req, function (err, fields, {files}) {
+    form.parse(req, async (err, fields, {files}) => {
         if (!Array.isArray(files)) files = [files]
 
         toUpload = files.map(({path, type, name, size}) => ({
-            _id: `${nextId++}`,
-            savedate: Date.now(),
             path,
             type,
             name,
             size,
         }))
-        fileDB.insert(toUpload, (e, docs) => console.log(e || docs))
+        await addFiles(toUpload).catch((e) => console.log(e))
 
         res.redirect('/filemanager')
     })
 })
 
 app.get('/filemanager', (req, res) => {
-    const files = fileDB
-        .getAllData()
+    const files = getFiles()
         .map((file) => ({
             ...file,
             icon: path.join(
@@ -77,43 +112,37 @@ app.get('/filemanager', (req, res) => {
         .sort((a, b) => parseInt(a._id) - parseInt(b._id))
     res.render('filemanager.hbs', {files})
 })
-app.get('/show', (req, res) => {
-    fileDB.findOne({_id: req.query.id}, (e, doc) => {
-        console.log(e || doc)
-        if (e || doc === null) return res.redirect('/filemanager')
+app.get('/show', async (req, res) => {
+    const file = await getFile(req.query.id)
 
-        res.setHeader('Content-Type', doc.type)
-        res.sendFile(doc.path)
-    })
+    if (!file) return res.redirect('/filemanager')
+
+    res.setHeader('Content-Type', file.type)
+    res.sendFile(file.path)
 })
-app.get('/info', (req, res) => {
-    fileDB.findOne({_id: req.query.id}, (e, doc) => {
-        console.log(e || doc)
-        if (e || doc === null) return res.redirect('/filemanager')
+app.get('/info', async (req, res) => {
+    const file = await getFile(req.query.id)
 
-        res.render('info.hbs', doc)
-    })
+    if (!file) return res.redirect('/filemanager')
+    res.render('info.hbs', file)
 })
 
-app.get('/delete', (req, res) => {
-    fileDB.remove({_id: req.query.id}, (e, doc) => console.log(e || doc))
+app.get('/delete', async (req, res) => {
+    await deleteFile(req.query.id)
 
     res.redirect('/filemanager')
 })
-app.get('/reset', (req, res) => {
-    fileDB.remove({}, {multi: true}, (e, doc) => {
-        console.log(e || doc)
-        res.redirect('/filemanager')
-    })
+app.get('/reset', async (req, res) => {
+    await clearFiles()
+
+    res.redirect('/filemanager')
 })
 
-app.get('/download', (req, res) => {
-    fileDB.findOne({_id: req.query.id}, (e, doc) => {
-        console.log(e || doc)
-        if (e || doc === null) return res.redirect('/filemanager')
+app.get('/download', async (req, res) => {
+    const file = await getFile(req.query.id)
 
-        res.download(doc.path)
-    })
+    if (!file) return res.redirect('/filemanager')
+    res.download(file.path)
 })
 
 app.listen(PORT, () => {
