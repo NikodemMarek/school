@@ -1,0 +1,19 @@
+{{> style}}
+
+<div class="max-height flex-column">
+  {{> navigation}}
+
+  <div class="max-height flex-row">
+    <div class="sidebar">multiupload</div>
+
+    <div class="content">
+      <form action="upload" method="post" enctype="multipart/form-data">
+        <label for="files">Wybierz pliki</label>
+        <input type="file" name="files" multiple />
+
+        <br>
+        <input type="submit" value="Upload" />
+      </form>
+    </div>
+  </div>
+</div>

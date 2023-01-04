@@ -1,9 +1,0 @@
-<form action="/handle" method="post" enctype="multipart/form-data" style="display: flex; flex-direction: column; width: 100px">
-  <select name="toShow" id="select" style="height: 60px;" multiple="multiple">
-    {{#each fields}}
-      <option value="{{this}}" style="margin: 0 10px;">{{this}}</option>
-    {{/each}}
-  </select>
-  
-  <button type="submit" style="color: blue; padding: 5px 10px;">wyślij</button>
-</form>
