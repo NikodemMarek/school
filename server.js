@@ -17,6 +17,7 @@ app.engine(
     })
 )
 app.set('view engine', 'hbs')
+app.use('/icons', express.static(path.join(__dirname, 'icons')))
 
 const fileDB = new Datastore({
     filename: path.join('db', 'files.db'),
@@ -25,6 +26,14 @@ const fileDB = new Datastore({
 
 const files = fileDB.getAllData()
 let nextId = files.length > 0 ? files[files.length - 1]._id + 1 : 0
+
+const FileIcons = {
+    image: 'file_type_image.svg',
+    video: 'file_type_video.svg',
+    audio: 'file_type_audio.svg',
+    text: 'file_type_text.svg',
+    application: 'file_type_default.svg',
+}
 
 app.get('/', (req, res) => {
     res.render('upload.hbs', {})
@@ -38,10 +47,8 @@ app.post('/upload', (req, res) => {
     form.uploadDir = path.join(__dirname, 'db', 'files')
 
     form.parse(req, function (err, fields, {files}) {
-        console.log(files)
         if (!Array.isArray(files)) files = [files]
 
-        console.log(files)
         toUpload = files.map(({path, type, name, size}) => ({
             _id: `${nextId++}`,
             savedate: Date.now(),
@@ -57,7 +64,17 @@ app.post('/upload', (req, res) => {
 })
 
 app.get('/filemanager', (req, res) => {
-    const files = fileDB.getAllData()
+    const files = fileDB
+        .getAllData()
+        .map((file) => ({
+            ...file,
+            icon: path.join(
+                'icons',
+                FileIcons[(file.type || '/').split('/')[0]] ||
+                    'file_type_default.svg'
+            ),
+        }))
+        .sort((a, b) => parseInt(a._id) - parseInt(b._id))
     res.render('filemanager.hbs', {files})
 })
 app.get('/show', (req, res) => {

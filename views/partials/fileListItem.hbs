@@ -1,15 +1,6 @@
 <tr>
-  <td class="file-id">{{_id}}</td>
-  <td class="file-icon">
-    {{#if icon}}
-    <img src="{{icon}}" alt="file-icon">
-    {{/if}}
-  </td>
-  <td class="file-name">{{name}}</td>
-  <td class="file-size">{{size}}</td>
-  <td class="file-type">{{type}}</td>
   <td class="file-actions">
-    <a href="/show?id={{_id}}" class="no-deco" title="show">
+    <a href="/show?id={{_id}}" class="no-deco" title="show" target="_blank">
       <svg height="20" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" fill="#000000">
         <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
         <g id="SVGRepo_iconCarrier">
@@ -66,4 +57,14 @@
       </svg>
     </a>
   </td>
+  <td class="file-id">{{_id}}</td>
+  <td class="file-name flex-row">
+    {{#if icon}}
+    <img src="{{icon}}">
+    {{/if}}
+  
+    &nbsp;{{name}}
+  </td>
+  <td class="file-size">{{size}}</td>
+  <td class="file-type">{{type}}</td>
 </tr>
