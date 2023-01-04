@@ -2,7 +2,6 @@ const express = require('express')
 const path = require('path')
 const hbs = require('express-handlebars')
 const formidable = require('formidable')
-const Datastore = require('nedb')
 
 const PORT = 3000
 const app = express()
@@ -19,51 +18,42 @@ app.engine(
 app.set('view engine', 'hbs')
 app.use('/icons', express.static(path.join(__dirname, 'icons')))
 
-const getFiles = () => fileDB.getAllData()
+const getFiles = () => files
 
 const getFile = async (id) =>
     await new Promise((resolve, reject) => {
-        fileDB.findOne({_id: id}, (e, doc) => {
-            if (e || doc === null) reject()
-            resolve(doc)
-        })
+        const file = files.find((file) => file._id === id)
+
+        resolve(file)
     })
-const addFiles = async (files) =>
+const addFiles = async (newFiles) =>
     await new Promise((resolve, reject) => {
-        fileDB.insert(
-            files.map((file) => ({
+        files = files.concat(
+            newFiles.map((file) => ({
                 ...file,
                 _id: `${nextId++}`,
                 savedate: Date.now(),
-            })),
-            (e, docs) => {
-                if (e || docs === null) reject()
-                resolve(docs)
-            }
+            }))
         )
+        resolve()
     })
 const deleteFile = async (id) =>
     await new Promise((resolve, reject) => {
-        fileDB.remove({_id: id}, (e, doc) => {
-            if (e || doc === null) reject()
-            resolve(doc)
-        })
+        const rmFrom = files.findIndex((file) => file._id === id)
+
+        if (rmFrom === -1) reject()
+
+        files.splice(rmFrom, 1)
+        resolve()
     })
 const clearFiles = async () =>
     await new Promise((resolve, reject) => {
-        fileDB.remove({}, {multi: true}, (e, docs) => {
-            if (e || docs === null) reject()
-            resolve(docs)
-        })
+        files = []
+        resolve()
     })
 
-const fileDB = new Datastore({
-    filename: path.join('db', 'files.db'),
-    autoload: true,
-})
-
-const files = getFiles()
-let nextId = files.length > 0 ? files[files.length - 1]._id + 1 : 0
+let files = []
+let nextId = 0
 
 const FileIcons = {
     image: 'file_type_image.svg',
@@ -84,15 +74,21 @@ app.post('/upload', async (req, res) => {
     form.keepExtensions = true
     form.uploadDir = path.join(__dirname, 'db', 'files')
 
-    form.parse(req, async (err, fields, {files}) => {
-        if (!Array.isArray(files)) files = [files]
+    form.parse(req, async (err, fields, {files: fls}) => {
+        if (!Array.isArray(fls)) fls = [fls]
 
-        toUpload = files.map(({path, type, name, size}) => ({
-            path,
-            type,
-            name,
-            size,
-        }))
+        toUpload = fls.reduce((acc, {path, type, name, size}) => {
+            if (type === 'application/octet-stream') return acc
+            return [
+                ...acc,
+                {
+                    path,
+                    type,
+                    name,
+                    size,
+                },
+            ]
+        }, [])
         await addFiles(toUpload).catch((e) => console.log(e))
 
         res.redirect('/filemanager')
@@ -100,7 +96,7 @@ app.post('/upload', async (req, res) => {
 })
 
 app.get('/filemanager', (req, res) => {
-    const files = getFiles()
+    const fls = getFiles()
         .map((file) => ({
             ...file,
             icon: path.join(
@@ -110,7 +106,7 @@ app.get('/filemanager', (req, res) => {
             ),
         }))
         .sort((a, b) => parseInt(a._id) - parseInt(b._id))
-    res.render('filemanager.hbs', {files})
+    res.render('filemanager.hbs', {files: fls})
 })
 app.get('/show', async (req, res) => {
     const file = await getFile(req.query.id)
