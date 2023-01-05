@@ -1,0 +1,37 @@
+<div class="w-full flex flex-col">
+  <div id="new-folder" class="button">new folder</div>
+  <div id="new-file" class="button">new file</div>
+
+  <dialog id="dialog">
+    <form method="dialog">
+      <input type="text" name="name" placeholder="name" pattern="\S+.*" required>
+
+      <button type="submit" value="ok">ok</button>
+      <button type="reset" value="cancel">cancel</button>
+    </form>
+  </dialog>
+</div>
+
+<script defer>
+  const createDialog = (title, callback) => {
+    const dialog = document.querySelector('#dialog');
+    dialog.querySelector('input').placeholder = title;
+
+    dialog.showModal();
+
+    dialog.onclose = () => {
+      const path = dialog.querySelector('input').value;
+
+      var xhr = new XMLHttpRequest();
+      xhr.open("POST", "/create", true);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      xhr.send(JSON.stringify({ path: path }));
+    }
+  }
+
+  const createFolder = document.querySelector('#new-folder');
+  const createFile = document.querySelector('#new-file');
+
+  createFolder.onclick = () => createDialog("folder name");
+  createFile.onclick = () => createDialog("file name");
+</script>

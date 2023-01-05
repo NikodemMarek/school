@@ -18,6 +18,7 @@ app.engine(
     })
 )
 app.set('view engine', 'hbs')
+app.use(express.json())
 
 app.get('/', (req, res) => {
     res.redirect('/filemanager')
@@ -34,7 +35,21 @@ app.post('/upload', (req, res) => {
         keepExtensions: true,
     })
 
-    form.parse(req, (err, fields, files) => {})
+    form.parse(req, (err, fields, files) => {
+        console.log(files)
+    })
+})
+app.post('/create', (req, res) => {
+    const fullPath = req.body.path
+        .split(/\/|\\/g)
+        .map((part) => part.trim())
+        .filter((item) => item !== '')
+    const [file, absolutePath] = [
+        fullPath.pop(),
+        path.join(__dirname, ...fullPath),
+    ]
+
+    console.log(absolutePath, file)
 })
 
 app.listen(PORT, () => {
