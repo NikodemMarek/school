@@ -1,0 +1,16 @@
+<div class="h-full flex flex-col sidebar">
+  <div id="new-folder" class="button">new folder</div>
+  <div id="new-file" class="button">new file</div>
+
+  {{> upload_form}}
+
+  <script defer>
+    const createFolder = document.querySelector('#create-folder');
+    const createFile = document.querySelector('#create-file');
+
+    createFile.addEventListener('click', () => {
+      const file = document.querySelector('#file');
+      file.click();
+    });
+  </script>
+</div>
