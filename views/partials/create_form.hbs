@@ -3,8 +3,8 @@
   <div id="new-file" class="button">new file</div>
 
   <dialog id="dialog">
-    <form method="dialog">
-      <input type="text" name="name" placeholder="name" pattern="\S+.*" required>
+    <form action="/create" method="post">
+      <input type="text" name="path" placeholder="name" pattern="\S+.*" required>
 
       <button type="submit" value="ok">ok</button>
       <button type="reset" value="cancel">cancel</button>
@@ -13,29 +13,17 @@
 </div>
 
 <script defer>
-  const createDialog = (type) => {
-    const { title, endpoint } = [
-      { title: 'folder name', endpoint: '/create/folder' },
-      { title: 'file name', endpoint: '/create/file' }
-    ][type]
-
+  const createDialog = (title, endpoint) => {
     const dialog = document.querySelector('#dialog');
-    dialog.querySelector('input').placeholder = title;
 
-    dialog.showModal();
+    dialog.querySelector('form').action = endpoint;
+    dialog.querySelector('input').placeholder = title;
 
     dialog.querySelector('button[type="reset"]').onclick = () => dialog.close()
 
-    dialog.onclose = () => {
-      const path = dialog.querySelector('input').value;
-
-      const xhr = new XMLHttpRequest();
-      xhr.open("POST", endpoint, true);
-      xhr.setRequestHeader('Content-Type', 'application/json');
-      xhr.send(JSON.stringify({ path: path }));
-    }
+    dialog.showModal();
   }
 
-  document.querySelector('#new-folder').onclick = () => createDialog(0);
-  document.querySelector('#new-file').onclick = () => createDialog(1);
+  document.querySelector('#new-folder').onclick = () => createDialog('folder name', '/create/folder');
+  document.querySelector('#new-file').onclick = () => createDialog('file name', '/create/file');
 </script>

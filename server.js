@@ -1,5 +1,5 @@
 const express = require('express')
-const fs = require('fs')
+const fs = require('fs').promises
 const path = require('path')
 
 const hbs = require('express-handlebars')
@@ -12,25 +12,66 @@ const parseDirs = (raw) =>
     raw
         .split(/\/|\\/g)
         .map((part) => part.trim())
-        .filter((item) => item !== '')
+        .filter((item) => ![''].includes(item))
 const pth = (...dirs) => path.join(__dirname, 'data', ...dirs)
+const rlpth = (...dirs) => pth(...currentDirs, ...dirs)
 
-const createFolder = (dirs) => {
+const exists = async (path) =>
+    await fs
+        .access(path)
+        .then(() => true)
+        .catch(() => false)
+
+const cd = async (dirs) =>
+    await dirs.every(async (dir) => {
+        if (['..'].includes(dir)) currentDirs.pop()
+        else if (['~', '/'].includes(dir)) currentDirs = []
+        else if (['', '.'].includes(dir)) return true
+        else {
+            if (!(await exists(rlpth(dir)))) return false
+
+            currentDirs.push(dir)
+        }
+
+        return true
+    })
+
+const createFolder = async (dirs) => {
+    const path = rlpth(...dirs)
+
+    await fs.mkdir(path, {recursive: true})
+
+    return path
+}
+const createFile = async (dirs, name, content = '') => {
+    if (!(await exists(rlpth(...dirs)))) await createFolder(dirs)
+
+    const path = rlpth(...dirs, name)
+
+    await fs.writeFile(path, content)
+
+    return path
+}
+
+const listDir = async (dirs) => {
     const path = pth(...dirs)
 
-    if (!fs.existsSync(path)) fs.mkdirSync(path, {recursive: true})
+    if (!(await exists(path)))
+        return {
+            folders: [],
+            files: [],
+        }
 
-    return path
+    const list = await fs.readdir(path, {withFileTypes: true})
+    return {
+        folders: list
+            .filter((item) => item.isDirectory())
+            .map(({name}) => ({name})),
+        files: list.filter((item) => item.isFile()).map(({name}) => ({name})),
+    }
 }
-const createFile = (dirs, name, content = '') => {
-    if (!fs.existsSync(pth(...dirs))) createFolder(dirs)
 
-    const path = pth(...dirs, name)
-
-    fs.writeFileSync(path, content)
-
-    return path
-}
+let currentDirs = []
 
 app.set('views', path.join(__dirname, 'views'))
 app.engine(
@@ -42,37 +83,62 @@ app.engine(
     })
 )
 app.set('view engine', 'hbs')
-app.use(express.json())
+app.use(express.urlencoded())
 
 app.get('/', (req, res) => {
     res.redirect('/filemanager')
 })
 
-app.get('/filemanager', (req, res) => {
-    res.render('filemanager.hbs')
+app.get('/filemanager', async (req, res) => {
+    const dirs = currentDirs.map((dir, i) => ({
+        name: dir,
+        path: ['~', ...currentDirs.slice(0, i + 1)].join('/'),
+    }))
+    const {folders, files} = await listDir([
+        ...currentDirs,
+        ...parseDirs(req.query.path || ''),
+    ])
+
+    res.render('filemanager.hbs', {
+        dirs,
+        folders: currentDirs.length > 0 ? [{name: '..'}, ...folders] : folders,
+        files,
+    })
 })
 
 app.post('/upload', (req, res) => {
-    const form = formidable({
+    formidable({
         multiples: true,
-        uploadDir: path.join(__dirname, 'data'),
+        uploadDir: pth(),
         keepExtensions: true,
-    })
+    }).parse(req, (err, fields, {files}) => {
+        if (!Array.isArray(files)) files = [files]
 
-    form.parse(req, (err, fields, files) => {
         console.log(files)
     })
 })
-app.post('/create/folder', (req, res) => {
+app.post('/create/folder', async (req, res) => {
     const fullPath = parseDirs(req.body.path)
 
-    createFolder(fullPath)
+    await createFolder(fullPath)
+
+    res.redirect('/filemanager')
 })
-app.post('/create/file', (req, res) => {
+app.post('/create/file', async (req, res) => {
     const fullPath = parseDirs(req.body.path)
     const [file, ...dirs] = [fullPath.pop(), ...fullPath]
 
-    createFile(dirs, file)
+    await createFile(dirs, file)
+
+    res.redirect('/filemanager')
+})
+
+app.get('/cd', async (req, res) => {
+    const dirs = parseDirs(req.query.path || '')
+
+    await cd(dirs)
+
+    res.redirect('/filemanager')
 })
 
 app.listen(PORT, () => {

@@ -1,0 +1,7 @@
+<div class="path">
+  <a href="/cd?path=~" class="a path-part">~</a>
+
+  {{#each dirs}}
+  / <a href="/cd?path={{path}}" class="a path-part">{{name}}</a>
+  {{/each}}
+</div>
