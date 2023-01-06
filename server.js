@@ -53,6 +53,8 @@ const createFile = async (dirs, name, content = '') => {
     return path
 }
 
+const rm = async (path) => await fs.rm(path, {recursive: true})
+
 const listDir = async (dirs) => {
     const path = pth(...dirs)
 
@@ -66,8 +68,10 @@ const listDir = async (dirs) => {
     return {
         folders: list
             .filter((item) => item.isDirectory())
-            .map(({name}) => ({name})),
-        files: list.filter((item) => item.isFile()).map(({name}) => ({name})),
+            .map(({name}) => ({name, path: pth(...dirs, name)})),
+        files: list
+            .filter((item) => item.isFile())
+            .map(({name}) => ({name, path: pth(...dirs, name)})),
     }
 }
 
@@ -83,7 +87,7 @@ app.engine(
     })
 )
 app.set('view engine', 'hbs')
-app.use(express.urlencoded())
+app.use(express.urlencoded({extended: true}))
 
 app.get('/', (req, res) => {
     res.redirect('/filemanager')
@@ -109,12 +113,12 @@ app.get('/filemanager', async (req, res) => {
 app.post('/upload', (req, res) => {
     formidable({
         multiples: true,
-        uploadDir: pth(),
+        uploadDir: rlpth(),
         keepExtensions: true,
     }).parse(req, (err, fields, {files}) => {
         if (!Array.isArray(files)) files = [files]
 
-        console.log(files)
+        res.redirect('/filemanager')
     })
 })
 app.post('/create/folder', async (req, res) => {
@@ -129,6 +133,14 @@ app.post('/create/file', async (req, res) => {
     const [file, ...dirs] = [fullPath.pop(), ...fullPath]
 
     await createFile(dirs, file)
+
+    res.redirect('/filemanager')
+})
+
+app.get('/rm', async (req, res) => {
+    const fullPath = req.query.path
+
+    await rm(fullPath)
 
     res.redirect('/filemanager')
 })
