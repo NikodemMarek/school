@@ -13,25 +13,29 @@
 </div>
 
 <script defer>
-  const createDialog = (title, callback) => {
+  const createDialog = (type) => {
+    const { title, endpoint } = [
+      { title: 'folder name', endpoint: '/create/folder' },
+      { title: 'file name', endpoint: '/create/file' }
+    ][type]
+
     const dialog = document.querySelector('#dialog');
     dialog.querySelector('input').placeholder = title;
 
     dialog.showModal();
 
+    dialog.querySelector('button[type="reset"]').onclick = () => dialog.close()
+
     dialog.onclose = () => {
       const path = dialog.querySelector('input').value;
 
-      var xhr = new XMLHttpRequest();
-      xhr.open("POST", "/create", true);
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", endpoint, true);
       xhr.setRequestHeader('Content-Type', 'application/json');
       xhr.send(JSON.stringify({ path: path }));
     }
   }
 
-  const createFolder = document.querySelector('#new-folder');
-  const createFile = document.querySelector('#new-file');
-
-  createFolder.onclick = () => createDialog("folder name");
-  createFile.onclick = () => createDialog("file name");
+  document.querySelector('#new-folder').onclick = () => createDialog(0);
+  document.querySelector('#new-file').onclick = () => createDialog(1);
 </script>
