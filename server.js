@@ -39,18 +39,27 @@ const cd = async (dirs) =>
 const createFolder = async (dirs) => {
     const path = rlpth(...dirs)
 
+    if (await exists(path)) throw new Error('Folder  already exists')
     await fs.mkdir(path, {recursive: true})
 
     return path
 }
 const createFile = async (dirs, name, content = '') => {
-    if (!(await exists(rlpth(...dirs)))) await createFolder(dirs)
+    try {
+        if (await exists(rlpth(...dirs, name)))
+            throw new Error('File already exists')
 
-    const path = rlpth(...dirs, name)
+        if (!(await exists(rlpth(...dirs)))) await createFolder(dirs)
 
-    await fs.writeFile(path, content)
+        const path = rlpth(...dirs, name)
+        await fs.writeFile(path, content)
 
-    return path
+        return path
+    } catch (e) {
+        throw e
+    }
+
+    return ''
 }
 
 const rm = async (path) => await fs.rm(path, {recursive: true})
@@ -124,7 +133,11 @@ app.post('/upload', (req, res) => {
 app.post('/create/folder', async (req, res) => {
     const fullPath = parseDirs(req.body.path)
 
-    await createFolder(fullPath)
+    try {
+        await createFolder(fullPath)
+    } catch (e) {
+        console.log(e)
+    }
 
     res.redirect('/filemanager')
 })
@@ -132,7 +145,11 @@ app.post('/create/file', async (req, res) => {
     const fullPath = parseDirs(req.body.path)
     const [file, ...dirs] = [fullPath.pop(), ...fullPath]
 
-    await createFile(dirs, file)
+    try {
+        await createFile(dirs, file)
+    } catch (e) {
+        console.log(e)
+    }
 
     res.redirect('/filemanager')
 })
