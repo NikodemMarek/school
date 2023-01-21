@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <title>żużel</title>
+
+        <style>
+            body {
+                margin: 0;
+                padding: 0;
+                background-color: #000;
+                height: 100%;
+                width: 100%;
+                overflow: hidden;
+            }
+
+            #start-menu {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: red;
+                z-index: 2;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+            }
+            
+            .player {
+                background-color: slategray;
+                border: 4px solid black;
+                font-size: xx-large;
+                font-weight: bolder;
+                display: flex;
+                flex-direction: row;
+                margin-bottom: 10px;
+            }
+            
+            .player-controls {
+                min-width: 100px;
+                height: 100px;
+                background-color: lightgray;
+                border:none;
+                font-size: xx-large;
+                font-weight: bolder;
+            }
+            .player-controls:hover {
+                background-color: gray;
+            }
+            .player-controls:focus {
+                background-color: black;
+                color: white;
+            }
+            
+            #start-button {
+                width: 200px;
+                height: 100px;
+                background-color: lightgray;
+                border: 4px solid black;
+                font-size: xx-large;
+                font-weight: bolder;
+            }
+            #start-button:hover {
+                background-color: gray;
+            }
+
+            #scoreboard {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 200px;
+                height: 50px;
+                background-color: lightgray;
+                border: 4px solid black;
+                z-index: 1;
+                font-size: xx-large;
+                font-weight: bolder;
+                display: flex;
+                flex-direction: row;
+            }
+
+            #background {
+                display: none;
+            }
+
+            .bike-img {
+                width: 100px;
+                height: 100px;
+            }
+            .bike-img:hover {
+                background-color: blue;
+            }
+            
+            .on {
+                background-color: green;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="start-menu">
+            <div class="player on" id="p0">
+                <button id="p0-l" class="player-controls"><</button>
+                <img src="./assets/bike-red.png" class="bike-img" id="p0-on" />
+                <button id="p0-r" class="player-controls">></button>
+            </div>
+            <div class="player" id="p1">
+                <button id="p1-l" class="player-controls"><</button>
+                <img src="./assets/bike-blue.png" class="bike-img" id="p1-on" />
+                <button id="p1-r" class="player-controls">></button>
+            </div>
+            <div class="player" id="p2">
+                <button id="p2-l" class="player-controls"><</button>
+                <img src="./assets/bike-yellow.png" class="bike-img" id="p2-on"/>
+                <button id="p2-r" class="player-controls">></button>
+            </div>
+            <div class="player" id="p3">
+                <button id="p3-l" class="player-controls"><</button>
+                <img src="./assets/bike-gray.png" class="bike-img" id="p3-on" />
+                <button id="p3-r" class="player-controls">></button>
+            </div>
+
+            <button id="start-button">start</button>
+        </div>
+
+        <div id="scoreboard"></div>
+
+        <canvas id="game"></canvas>
+
+        <img src="./assets/bg.png" id="background" />
+
+        <script src="./index.js" type="module" defer></script>
+    </body>
+</html>
