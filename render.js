@@ -142,16 +142,16 @@ class Render {
         this.ctx.translate(x, y)
         this.ctx.rotate(bike.angle)
         this.ctx.translate(-x, -y)
-        this.ctx.drawImage(bike.img, x - 20, y - 20, 40, 40)
+        this.ctx.drawImage(bike.img, x - 20, y - 10, 40, 20)
         this.ctx.restore()
     }
 
     isOnTrack = (bike) =>
         [
-            {x: bike.x - 15, y: bike.y - 10},
-            {x: bike.x + 15, y: bike.y - 10},
-            {x: bike.x - 15, y: bike.y + 10},
-            {x: bike.x + 15, y: bike.y + 10},
+            {x: bike.x - 10, y: bike.y - 10},
+            {x: bike.x + 10, y: bike.y - 10},
+            {x: bike.x - 10, y: bike.y + 10},
+            {x: bike.x + 10, y: bike.y + 10},
         ].every((point) => this.ctx.isPointInPath(this.track, point.x, point.y))
 }
 

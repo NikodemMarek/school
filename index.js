@@ -17,7 +17,10 @@ const init = (bikesOptions, bikeSpeed, angle, loops) => {
     const {render, isOnTrack, size} = new Render(
         document.querySelector('#game'),
         {
-            x: window.innerWidth,
+            x:
+                window.innerWidth < window.innerHeight
+                    ? window.innerHeight
+                    : window.innerWidth,
             y: window.innerHeight,
         }
     )
@@ -51,9 +54,6 @@ const init = (bikesOptions, bikeSpeed, angle, loops) => {
 
     const update = (delta) => {
         bikes.forEach((bike) => {
-            if (pressed.has(bike.keymap.LEFT)) bike.angle -= angle
-            else if (pressed.has(bike.keymap.RIGHT)) bike.angle += angle
-
             if (bike.isDead) return
 
             if (!isOnTrack(bike)) {
@@ -64,6 +64,9 @@ const init = (bikesOptions, bikeSpeed, angle, loops) => {
 
                 return
             }
+
+            if (pressed.has(bike.keymap.LEFT)) bike.angle -= angle
+            else if (pressed.has(bike.keymap.RIGHT)) bike.angle += angle
 
             bike.x += Math.cos(bike.angle) * bikeSpeed * delta
             bike.y += Math.sin(bike.angle) * bikeSpeed * delta
@@ -97,7 +100,7 @@ const BIKES_ON = Array(4).fill(false)
 BIKES_ON[0] = true
 
 const BIKE_IMGS = Array.from(document.querySelectorAll('.bike-img'))
-const BIKE_COLORS = ['red', 'blue', 'orange', 'black']
+const BIKE_COLORS = ['red', 'blue', 'orange', 'green']
 const BIKE_KEYMAPS = [
     {
         LEFT: 'ArrowLeft',
