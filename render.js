@@ -1,4 +1,4 @@
-const MARK_MAX_AGE = 100
+const MARK_MAX_AGE = 1000
 
 class Render {
     constructor(canvas, size) {
@@ -106,12 +106,12 @@ class Render {
 
         this.marks = this.marks.filter((mark) => {
             // Disappear marks.
-            // if (++mark.age > MARK_MAX_AGE) return false
-            // this.ctx.globalAlpha = 1 - mark.age / MARK_MAX_AGE
+            if (++mark.age > MARK_MAX_AGE) return false
+            this.ctx.globalAlpha = 1 - mark.age / MARK_MAX_AGE
 
             // Leave marks.
-            mark.age += 1 / MARK_MAX_AGE
-            this.ctx.globalAlpha = mark.age > 9 ? 0.1 : 1 - mark.age / 10
+            // mark.age += 1 / MARK_MAX_AGE
+            // this.ctx.globalAlpha = mark.age > 9 ? 0.1 : 1 - mark.age / 10
 
             this.ctx.fillStyle = mark.color
             this.ctx.fillRect(mark.x, mark.y, 2, 2)
