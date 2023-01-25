@@ -1,6 +1,6 @@
 const express = require('express')
 const fs = require('fs').promises
-const path = require('path')
+const path_util = require('path')
 
 const hbs = require('express-handlebars')
 const formidable = require('formidable')
@@ -8,13 +8,47 @@ const formidable = require('formidable')
 const PORT = 3000
 const app = express()
 
-const parseDirs = (raw) =>
-    raw
+app.set('views', path_util.join(__dirname, 'views'))
+app.engine(
+    'hbs',
+    hbs({
+        defaultLayout: 'main.hbs',
+        extname: '.hbs',
+        partialsDir: path_util.join('views', 'partials'),
+    })
+)
+app.set('view engine', 'hbs')
+app.use(express.urlencoded({extended: true}))
+
+const Status = Object.freeze({
+    SUCCESS: 0,
+    ERROR: 1,
+    EXISTS: 2,
+})
+
+const parsePath = (raw) =>
+    path_util.join(
+        ...raw.split(/\/|\\/g).reduce((acc, dir, i) => {
+            if (['..'].includes(dir)) acc.pop()
+            else if (['~', '/'].includes(dir)) return []
+            else if (['', '.'].includes(dir)) return acc
+            else acc.push(dir)
+
+            return acc
+        }, [])
+    )
+const absPath = (path) => path_util.join(__dirname, 'data', path)
+const relPath = (path) =>
+    path_util.relative(path_util.join(__dirname, 'data'), path)
+
+const dirs = (path) =>
+    path
         .split(/\/|\\/g)
         .map((part) => part.trim())
         .filter((item) => ![''].includes(item))
-const pth = (...dirs) => path.join(__dirname, 'data', ...dirs)
-const rlpth = (...dirs) => pth(...currentDirs, ...dirs)
+
+const addPth = (...paths) =>
+    path_util.join(paths.map((pth) => dirs(pth)).flat(Infinity))
 
 const exists = async (path) =>
     await fs
@@ -22,51 +56,29 @@ const exists = async (path) =>
         .then(() => true)
         .catch(() => false)
 
-const cd = async (dirs) =>
-    await dirs.every(async (dir) => {
-        if (['..'].includes(dir)) currentDirs.pop()
-        else if (['~', '/'].includes(dir)) currentDirs = []
-        else if (['', '.'].includes(dir)) return true
-        else {
-            if (!(await exists(rlpth(dir)))) return false
+const mkFolder = async (path) => {
+    if (await exists(path)) return Status.EXISTS
 
-            currentDirs.push(dir)
-        }
-
-        return true
-    })
-
-const createFolder = async (dirs) => {
-    const path = rlpth(...dirs)
-
-    if (await exists(path)) throw new Error('Folder  already exists')
     await fs.mkdir(path, {recursive: true})
 
-    return path
+    return Status.SUCCESS
 }
-const createFile = async (dirs, name, content = '') => {
-    try {
-        if (await exists(rlpth(...dirs, name)))
-            throw new Error('File already exists')
+const mkFile = async (path, content = '') => {
+    const [folder, file] = [path_util.dirname(path), path_util.basename(path)]
+    console.log(folder, file)
 
-        if (!(await exists(rlpth(...dirs)))) await createFolder(dirs)
+    if (await exists(path)) return Status.EXISTS
 
-        const path = rlpth(...dirs, name)
-        await fs.writeFile(path, content)
+    await mkFolder(folder)
 
-        return path
-    } catch (e) {
-        throw e
-    }
+    await fs.writeFile(path, content)
 
-    return ''
+    return Status.SUCCESS
 }
 
 const rm = async (path) => await fs.rm(path, {recursive: true})
 
-const listDir = async (dirs) => {
-    const path = pth(...dirs)
-
+const ls = async (path) => {
     if (!(await exists(path)))
         return {
             folders: [],
@@ -77,49 +89,55 @@ const listDir = async (dirs) => {
     return {
         folders: list
             .filter((item) => item.isDirectory())
-            .map(({name}) => ({name, path: pth(...dirs, name)})),
+            .map(({name}) => ({name, path: `${relPath(path)}/${name}`})),
         files: list
             .filter((item) => item.isFile())
-            .map(({name}) => ({name, path: pth(...dirs, name)})),
+            .map(({name}) => ({name, path: `${relPath(path)}/${name}`})),
     }
 }
-
-let currentDirs = []
-
-app.set('views', path.join(__dirname, 'views'))
-app.engine(
-    'hbs',
-    hbs({
-        defaultLayout: 'main.hbs',
-        extname: '.hbs',
-        partialsDir: path.join('views', 'partials'),
-    })
-)
-app.set('view engine', 'hbs')
-app.use(express.urlencoded({extended: true}))
 
 app.get('/', (req, res) => {
     res.redirect('/filemanager')
 })
 
 app.get('/filemanager', async (req, res) => {
-    const dirs = currentDirs.map((dir, i) => ({
-        name: dir,
-        path: ['~', ...currentDirs.slice(0, i + 1)].join('/'),
-    }))
-    const {folders, files} = await listDir([
-        ...currentDirs,
-        ...parseDirs(req.query.path || ''),
-    ])
+    const currentPath = absPath(req.query.path || '')
+    const relativePath = relPath(currentPath)
+
+    const pathDirs = (dirs(relativePath) || []).reduce(
+        (acc, dir, i) => [
+            ...acc,
+            {
+                name: dir,
+                path: `${acc[i - 1]?.path || ''}/${dir}`,
+            },
+        ],
+        []
+    )
+
+    const {folders, files} = await ls(currentPath)
 
     res.render('filemanager.hbs', {
-        dirs,
-        folders: currentDirs.length > 0 ? [{name: '..'}, ...folders] : folders,
+        dirs: pathDirs,
+        folders:
+            relativePath === ''
+                ? folders
+                : [
+                      {
+                          name: '..',
+                          path: relativePath
+                              .split(/\/|\\/)
+                              .slice(0, -1)
+                              .join('/'),
+                      },
+                      ...folders,
+                  ],
         files,
     })
 })
 
 app.post('/upload', (req, res) => {
+    // TODO: Save files to separate folder and rename them.
     formidable({
         multiples: true,
         uploadDir: rlpth(),
@@ -131,43 +149,32 @@ app.post('/upload', (req, res) => {
     })
 })
 app.post('/create/folder', async (req, res) => {
-    const fullPath = parseDirs(req.body.path)
+    const fullPath = absPath(parsePath(req.body.path))
 
-    try {
-        await createFolder(fullPath)
-    } catch (e) {
-        console.log(e)
-    }
+    await mkFolder(fullPath)
 
     res.redirect('/filemanager')
 })
 app.post('/create/file', async (req, res) => {
-    const fullPath = parseDirs(req.body.path)
-    const [file, ...dirs] = [fullPath.pop(), ...fullPath]
+    const fullPath = absPath(parsePath(req.body.path))
 
-    try {
-        await createFile(dirs, file)
-    } catch (e) {
-        console.log(e)
-    }
+    await mkFile(fullPath)
 
     res.redirect('/filemanager')
 })
 
 app.get('/rm', async (req, res) => {
-    const fullPath = req.query.path
+    const path = absPath(parsePath(req.query.path))
 
-    await rm(fullPath)
+    await rm(path)
 
     res.redirect('/filemanager')
 })
 
 app.get('/cd', async (req, res) => {
-    const dirs = parseDirs(req.query.path || '')
+    const path = parsePath(req.query.path)
 
-    await cd(dirs)
-
-    res.redirect('/filemanager')
+    res.redirect(`/filemanager?path=${path}`)
 })
 
 app.listen(PORT, () => {
