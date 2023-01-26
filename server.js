@@ -15,6 +15,10 @@ app.engine(
         defaultLayout: 'main.hbs',
         extname: '.hbs',
         partialsDir: path_util.join('views', 'partials'),
+        helpers: {
+            truncate: (str, len) =>
+                str.length > len ? str.substring(0, len) + '...' : str,
+        },
     })
 )
 app.set('view engine', 'hbs')
