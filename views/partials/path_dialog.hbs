@@ -1,0 +1,29 @@
+<dialog id="dialog">
+  <form action="/create" method="post">
+    <input type="text" name="currentPath" value="{{@root.currentPath}}" class="hidden">
+    <input type="text" id="path-input-field" name="path" placeholder="name" pattern="\S+.*" required>
+
+    <input type="text" id="old-path-input-field" name="oldPath" placeholder="name" pattern="\S+.*" class="hidden">
+
+    <button class="button" type="submit" value="ok">ok</button>
+    <button class="button" type="reset" value="cancel">cancel</button>
+  </form>
+</dialog>
+
+<script defer>
+  const createDialog = (title, endpoint, path, oldPath) => {
+    const dialog = document.querySelector('#dialog');
+
+    dialog.querySelector('form').action = endpoint;
+
+    const input = dialog.querySelector('#path-input-field');
+    input.placeholder = title;
+    input.value = path || '';
+
+    dialog.querySelector('#old-path-input-field').value = oldPath || '';
+
+    dialog.querySelector('button[type="reset"]').onclick = () => dialog.close()
+
+    dialog.showModal();
+  }
+</script>

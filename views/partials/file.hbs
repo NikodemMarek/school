@@ -1,13 +1,23 @@
 <div class="file">
-  <div class="file__icon">
-    <img src="{{icon}}" alt="file icon" />
+<div class="btns flex">
+  <div class="mv-btn-f bg-primary">
+    R
   </div>
-  <a href="/rm?currentPath={{@root.currentPath}}&path={{path}}">
-    <div class="rm-btn">
+  <a href="/rm?currentPath={{@root.currentPath}}&path={{path}}" class="a">
+    <div class="rm-btn bg-primary">
       X
     </div>
   </a>
+  </div>
+  
+  <div class="file__icon">
+    <img src="{{icon}}" alt="file icon" />
+  </div>
+
   <div class="file__name">
     {{truncate name 10}}
   </div>
 </div>
+<script>
+  Array.from(document.querySelectorAll('.mv-btn-f'))[Number('{{@index}}')].onclick = () => createDialog('new path', '/mv/file', '{{path}}', '{{path}}');
+</script>

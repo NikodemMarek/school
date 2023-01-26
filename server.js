@@ -63,13 +63,25 @@ const ls = async (path) => {
         }
 
     const list = await fs.readdir(path, {withFileTypes: true})
+
+    const relativePath = relPath(path)
     return {
         folders: list
             .filter((item) => item.isDirectory())
-            .map(({name}) => ({name, path: `${relPath(path)}/${name}`})),
+            .map(({name}) => ({
+                name,
+                path: `/${
+                    relativePath === '' ? '' : relativePath + '/'
+                }${name}`,
+            })),
         files: list
             .filter((item) => item.isFile())
-            .map(({name}) => ({name, path: `${relPath(path)}/${name}`})),
+            .map(({name}) => ({
+                name,
+                path: `/${
+                    relativePath === '' ? '' : relativePath + '/'
+                }${name}`,
+            })),
     }
 }
 
@@ -93,7 +105,16 @@ const mkFile = async (path, content = '') => {
 }
 
 const rm = async (path) => await fs.rm(path, {recursive: true})
-const mv = async (path, newPath) => await fs.rename(path, newPath)
+const mv = async (path, newPath, isFile) => {
+    try {
+        if (!isFile)
+            await mkFolder(newPath.split(/\/|\\/).slice(0, -1).join('/'))
+
+        await fs.rename(path, newPath)
+    } catch (e) {
+        return Status.ERROR
+    }
+}
 
 app.get('/', (req, res) => {
     res.redirect('/filemanager')
@@ -117,7 +138,7 @@ app.get('/filemanager', async (req, res) => {
     const {folders, files} = await ls(currentPath)
 
     res.render('filemanager.hbs', {
-        currentPath: relativePath,
+        currentPath: `/${relativePath}`,
         dirs: pathDirs,
         folders:
             relativePath === ''
@@ -163,18 +184,14 @@ app.post('/upload', async (req, res) => {
     })
 })
 app.post('/mk/folder', async (req, res) => {
-    const fullPath = absPath(
-        parsePath(`${req.body.currentPath}/${req.body.path}`)
-    )
+    const fullPath = absPath(parsePath(`${req.body.path}`))
 
     await mkFolder(fullPath)
 
     res.redirect(`/filemanager?path=${req.body.currentPath}`)
 })
 app.post('/mk/file', async (req, res) => {
-    const fullPath = absPath(
-        parsePath(`${req.body.currentPath}/${req.body.path}`)
-    )
+    const fullPath = absPath(parsePath(`${req.body.path}`))
 
     await mkFile(fullPath)
 
@@ -188,13 +205,21 @@ app.get('/rm', async (req, res) => {
 
     res.redirect(`/filemanager?path=${req.query.currentPath}`)
 })
-app.get('/mv', async (req, res) => {
-    const path = absPath(parsePath(req.query.path))
-    const newPath = absPath(parsePath(req.query.newPath))
+app.post('/mv/folder', async (req, res) => {
+    const path = absPath(parsePath(req.body.oldPath))
+    const newPath = absPath(parsePath(req.body.path))
 
-    await mv(path, newPath)
+    await mv(path, newPath, false)
 
-    res.redirect(`/filemanager?path=${req.query.currentPath}`)
+    res.redirect(`/filemanager?path=${req.body.currentPath}`)
+})
+app.post('/mv/file', async (req, res) => {
+    const path = absPath(parsePath(req.body.oldPath))
+    const newPath = absPath(parsePath(req.body.path))
+
+    await mv(path, newPath, true)
+
+    res.redirect(`/filemanager?path=${req.body.currentPath}`)
 })
 
 app.listen(PORT, () => {

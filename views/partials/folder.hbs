@@ -1,17 +1,28 @@
-<a href="/cd?path={{path}}" class="a">
-  <div class="flex flex-col folder">
+<div class="flex flex-col folder">
+  {{#if goback}}
+  <div class="hidden">
+    {{else}}
+    <div class="btns flex">
+      {{/if}}
+      <div class="mv-btn bg-secondary">
+        R
+    </div>
+<a href="/rm?currentPath={{@root.currentPath}}&path={{path}}" class="a">
+  <div class="rm-btn bg-secondary">
+        X
+      </div>
+    </a>
+  </div>
+  <a href="/cd?path={{path}}" class="a">
     <div class="folder__icon">
       <img src="{{icon}}" alt="folder icon" />
     </div>
-    {{#unless goback}}
-    <a href="/rm?currentPath={{@root.currentPath}}&path={{path}}">
-      <div class="rm-btn">
-        X
-      </div>
-    {{/unless}}
-    </a>
-    <div class="folder__name">
-      {{truncate name 10}}
-    </div>
+<div class="folder__name">
+  {{truncate name 10}}
   </div>
-</a>
+  </a>
+</div>
+
+<script>
+  Array.from(document.querySelectorAll('.mv-btn'))[Number('{{@index}}')].onclick = () => createDialog('new path', '/mv/folder', '{{path}}', '{{path}}');
+</script>
