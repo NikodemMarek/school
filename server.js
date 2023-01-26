@@ -40,43 +40,16 @@ const parsePath = (raw) =>
 const absPath = (path) => path_util.join(__dirname, 'data', path)
 const relPath = (path) =>
     path_util.relative(path_util.join(__dirname, 'data'), path)
-
-const dirs = (path) =>
-    path
-        .split(/\/|\\/g)
-        .map((part) => part.trim())
-        .filter((item) => ![''].includes(item))
-
-const addPth = (...paths) =>
-    path_util.join(paths.map((pth) => dirs(pth)).flat(Infinity))
-
 const exists = async (path) =>
     await fs
         .access(path)
         .then(() => true)
         .catch(() => false)
-
-const mkFolder = async (path) => {
-    if (await exists(path)) return Status.EXISTS
-
-    await fs.mkdir(path, {recursive: true})
-
-    return Status.SUCCESS
-}
-const mkFile = async (path, content = '') => {
-    const [folder, file] = [path_util.dirname(path), path_util.basename(path)]
-    console.log(folder, file)
-
-    if (await exists(path)) return Status.EXISTS
-
-    await mkFolder(folder)
-
-    await fs.writeFile(path, content)
-
-    return Status.SUCCESS
-}
-
-const rm = async (path) => await fs.rm(path, {recursive: true})
+const dirs = (path) =>
+    path
+        .split(/\/|\\/g)
+        .map((part) => part.trim())
+        .filter((item) => ![''].includes(item))
 
 const ls = async (path) => {
     if (!(await exists(path)))
@@ -95,6 +68,28 @@ const ls = async (path) => {
             .map(({name}) => ({name, path: `${relPath(path)}/${name}`})),
     }
 }
+
+const mkFolder = async (path) => {
+    if (await exists(path)) return Status.EXISTS
+
+    await fs.mkdir(path, {recursive: true})
+
+    return Status.SUCCESS
+}
+const mkFile = async (path, content = '') => {
+    const [folder, file] = [path_util.dirname(path), path_util.basename(path)]
+
+    if (await exists(path)) return Status.EXISTS
+
+    await mkFolder(folder)
+
+    await fs.writeFile(path, content)
+
+    return Status.SUCCESS
+}
+
+const rm = async (path) => await fs.rm(path, {recursive: true})
+const mv = async (path, newPath) => await fs.rename(path, newPath)
 
 app.get('/', (req, res) => {
     res.redirect('/filemanager')
@@ -118,6 +113,7 @@ app.get('/filemanager', async (req, res) => {
     const {folders, files} = await ls(currentPath)
 
     res.render('filemanager.hbs', {
+        currentPath: relativePath,
         dirs: pathDirs,
         folders:
             relativePath === ''
@@ -129,6 +125,7 @@ app.get('/filemanager', async (req, res) => {
                               .split(/\/|\\/)
                               .slice(0, -1)
                               .join('/'),
+                          goback: true,
                       },
                       ...folders,
                   ],
@@ -136,31 +133,48 @@ app.get('/filemanager', async (req, res) => {
     })
 })
 
-app.post('/upload', (req, res) => {
-    // TODO: Save files to separate folder and rename them.
+app.get('/cd', async (req, res) => {
+    const path = parsePath(req.query.path)
+
+    res.redirect(`/filemanager?path=${path}`)
+})
+
+app.post('/upload', async (req, res) => {
     formidable({
         multiples: true,
-        uploadDir: rlpth(),
+        uploadDir: path_util.join(__dirname, 'uploads'),
         keepExtensions: true,
-    }).parse(req, (err, fields, {files}) => {
+    }).parse(req, async (err, fields, {files}) => {
         if (!Array.isArray(files)) files = [files]
 
-        res.redirect('/filemanager')
+        for (const file of files) {
+            const newPath = absPath(
+                parsePath(`${fields.currentPath}/${file.name}`)
+            )
+
+            await mv(file.path, newPath)
+        }
+
+        res.redirect(`/filemanager?path=${fields.currentPath}`)
     })
 })
-app.post('/create/folder', async (req, res) => {
-    const fullPath = absPath(parsePath(req.body.path))
+app.post('/mk/folder', async (req, res) => {
+    const fullPath = absPath(
+        parsePath(`${req.body.currentPath}/${req.body.path}`)
+    )
 
     await mkFolder(fullPath)
 
-    res.redirect('/filemanager')
+    res.redirect(`/filemanager?path=${req.body.currentPath}`)
 })
-app.post('/create/file', async (req, res) => {
-    const fullPath = absPath(parsePath(req.body.path))
+app.post('/mk/file', async (req, res) => {
+    const fullPath = absPath(
+        parsePath(`${req.body.currentPath}/${req.body.path}`)
+    )
 
     await mkFile(fullPath)
 
-    res.redirect('/filemanager')
+    res.redirect(`/filemanager?path=${req.body.currentPath}`)
 })
 
 app.get('/rm', async (req, res) => {
@@ -168,13 +182,15 @@ app.get('/rm', async (req, res) => {
 
     await rm(path)
 
-    res.redirect('/filemanager')
+    res.redirect(`/filemanager?path=${req.query.currentPath}`)
 })
+app.get('/mv', async (req, res) => {
+    const path = absPath(parsePath(req.query.path))
+    const newPath = absPath(parsePath(req.query.newPath))
 
-app.get('/cd', async (req, res) => {
-    const path = parsePath(req.query.path)
+    await mv(path, newPath)
 
-    res.redirect(`/filemanager?path=${path}`)
+    res.redirect(`/filemanager?path=${req.query.currentPath}`)
 })
 
 app.listen(PORT, () => {

@@ -4,6 +4,7 @@
 
   <dialog id="dialog">
     <form action="/create" method="post">
+      <input type="text" name="currentPath" value="{{@root.currentPath}}" class="hidden">
       <input type="text" name="path" placeholder="name" pattern="\S+.*" required>
 
       <button class="button" type="submit" value="ok">ok</button>
@@ -24,6 +25,6 @@
     dialog.showModal();
   }
 
-  document.querySelector('#new-folder').onclick = () => createDialog('folder name', '/create/folder');
-  document.querySelector('#new-file').onclick = () => createDialog('file name', '/create/file');
+  document.querySelector('#new-folder').onclick = () => createDialog('folder name', '/mk/folder');
+  document.querySelector('#new-file').onclick = () => createDialog('file name', '/mk/file');
 </script>

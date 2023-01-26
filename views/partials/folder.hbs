@@ -3,10 +3,12 @@
     <div class="folder__icon">
       <img src="{{icon}}" alt="folder icon" />
     </div>
-    <a href="/rm?path={{path}}">
+    {{#unless goback}}
+    <a href="/rm?currentPath={{@root.currentPath}}&path={{path}}">
       <div class="rm-btn">
         X
       </div>
+    {{/unless}}
     </a>
     <div class="folder__name">
       {{name}}
