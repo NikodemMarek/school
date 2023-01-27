@@ -6,7 +6,7 @@ class UI {
     login = async () => {
         this.container.innerHTML = `
             <div id="login">
-                <input type="text" placeholder="Username" />
+                <input id="username" type="text" placeholder="Username" />
                 <button id="login-btn">Login</button>
             </div>
         `

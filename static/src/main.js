@@ -5,16 +5,21 @@ import UI from './ui.js'
 const login = async () => {
     const username = await ui.login()
 
-    console.log(username)
-    const user = await net.login(username)
+    await net.login(username)
 
-    console.log(user)
+    const player = await net.getPlayer()
+    const game = await net.getGame()
+
+    render = new Game([true, false][player.color], game.board).render
+    render()
 }
 
-const {render} = new Game()
+let {render} = new Game(false)
 const net = new Net()
 const ui = new UI()
 
 render()
 
-login()
+login().then(() => {
+    console.log('logged in')
+})
