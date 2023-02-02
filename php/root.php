@@ -12,8 +12,6 @@ mysqli_close($conn);
 
 ?>
 
-<a href="logout.php">wyloguj</a>
-
 <h1>dodaj seans</h1>
 <form action="add_movie.php" method="post">
   <input type="text" name="title" placeholder="tytuł" required>

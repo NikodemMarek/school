@@ -2,6 +2,12 @@
 
 require 'db.php';
 
+session_start();
+
+if (!isset($_SESSION['logged_in_root']) || $_SESSION['logged_in_root'] !== true) {
+  header('location: _logout.php');
+}
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $title = mysqli_real_escape_string($conn, $_POST["title"]);
     $datetime = mysqli_real_escape_string($conn, $_POST["datetime"]);

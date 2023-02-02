@@ -1,5 +1,7 @@
 <?php
 
+require 'start_session.php';
+
 require 'db.php';
 
 if (isset($_GET['id'])) {
