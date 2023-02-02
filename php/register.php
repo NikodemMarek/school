@@ -31,7 +31,7 @@ mysqli_close($conn);
 <form action="register.php" method="post" id="register-form">
     <input type="text" name="username" placeholder="nazwa użytkownika" required>
     <input type="password" name="password" placeholder="hasło" required>
-    <input type="tel" id="phone" name="phone" placeholder="numer telefonu">
+    <input type="tel" id="phone" name="phone" placeholder="numer telefonu" required>
 
     <button type="submit">zarejestruj</button>
 
