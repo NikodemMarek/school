@@ -205,8 +205,40 @@ app.post('/mk/file', async (req, res) => {
     const fullPath = absPath(
         parsePath(`${req.body.currentPath}/${req.body.path}`)
     )
+    const fileType = req.body.path.split('.')?.[1] || 'empty'
 
-    await mkFile(fullPath)
+    const content = {
+        js: 'console.log("Hello World!")',
+        html: `<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <title>Hello World!</title>
+    </head>
+
+    <body>
+        <h1>Hello World!</h1>
+    </body>
+</html>`,
+        css: `body {
+    background-color: #000;
+    color: #fff;
+}`,
+        json: `{
+    "name": "Hello World!"
+}`,
+        txt: 'Hello World!',
+        xml: `<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <name>Hello World!</name>
+</root>`,
+        empty: '',
+    }[fileType]
+
+    await mkFile(fullPath, content)
 
     res.redirect(`/filemanager?path=${req.body.currentPath}`)
 })
