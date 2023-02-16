@@ -1,0 +1,53 @@
+<div class="filters-bar">
+    {{#each filters}}
+    <div class="filter-preview cursor-pointer">
+        <div class="filter-image">
+            <img src="{{@root.path}}" style="filter: {{value}};" alt="{{name}}">
+        </div>
+        <div class="filter-name">{{name}}</div>
+    </div>
+    {{/each}}
+</div>
+
+<script>
+    const filters = document.querySelectorAll('.filter-preview');
+
+    filters.forEach(filter =>
+        filter.onclick = () => {
+            const image = document.querySelector('#image');
+            image.style.filter = filter.querySelector('.filter-image img').style.filter;
+        });
+</script>
+
+<style>
+    .filters-bar {
+        display: flex;
+        flex-direction: column;
+        margin: 5px;
+        gap: 5px;
+    }
+
+    .filter-preview {
+        width: 100px;
+        height: 100px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background-color: #333;
+        border-radius: 10px;
+        padding: 1rem;
+    }
+
+    .filter-name {
+        font-size: 1.5rem;
+        color: #fff;
+    }
+
+    .filter-image {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+</style>

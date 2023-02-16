@@ -14,9 +14,11 @@
     <img src="{{icon}}" alt="file icon" />
   </div>
 
-  <div class="file__name">
-    {{truncate name 10}}
-  </div>
+  <a href="/edit?currentPath={{@root.currentPath}}&path={{path}}" class="a">
+    <div class="file__name">
+      {{truncate name 10}}
+    </div>
+  </a>
 </div>
 <script>
   Array.from(document.querySelectorAll('.mv-btn-f'))[Number('{{@index}}')].onclick = () => createDialog('new path', '/mv/file', '{{path}}', '{{path}}');

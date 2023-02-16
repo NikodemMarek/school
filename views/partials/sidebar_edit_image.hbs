@@ -1,0 +1,14 @@
+<div class="h-full flex flex-col sidebar">
+  <div class="w-full flex flex-col">
+    <div id="filters-btn" class="button">filters</div>
+  </div>
+</div>
+
+<div id="filters-bar-drawer" class="hidden">
+  {{> filters_bar}}
+</div>
+
+<script>
+  document.querySelector('#filters-btn').onclick = () =>
+    document.querySelector('#filters-bar-drawer').classList.toggle('hidden');
+</script>

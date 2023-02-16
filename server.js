@@ -117,15 +117,8 @@ const mv = async (path, newPath, isFile) => {
     }
 }
 
-app.get('/', (req, res) => {
-    res.redirect('/filemanager')
-})
-
-app.get('/filemanager', async (req, res) => {
-    const currentPath = absPath(req.query.path || '')
-    const relativePath = relPath(currentPath)
-
-    const pathDirs = (dirs(relativePath) || []).reduce(
+const pathDirs = (path) =>
+    (dirs(relPath(path)) || []).reduce(
         (acc, dir, i) => [
             ...acc,
             {
@@ -136,11 +129,23 @@ app.get('/filemanager', async (req, res) => {
         []
     )
 
+app.use(express.static(path_util.join(__dirname, 'data')))
+
+app.get('/', (req, res) => {
+    res.redirect('/filemanager')
+})
+
+app.get('/filemanager', async (req, res) => {
+    const currentPath = absPath(req.query.path || '')
+    const relativePath = relPath(currentPath)
+
+    const dirs = pathDirs(currentPath)
+
     const {folders, files} = await ls(currentPath)
 
     res.render('filemanager.hbs', {
         currentPath: `/${relativePath}`,
-        dirs: pathDirs,
+        dirs,
         folders:
             relativePath === ''
                 ? folders
@@ -265,6 +270,62 @@ app.post('/mv/file', async (req, res) => {
     await mv(path, newPath, true)
 
     res.redirect(`/filemanager?path=${req.body.currentPath}`)
+})
+
+app.get('/edit', async (req, res) => {
+    const path = absPath(parsePath(req.query.path))
+    const currentPath = req.query.currentPath
+
+    const type = {
+        js: 'text',
+        html: 'text',
+        css: 'text',
+        json: 'text',
+        txt: 'text',
+        xml: 'text',
+        png: 'image',
+        jpg: 'image',
+        jpeg: 'image',
+    }[path.split('.').pop() || 'empty']
+    res.redirect(`/edit/${type}?currentPath=${currentPath}&path=${path}`)
+})
+app.get('/edit/image', async (req, res) => {
+    const path = parsePath(req.query.path)
+    const relativePath = relPath(`/${path}`)
+    const currentPath = req.query.currentPath
+
+    const dirs = pathDirs(absPath(currentPath))
+
+    res.render('edit_image.hbs', {
+        dirs,
+        path: `/${relativePath}`,
+        filters: [
+            {
+                name: 'original',
+                value: 'none',
+            },
+            {
+                name: 'grayscale',
+                value: 'grayscale(100%)',
+            },
+            {
+                name: 'blur',
+                value: 'blur(5px)',
+            },
+            {
+                name: 'sepia',
+                value: 'sepia(100%)',
+            },
+            {
+                name: 'invert',
+                value: 'invert(100%)',
+            },
+            {
+                name: 'hue-rotate',
+                value: 'hue-rotate(90deg)',
+            },
+        ],
+    })
 })
 
 app.listen(PORT, () => {

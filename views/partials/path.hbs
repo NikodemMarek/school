@@ -1,7 +1,22 @@
-<div class="path">
+<div class="path w-full h-fit">
   <a href="/cd?path=~" class="a path-part">~</a>
 
   {{#each dirs}}
   / <a href="/cd?path={{path}}" class="a path-part">{{name}}</a>
   {{/each}}
 </div>
+<style>
+  .path {
+    background-color: #333;
+    color: white;
+    padding: 8px;
+    border-radius: 40px;
+    font-weight: bolder;
+    box-sizing: border-box;
+    margin: 4px;
+  }
+
+  .path-part:hover {
+    text-decoration: underline;
+  }
+</style>
