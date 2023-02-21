@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  php-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./src:/var/www/html/
+    ports:
+      - 3000:80
+
+  db:
+    image: mysql:8.0
+    command: --init-file /data/application/init.sql
+    volumes:
+      - ./init.sql:/data/application/init.sql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    restart: always
+    ports:
+      - 3001:80
+    environment:
+      - PMA_ARBITRARY=1
