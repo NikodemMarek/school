@@ -1,0 +1,64 @@
+<style>
+    #line-numbers {
+        padding: 5px;
+        background-color: #f5f5f5;
+        border-right: 1px solid #e5e5e5;
+        box-sizing: border-box;
+    }
+
+    #line-numbers div {
+        padding: 0;
+        font-family: monospace;
+        font-size: 16px;
+        color: #999;
+    }
+
+    #text {
+        width: 100%;
+        background-color: #f5f5f5;
+        border: none;
+        box-sizing: border-box;
+        font-family: monospace;
+        font-size: 16px;
+        outline: none;
+    }
+</style>
+
+<div class="w-full h-full flex flex-col">
+    {{> path}}
+
+    <div class="flex flex-row h-full">
+        <div id="line-numbers"></div>
+
+        <textarea id="text">{{content}}</textarea>
+    </div>
+</div>
+
+<script>
+    const lineNumbers = document.querySelector('#line-numbers');
+    const text = document.querySelector('#text');
+
+    const refreshLineNumbers = () =>
+        lineNumbers.innerHTML = text.value.split("\n").map((line, i) =>
+            `<div>${i + 1}</div>`).join('')
+
+    text.oninput = refreshLineNumbers
+
+    const save = () => {
+        const path = window.location.search.split('=')[1];
+        const content = text.value;
+
+        fetch('/save', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                path,
+                content
+            })
+        })
+    }
+
+    refreshLineNumbers()
+</script>

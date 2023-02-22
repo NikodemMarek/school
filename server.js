@@ -214,32 +214,11 @@ app.post('/mk/file', async (req, res) => {
 
     const content = {
         js: 'console.log("Hello World!")',
-        html: `<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-        <title>Hello World!</title>
-    </head>
-
-    <body>
-        <h1>Hello World!</h1>
-    </body>
-</html>`,
-        css: `body {
-    background-color: #000;
-    color: #fff;
-}`,
-        json: `{
-    "name": "Hello World!"
-}`,
+        html: '<!DOCTYPE html>\n<html lang="en">\n\t<head>\n\t\t<meta charset="UTF-8">\n\t\t<meta http-equiv="X-UA-Compatible" content="IE=edge">\n\t\t<meta name="viewport" content="width=device-width, initial-scale=1.0">\n\n\t\t<title>Hello World!</title>\n\t</head>\n\n\t<body>\n\t\t<h1>Hello World!</h1>\n\t</body>\n</html>',
+        css: 'body {\n\tbackground-color: #000;\n\tcolor: #fff;\n}',
+        json: '{\n\t"name": "Hello World!"\n}',
         txt: 'Hello World!',
-        xml: `<?xml version="1.0" encoding="UTF-8"?>
-<root>
-    <name>Hello World!</name>
-</root>`,
+        xml: '<?xml version="1.0" encoding="UTF-8"?>\n<root>\n\t<name>Hello World!</name>\n</root>',
         empty: '',
     }[fileType]
 
@@ -289,6 +268,21 @@ app.get('/edit', async (req, res) => {
     }[path.split('.').pop() || 'empty']
     res.redirect(`/edit/${type}?currentPath=${currentPath}&path=${path}`)
 })
+app.get('/edit/text', async (req, res) => {
+    const path = parsePath(req.query.path)
+    const relativePath = relPath(`/${path}`)
+    const currentPath = req.query.currentPath
+
+    const dirs = pathDirs(absPath(currentPath))
+
+    const content = await fs.readFile(`/${path}`, 'utf-8')
+
+    res.render('editor.hbs', {
+        path: `/${relativePath}`,
+        dirs,
+        content,
+    })
+})
 app.get('/edit/image', async (req, res) => {
     const path = parsePath(req.query.path)
     const relativePath = relPath(`/${path}`)
@@ -326,6 +320,15 @@ app.get('/edit/image', async (req, res) => {
             },
         ],
     })
+})
+
+app.post('/save', async (req, res) => {
+    const path = absPath(parsePath(req.body.path))
+    const content = req.body.content
+
+    await fs.writeFile(path, content)
+
+    res.redirect(`/filemanager?path=${req.body.currentPath}`)
 })
 
 app.listen(PORT, () => {
