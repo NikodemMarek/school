@@ -1,6 +1,12 @@
 <div class="h-full flex flex-col sidebar">
   <div class="w-full flex flex-col">
     <div id="filters-btn" class="button">filters</div>
+
+    <div id="save-changes" class="button">save changes</div>
+    <a href="/preview?path={{path}}" target="_blank" class="a">
+      <div id="preview" class="button">preview</div>
+    </a>
+    <div id="change-name" class="button">rename</div>
   </div>
 </div>
 
@@ -11,4 +17,26 @@
 <script>
   document.querySelector('#filters-btn').onclick = () =>
     document.querySelector('#filters-bar-drawer').classList.toggle('hidden');
+
+  const save = () => {
+    const content = text.value
+
+    fetch('/save', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        path: '{{path}}',
+        content,
+      })
+    });
+  }
+
+  document.querySelector('#save-changes').onclick = save
+
+  document.querySelector('#change-name').onclick = () => {
+    console.log('change name');
+    createDialog('new path', '/mv/file', '{{path}}', '{{path}}');
+  }
 </script>
