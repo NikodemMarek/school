@@ -1,0 +1,37 @@
+<div class="h-full flex flex-col sidebar">
+  <div id="save-changes" class="button">save changes</div>
+  <a href="/preview?path={{path}}" class="a">
+    <div id="preview" class="button">preview</div>
+  </a>
+  <div id="change-name" class="button">rename</div>
+</div>
+
+<script>
+  const save = () => {
+    const content = document.querySelector('#text').value
+
+    fetch('/save', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        path: '{{path}}',
+        content,
+      })
+    }).then(res => {
+      if (res.status === 200) {
+        console.log('saved');
+      } else {
+        console.log('error');
+      }
+    });
+  }
+
+  document.querySelector('#save-changes').onclick = save
+
+  document.querySelector('#change-name').onclick = () => {
+    console.log('change name');
+    createDialog('new path', '/mv/file', '{{path}}', '{{path}}');
+  }
+</script>

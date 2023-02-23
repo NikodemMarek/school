@@ -44,21 +44,5 @@
 
     text.oninput = refreshLineNumbers
 
-    const save = () => {
-        const path = window.location.search.split('=')[1];
-        const content = text.value;
-
-        fetch('/save', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                path,
-                content
-            })
-        })
-    }
-
     refreshLineNumbers()
 </script>

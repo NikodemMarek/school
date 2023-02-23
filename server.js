@@ -24,6 +24,7 @@ app.engine(
 )
 app.set('view engine', 'hbs')
 app.use(express.urlencoded({extended: true}))
+app.use(express.json())
 
 const Status = Object.freeze({
     SUCCESS: 0,
@@ -214,11 +215,11 @@ app.post('/mk/file', async (req, res) => {
 
     const content = {
         js: 'console.log("Hello World!")',
-        html: '<!DOCTYPE html>\n<html lang="en">\n\t<head>\n\t\t<meta charset="UTF-8">\n\t\t<meta http-equiv="X-UA-Compatible" content="IE=edge">\n\t\t<meta name="viewport" content="width=device-width, initial-scale=1.0">\n\n\t\t<title>Hello World!</title>\n\t</head>\n\n\t<body>\n\t\t<h1>Hello World!</h1>\n\t</body>\n</html>',
-        css: 'body {\n\tbackground-color: #000;\n\tcolor: #fff;\n}',
-        json: '{\n\t"name": "Hello World!"\n}',
+        html: '<!DOCTYPE html>\n<html lang="en">\n  <head>\n    <meta charset="UTF-8">\n    <meta http-equiv="X-UA-Compatible" content="IE=edge">\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n\n    <title>Hello World!</title>\n  </head>\n\n  <body>\n    <h1>Hello World!</h1>\n  </body>\n</html>',
+        css: 'body {\n  background-color: #000;\n  color: #fff;\n}',
+        json: '{\n  "name": "Hello World!"\n}',
         txt: 'Hello World!',
-        xml: '<?xml version="1.0" encoding="UTF-8"?>\n<root>\n\t<name>Hello World!</name>\n</root>',
+        xml: '<?xml version="1.0" encoding="UTF-8"?>\n<root>\n  <name>Hello World!</name>\n</root>',
         empty: '',
     }[fileType]
 
@@ -277,7 +278,7 @@ app.get('/edit/text', async (req, res) => {
 
     const content = await fs.readFile(`/${path}`, 'utf-8')
 
-    res.render('editor.hbs', {
+    res.render('edit_text.hbs', {
         path: `/${relativePath}`,
         dirs,
         content,
@@ -323,12 +324,19 @@ app.get('/edit/image', async (req, res) => {
 })
 
 app.post('/save', async (req, res) => {
-    const path = absPath(parsePath(req.body.path))
-    const content = req.body.content
+    const {path, content} = req.body
+    const fullPath = absPath(parsePath(path))
 
-    await fs.writeFile(path, content)
+    await fs.writeFile(fullPath, content)
 
     res.redirect(`/filemanager?path=${req.body.currentPath}`)
+})
+
+app.get('/preview', async (req, res) => {
+    const path = parsePath(req.query.path)
+    const fullPath = absPath(path)
+
+    res.sendFile(fullPath)
 })
 
 app.listen(PORT, () => {
