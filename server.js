@@ -253,8 +253,7 @@ app.post('/mv/file', async (req, res) => {
 })
 
 app.get('/edit', async (req, res) => {
-    const path = absPath(parsePath(req.query.path))
-    const currentPath = req.query.currentPath
+    const {path} = req.query
 
     const type = {
         js: 'text',
@@ -267,33 +266,37 @@ app.get('/edit', async (req, res) => {
         jpg: 'image',
         jpeg: 'image',
     }[path.split('.').pop() || 'empty']
-    res.redirect(`/edit/${type}?currentPath=${currentPath}&path=${path}`)
+    res.redirect(`/edit/${type}?path=${path}`)
 })
 app.get('/edit/text', async (req, res) => {
-    const path = parsePath(req.query.path)
-    const relativePath = relPath(`/${path}`)
-    const currentPath = req.query.currentPath
+    const {path} = req.query
+    const dirPath = path.split('/')?.slice(0, -1).join('/') || ''
 
-    const dirs = pathDirs(absPath(currentPath))
+    const dirs = pathDirs(absPath(dirPath))
 
-    const content = await fs.readFile(`/${path}`, 'utf-8')
+    const content = await fs.readFile(absPath(path), 'utf-8')
+
+    const preferences = await fs.readFile(
+        path_util.join(__dirname, 'preferences.json'),
+        'utf-8'
+    )
 
     res.render('edit_text.hbs', {
-        path: `/${relativePath}`,
+        path,
         dirs,
         content,
+        preferences: JSON.parse(preferences),
     })
 })
 app.get('/edit/image', async (req, res) => {
-    const path = parsePath(req.query.path)
-    const relativePath = relPath(`/${path}`)
-    const currentPath = req.query.currentPath
+    const {path} = req.query
+    const dirPath = path.split('/')?.slice(0, -1).join('/') || ''
 
-    const dirs = pathDirs(absPath(currentPath))
+    const dirs = pathDirs(absPath(dirPath))
 
     res.render('edit_image.hbs', {
         dirs,
-        path: `/${relativePath}`,
+        path,
         filters: [
             {
                 name: 'original',
@@ -325,18 +328,27 @@ app.get('/edit/image', async (req, res) => {
 
 app.post('/save', async (req, res) => {
     const {path, content} = req.body
-    const fullPath = absPath(parsePath(path))
 
-    await fs.writeFile(fullPath, content)
+    await fs.writeFile(absPath(path), content)
 
-    res.redirect(`/filemanager?path=${req.body.currentPath}`)
+    res.redirect(`/edit?path=${path}`)
 })
 
 app.get('/preview', async (req, res) => {
-    const path = parsePath(req.query.path)
-    const fullPath = absPath(path)
+    const {path} = req.query
 
-    res.sendFile(fullPath)
+    res.sendFile(absPath(path))
+})
+
+app.post('/preferences', async (req, res) => {
+    const {path, fontSize, primaryColor, secondaryColor} = req.body
+
+    await fs.writeFile(
+        path_util.join(__dirname, 'preferences.json'),
+        JSON.stringify({fontSize, primaryColor, secondaryColor}, null, 4)
+    )
+
+    res.redirect(`/edit?path=${path}`)
 })
 
 app.listen(PORT, () => {

@@ -1,14 +1,96 @@
 <div class="h-full flex flex-col sidebar">
+  <form action="/preferences" method="post">
+    <div id="font-size-changer">
+      <div id="font-down">-</div>
+      <div id="font-up">+</div>
+    </div>
+    <div id="theme-changer" class="button">change theme</div>
+  
+    <input type="hidden" name="fontSize" value="{{preferences.fontSize}}">
+    <input type="hidden" name="primaryColor" value="{{preferences.primaryColor}}">
+    <input type="hidden" name="secondaryColor" value="{{preferences.secondaryColor}}">
+  
+    <input type="hidden" name="path" value="{{path}}">
+  
+    <input type="submit" value="save preferences" class="button">
+  </form>
+  
+  <div style="margin: 10px 0;"></div>
+
   <div id="save-changes" class="button">save changes</div>
-  <a href="/preview?path={{path}}" class="a">
+  <a href="/preview?path={{path}}" target="_blank" class="a">
     <div id="preview" class="button">preview</div>
   </a>
   <div id="change-name" class="button">rename</div>
 </div>
 
+<style>
+  #font-size-changer {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin: 5px 0;
+    border-radius: 40px;
+    overflow: hidden;
+    gap: 1px;
+  }
+
+  #font-size-changer div {
+    color: white;
+    box-sizing: border-box;
+    padding: 16px 32px;
+    flex: 1;
+    text-align: center;
+    cursor: pointer;
+    background-color: #4CAF50;
+  }
+
+  #font-size-changer div:hover {
+    background-color: #3e8e41;
+  }
+</style>
+
 <script>
+    document.querySelector('#font-size-changer').onclick = e => {
+      const text = document.querySelector('#text');
+
+      const fontSize = document.querySelector('input[name="fontSize"]');
+
+      console.log(fontSize.value)
+
+      fontSize.value = parseInt(fontSize.value) + { 'font-up': 1, 'font-down': -1 }[e.target.id]
+
+      updateEditorPreferences({
+        fontSize: fontSize.value,
+        primaryColor: document.querySelector('input[name="primaryColor"]').value,
+        secondaryColor: document.querySelector('input[name="secondaryColor"]').value,
+      });
+    }
+    document.querySelector('#theme-changer').onclick = () => {
+      const text = document.querySelector('#text');
+
+      const primaryColor = document.querySelector('input[name="primaryColor"]');
+      const secondaryColor = document.querySelector('input[name="secondaryColor"]');
+
+      if (primaryColor.value === '#fff') {
+        primaryColor.value = '#333';
+        secondaryColor.value = '#fff';
+      } else {
+        primaryColor.value = '#fff';
+        secondaryColor.value = '#333';
+      }
+
+      updateEditorPreferences({
+        fontSize: document.querySelector('input[name="fontSize"]').value,
+        primaryColor: primaryColor.value,
+        secondaryColor: secondaryColor.value,
+      });
+    }
+
   const save = () => {
-    const content = document.querySelector('#text').value
+    const content = text.value
 
     fetch('/save', {
       method: 'POST',
@@ -19,12 +101,6 @@
         path: '{{path}}',
         content,
       })
-    }).then(res => {
-      if (res.status === 200) {
-        console.log('saved');
-      } else {
-        console.log('error');
-      }
     });
   }
 

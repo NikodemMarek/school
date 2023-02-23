@@ -38,6 +38,14 @@
     const lineNumbers = document.querySelector('#line-numbers');
     const text = document.querySelector('#text');
 
+    const updateEditorPreferences = ({ fontSize, primaryColor, secondaryColor }) => {
+        text.style.fontSize = `${fontSize}px`;
+        text.style.backgroundColor = primaryColor;
+        text.style.color = secondaryColor;
+
+        refreshLineNumbers()
+    }
+
     const refreshLineNumbers = () =>
         lineNumbers.innerHTML = text.value.split("\n").map((line, i) =>
             `<div>${i + 1}</div>`).join('')
@@ -45,4 +53,9 @@
     text.oninput = refreshLineNumbers
 
     refreshLineNumbers()
+    updateEditorPreferences({
+        fontSize: document.querySelector('input[name="fontSize"]').value,
+        primaryColor: document.querySelector('input[name="primaryColor"]').value,
+        secondaryColor: document.querySelector('input[name="secondaryColor"]').value,
+    })
 </script>
