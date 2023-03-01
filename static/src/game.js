@@ -2,48 +2,55 @@ import Tile from './objects/tile.js'
 import Pawn from './objects/pawn.js'
 
 class Game {
+    #dimensions = {}
+
+    #board = [
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+    ]
+
     #tiles = []
     #pawns = []
 
     #isWhite = true
 
-    #endTurn = () => {}
+    #isWhiteTurn = true
 
-    constructor(isWhite, board, canMove, endTurn) {
-        this.board = board || [
-            [0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0],
-        ]
-
-        const tileSize = {
-            x: 100,
-            y: 20,
-            z: 100,
-        }
-
-        const size = {
-            x: this.board[0].length,
-            y: this.board.length,
-        }
-
+    constructor(isWhite, board) {
         this.#isWhite = isWhite
+        this.#board = board
 
-        const [fullX, fullY] = [size.x * tileSize.x, size.y * tileSize.z]
-        const [halfX, halfY] = [fullX / 2, fullY / 2]
+        this.#dimensions = {
+            tileSize: {
+                x: 100,
+                y: 20,
+                z: 100,
+            },
+            size: {
+                x: this.#board[0].length,
+                y: this.#board.length,
+            },
+        }
+        this.#dimensions.fullX =
+            this.#dimensions.size.y * this.#dimensions.tileSize.z
+        this.#dimensions.fullY =
+            this.#dimensions.size.x * this.#dimensions.tileSize.x
+        this.#dimensions.halfX = this.#dimensions.fullY / 2
+        this.#dimensions.halfY = this.#dimensions.fullX / 2
 
         this.scene = new THREE.Scene()
 
         this.camera = new THREE.PerspectiveCamera(45, 4 / 3, 0.1, 10000)
         if (isWhite) {
-            this.camera.position.set(0, 1000, -fullY)
+            this.camera.position.set(0, 1000, -this.#dimensions.fullY)
         } else {
-            this.camera.position.set(0, 1000, fullY)
+            this.camera.position.set(0, 1000, this.#dimensions.fullY)
         }
         this.camera.lookAt(0, 0, 0)
 
@@ -57,19 +64,25 @@ class Game {
         root.innerHTML = ''
         root.append(this.renderer.domElement)
 
-        this.board.forEach((row, y) =>
+        this.#board.forEach((row, y) =>
             row.forEach((tile, x) => {
                 const position = {
-                    x: x * tileSize.x - halfX + tileSize.x / 2,
-                    y: tileSize.y / 2,
-                    z: y * tileSize.z - halfY + tileSize.z / 2,
+                    x:
+                        x * this.#dimensions.tileSize.x -
+                        this.#dimensions.halfX +
+                        this.#dimensions.tileSize.x / 2,
+                    y: this.#dimensions.tileSize.y / 2,
+                    z:
+                        y * this.#dimensions.tileSize.z -
+                        this.#dimensions.halfY +
+                        this.#dimensions.tileSize.z / 2,
                 }
 
                 const isWhite =
                     (y % 2 === 0 && x % 2 !== 0) || (y % 2 !== 0 && x % 2 === 0)
                 const tileObject = new Tile(
                     position,
-                    tileSize,
+                    this.#dimensions.tileSize,
                     isWhite ? 0xdddddd : 0x333333,
                     {x, y},
                     isWhite
@@ -80,8 +93,8 @@ class Game {
 
                 if (tile === 0) return
                 const pawnObject = new Pawn(
-                    {...position, y: tileSize.y},
-                    tileSize,
+                    {...position, y: this.#dimensions.tileSize.y},
+                    this.#dimensions.tileSize,
                     tile === 1 ? 0xffffff : 0x000000,
                     {x, y},
                     tile === 1
@@ -94,12 +107,46 @@ class Game {
 
         this.raycaster = new THREE.Raycaster()
 
-        this.render()
-
-        if (!canMove) return
-
-        this.#endTurn = endTurn
         document.onclick = this.onclick
+
+        this.render()
+    }
+
+    render = () => {
+        // Update camera aspect ratio.
+        this.camera.aspect = window.innerWidth / window.innerHeight
+        this.camera.updateProjectionMatrix()
+        this.renderer.setSize(window.innerWidth, window.innerHeight)
+
+        // Render the scene.
+        requestAnimationFrame(this.render)
+        this.renderer.render(this.scene, this.camera)
+    }
+
+    moveFromTo = (from, to) => {
+        if ([true, !this.#isWhite, this.#isWhite][this.#board[from.y][from.x]])
+            return
+
+        this.#isWhiteTurn = !this.#isWhiteTurn
+
+        this.#board[to.y][to.x] = this.#board[from.y][from.x]
+        this.#board[from.y][from.x] = 0
+
+        const pawn = this.#pawns.find(
+            (pawn) => pawn.tile.x === from.x && pawn.tile.y === from.y
+        )
+        if (!pawn) return
+
+        pawn.tile = to
+        pawn.position.set(
+            to.x * this.#dimensions.tileSize.x -
+                this.#dimensions.halfX +
+                this.#dimensions.tileSize.x / 2,
+            pawn.position.y,
+            to.y * this.#dimensions.tileSize.z -
+                this.#dimensions.halfY +
+                this.#dimensions.tileSize.z / 2
+        )
     }
 
     #selected = null
@@ -140,28 +187,28 @@ class Game {
                 (acc, [closePosition, farPosition]) => {
                     if (
                         closePosition.x < 0 ||
-                        closePosition.x >= this.board[0].length ||
+                        closePosition.x >= this.#board[0].length ||
                         closePosition.y < 0 ||
-                        closePosition.y >= this.board.length
+                        closePosition.y >= this.#board.length
                     )
                         return acc
 
-                    if (this.board[closePosition.y][closePosition.x] === 0)
+                    if (this.#board[closePosition.y][closePosition.x] === 0)
                         return [...acc, closePosition]
 
                     if (
                         farPosition.x < 0 ||
-                        farPosition.x >= this.board[0].length ||
+                        farPosition.x >= this.#board[0].length ||
                         farPosition.y < 0 ||
-                        farPosition.y >= this.board.length
+                        farPosition.y >= this.#board.length
                     )
                         return acc
 
                     if (
                         [false, !this.#isWhite, this.#isWhite][
-                            this.board[closePosition.y][closePosition.x]
+                            this.#board[closePosition.y][closePosition.x]
                         ] &&
-                        this.board[farPosition.y][farPosition.x] === 0
+                        this.#board[farPosition.y][farPosition.x] === 0
                     )
                         return [...acc, farPosition]
 
@@ -180,7 +227,9 @@ class Game {
             })
 
         const intersectsPawns = this.raycaster.intersectObjects(
-            this.#pawns.filter((pawn) => pawn.isWhite === this.#isWhite)
+            this.#isWhiteTurn === this.#isWhite
+                ? this.#pawns.filter((pawn) => pawn.isWhite === this.#isWhite)
+                : []
         )
 
         if (intersectsPawns.length > 0) {
@@ -210,40 +259,10 @@ class Game {
 
             resetColors()
 
-            this.board[tile.y][tile.x] =
-                this.board[this.#selected.y][this.#selected.x]
-            this.board[this.#selected.y][this.#selected.x] = 0
-
-            const pawn = this.#pawns.find(
-                (pawn) =>
-                    pawn.tile.x === this.#selected.x &&
-                    pawn.tile.y === this.#selected.y
-            )
-
-            this.#selected = tile
-
-            if (!pawn) return
-
-            pawn.tile = tile
-            const tilePos = this.#tiles.find(
-                (t) => t.tile.x === tile.x && t.tile.y === tile.y
-            ).position
-            pawn.position.set(tilePos.x, pawn.position.y, tilePos.z)
+            this.moveFromTo(this.#selected, tile)
 
             this.#selected = null
-            this.#endTurn(this.board)
         }
-    }
-
-    render = () => {
-        // Update camera aspect ratio.
-        this.camera.aspect = window.innerWidth / window.innerHeight
-        this.camera.updateProjectionMatrix()
-        this.renderer.setSize(window.innerWidth, window.innerHeight)
-
-        // Render the scene.
-        requestAnimationFrame(this.render)
-        this.renderer.render(this.scene, this.camera)
     }
 }
 
