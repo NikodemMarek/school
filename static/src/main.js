@@ -29,18 +29,15 @@ const start = async () => {
     const {board, players, isWhiteTurn} = await net.getGame()
     ui.gameInfo(players, isWhiteTurn)
 
-    const client = await io.connect()
-
-    const {moveFromTo} = new Game(net.isWhite, board, (from, to) => {
-        client.emit('move', {from, to})
+    const game = new Game(net.isWhite, board, (from, to) => {
+        net.moveFromTo(from, to)
         ui.loading(true)
     })
 
     ui.loading(!net.isWhite)
 
-    client.on('turn', ({from, to, isWhiteTurn}) => {
-        moveFromTo(from, to)
-
+    net.onTurn((from, to, isWhiteTurn) => {
+        game.moveFromTo(from, to)
         if (isWhiteTurn === net.isWhite) ui.loading(false)
     })
 }

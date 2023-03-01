@@ -3,6 +3,8 @@ class Net {
         this.id = null
         this.username = null
         this.isWhite = null
+
+        this.client = null
     }
 
     login = async (username) => {
@@ -23,6 +25,8 @@ class Net {
         this.id = id
         this.username = username
         this.isWhite = isWhite
+
+        this.client = await io.connect()
 
         return true
     }
@@ -56,6 +60,12 @@ class Net {
 
         return await res.json()
     }
+
+    moveFromTo = (from, to) => this.client.emit('move', {from, to})
+    onTurn = (exec) =>
+        this.client.on('turn', ({from, to, isWhiteTurn}) =>
+            exec(from, to, isWhiteTurn)
+        )
 }
 
 export default Net
