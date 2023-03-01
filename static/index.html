@@ -72,7 +72,18 @@
             cursor: pointer;
         }
 
-        #ui > #loading {
+        #loading {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+
+            display: flex;
+        }
+
+        #loading > #content {
             width: 200px;
             height: 200px;
             margin: auto;
@@ -120,6 +131,7 @@
 
 <body>
     <div id="root"></div>
+    <div id="loading"></div>
     <div id="ui"></div>
 
     <script src="./lib/three145.js" defer></script>

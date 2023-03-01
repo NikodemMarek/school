@@ -22,9 +22,12 @@ class Game {
 
     #isWhiteTurn = true
 
-    constructor(isWhite, board) {
+    #onMove = () => {}
+
+    constructor(isWhite, board, onMove) {
         this.#isWhite = isWhite
         this.#board = board
+        this.#onMove = onMove
 
         this.#dimensions = {
             tileSize: {
@@ -124,18 +127,17 @@ class Game {
     }
 
     moveFromTo = (from, to) => {
-        if ([true, !this.#isWhite, this.#isWhite][this.#board[from.y][from.x]])
-            return
-
-        this.#isWhiteTurn = !this.#isWhiteTurn
-
-        this.#board[to.y][to.x] = this.#board[from.y][from.x]
-        this.#board[from.y][from.x] = 0
+        if (this.#board[from.y][from.x] === 0) return
 
         const pawn = this.#pawns.find(
             (pawn) => pawn.tile.x === from.x && pawn.tile.y === from.y
         )
         if (!pawn) return
+
+        this.#isWhiteTurn = !this.#isWhiteTurn
+
+        this.#board[to.y][to.x] = this.#board[from.y][from.x]
+        this.#board[from.y][from.x] = 0
 
         pawn.tile = to
         pawn.position.set(
@@ -260,6 +262,7 @@ class Game {
             resetColors()
 
             this.moveFromTo(this.#selected, tile)
+            this.#onMove?.(this.#selected, tile)
 
             this.#selected = null
         }

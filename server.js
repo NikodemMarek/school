@@ -102,20 +102,16 @@ io.on('connection', (socket) => {
         // TODO: handle disconnect
     })
 
-    socket.on('join', (data) => {
-        io.emit('turn', {
-            board: board,
-            white: isWhiteTurn,
-        })
-    })
-
-    socket.on('move', (data) => {
-        board = data.board
+    socket.on('move', ({from, to}) => {
         isWhiteTurn = !isWhiteTurn
 
+        board[to.y][to.x] = board[from.y][from.x]
+        board[from.y][from.x] = 0
+
         io.emit('turn', {
-            board: board,
-            white: isWhiteTurn,
+            from,
+            to,
+            isWhiteTurn,
         })
     })
 })
