@@ -26,15 +26,15 @@
             left: 0;
             height: 100%;
             width: 100%;
+            overflow: hidden;
 
             display: flex;
-            justify-content: center;
-            align-items: center;
         }
 
         #ui > #login {
             width: 50%;
             height: 50%;
+            margin: auto;
             background-color: #fff;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
@@ -71,6 +71,50 @@
             justify-content: center;
             cursor: pointer;
         }
+
+        #ui > #loading {
+            width: 200px;
+            height: 200px;
+            margin: auto;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        #ui > #game-info {
+            width: 200px;
+            height: 100%;
+            margin: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            box-sizing: border-box;
+        }
+        
+        #ui > #game-info > .player-info {
+            width: 100%;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        #ui > #game-info > .player-info > .player-info-username {
+            font-size: 20px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
     </style>
 </head>
 
@@ -79,6 +123,7 @@
     <div id="ui"></div>
 
     <script src="./lib/three145.js" defer></script>
+    <script src="./lib/socket.io.js" defer></script>
     <script src="./src/main.js" type="module" defer></script>
 </body>
 </html>

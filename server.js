@@ -1,11 +1,17 @@
 const express = require('express')
 const path = require('path')
 
+const http = require('http')
+const {Server} = require('socket.io')
+
 const PORT = 3000
 const app = express()
 
-const games = []
+const server = http.createServer(app)
+const io = new Server(server)
 
+const isWhiteTurn = true
+const players = []
 const board = [
     [1, 0, 1, 0, 1, 0, 1, 0],
     [0, 1, 0, 1, 0, 1, 0, 1],
@@ -27,117 +33,89 @@ app.get('/', (req, res) => {
 app.post('/login', (req, res) => {
     const {username} = req.body
 
-    const openGames = games.filter(({players}) => players.length < 2)
-
     res.setHeader('Content-Type', 'application/json')
 
-    if (openGames.length) {
-        if (openGames[0].players[0].username === username) {
-            res.status(400).send(
-                JSON.stringify({
-                    code: 'USERNAME_TAKEN',
-                    error: 'Username already taken.',
-                })
-            )
-            return
-        }
-
-        openGames[0].players.push({
-            id: 1,
-            username,
-            color: 1,
-        })
-
-        res.send(
+    if (players.length >= 2)
+        return res.status(400).send(
             JSON.stringify({
-                gameId: openGames[0].id,
-                playerId: 1,
+                code: 'GAME_FULL',
+                error: 'Game is full.',
             })
         )
-        return
+    if (!username || players.find((player) => player.username === username))
+        return res.status(400).send(
+            JSON.stringify({
+                code: 'USERNAME_TAKEN',
+                error: 'Username already taken.',
+            })
+        )
+
+    const player = {
+        id: players.length,
+        username,
+        isWhite: players.length === 0,
     }
 
-    games.push({
-        id: games.length,
-        players: [
-            {
-                id: 0,
-                username,
-                color: 0,
-            },
-        ],
-        board: JSON.parse(JSON.stringify(board)),
-    })
-
-    res.send(
-        JSON.stringify({
-            gameId: games.length - 1,
-            playerId: 0,
-        })
-    )
+    players.push(player)
+    res.send(JSON.stringify(player))
 })
 
-app.get('/game/:gameId/info', (req, res) => {
-    const {gameId} = req.params
-
-    const game = games.find(({id}) => id === parseInt(gameId))
-
+app.get('/await', async (req, res) => {
     res.setHeader('Content-Type', 'application/json')
 
-    if (!game) {
-        res.status(400).send(
-            JSON.stringify({code: 'GAME_NOT_FOUND', error: 'Game not found.'})
-        )
-        return
-    }
+    const listen = setInterval(() => {
+        if (players.length === 2) {
+            clearInterval(listen)
 
-    res.send(
-        JSON.stringify({
-            gameId: game.id,
-            players: game.players.map(({id, username, color}) => ({
-                id,
-                username,
-                color,
-            })),
-            board: game.board,
-        })
-    )
+            res.send(JSON.stringify(players))
+        }
+    }, 100)
 })
 
-app.get('/game/:gameId/player/:playerId/info', (req, res) => {
-    const {gameId, playerId} = req.params
+app.get('/info', (req, res) => {
+    const {id} = req.query
 
-    const game = games.find(({id}) => id === parseInt(gameId))
+    const player = players.find((player) => player.id === id)
 
-    res.setHeader('Content-Type', 'application/json')
-
-    if (!game) {
-        res.status(400).send(
-            JSON.stringify({code: 'GAME_NOT_FOUND', error: 'Game not found.'})
-        )
-        return
-    }
-
-    const player = game.players.find(({id}) => id === parseInt(playerId))
-
-    if (!player) {
-        res.status(400).send(
+    if (!player)
+        return res.status(400).send(
             JSON.stringify({
                 code: 'PLAYER_NOT_FOUND',
                 error: 'Player not found.',
             })
         )
-        return
-    }
 
-    res.send(
-        JSON.stringify({
-            gameId: game.id,
-            playerId: player.id,
-            username: player.username,
-            color: player.color,
-        })
-    )
+    res.send(JSON.stringify(player))
 })
 
-app.listen(PORT, () => console.log(`listening on ${PORT}`))
+app.get('/game', (req, res) => {
+    res.setHeader('Content-Type', 'application/json')
+
+    res.send(JSON.stringify({board, players, isWhiteTurn}))
+})
+
+io.on('connection', (socket) => {
+    console.log('user connected')
+
+    socket.on('disconnect', () => {
+        console.log('user disconnected')
+        // TODO: handle disconnect
+    })
+
+    socket.on('join', (data) => {
+        socket.join(`game-${data.gameId}`)
+
+        socket.to(`game-${data.gameId}`).emit('wait')
+        socket.to(`game-${data.gameId}`).emit('turn', {
+            board: games[data.gameId].board,
+            white: true,
+        })
+    })
+
+    socket.on('move', (data) => {
+        console.log('move', data)
+        // TODO: handle move
+    })
+})
+
+server.listen(PORT, () => console.log(`listening on port ${PORT}`))
