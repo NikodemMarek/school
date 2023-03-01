@@ -231,7 +231,7 @@ class Game {
             pawn.position.set(tilePos.x, pawn.position.y, tilePos.z)
 
             this.#selected = null
-            this.#endTurn()
+            this.#endTurn(this.board)
         }
     }
 

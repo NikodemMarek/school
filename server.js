@@ -10,9 +10,9 @@ const app = express()
 const server = http.createServer(app)
 const io = new Server(server)
 
-const isWhiteTurn = true
+let isWhiteTurn = true
 const players = []
-const board = [
+let board = [
     [1, 0, 1, 0, 1, 0, 1, 0],
     [0, 1, 0, 1, 0, 1, 0, 1],
     [0, 0, 0, 0, 0, 0, 0, 0],
@@ -103,18 +103,20 @@ io.on('connection', (socket) => {
     })
 
     socket.on('join', (data) => {
-        socket.join(`game-${data.gameId}`)
-
-        socket.to(`game-${data.gameId}`).emit('wait')
-        socket.to(`game-${data.gameId}`).emit('turn', {
-            board: games[data.gameId].board,
-            white: true,
+        io.emit('turn', {
+            board: board,
+            white: isWhiteTurn,
         })
     })
 
     socket.on('move', (data) => {
-        console.log('move', data)
-        // TODO: handle move
+        board = data.board
+        isWhiteTurn = !isWhiteTurn
+
+        io.emit('turn', {
+            board: board,
+            white: isWhiteTurn,
+        })
     })
 })
 

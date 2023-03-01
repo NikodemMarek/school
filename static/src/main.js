@@ -3,7 +3,7 @@ import Net from './net.js'
 import UI from './ui.js'
 
 const start = async () => {
-    new Game(false, undefined, () => {})
+    new Game(false, undefined, false)
 
     do {
         try {
@@ -22,31 +22,20 @@ const start = async () => {
 
     ui.gameInfo(game.players, game.isWhiteTurn)
 
-    const sendMove = async (from, to) => {
-        console.log('sent')
-    }
-
-    new Game(
-        net.isWhite,
-        game.board,
-        net.isWhite === game.isWhiteTurn,
-        () => {}
-    )
-
-    return
-
     const client = await io.connect()
-    client.emit('join', {gameId: game.gameId, playerId: player.playerId})
+    client.emit('join')
 
-    client.on('wait', () => {
-        ui.loading(true)
-    })
+    ui.loading(true)
 
     client.on('turn', ({board, white}) => {
-        if (white === [true, false][player.color]) {
+        console.log(white, net.isWhite)
+        if (white === net.isWhite) {
             ui.loading(false)
-            const game = new Game([true, false][player.color], board, sendMove)
-            game.render()
+            new Game(net.isWhite, board, true, (board) => {
+                new Game(net.isWhite, board, false)
+                ui.loading(true)
+                client.emit('move', {board})
+            })
         }
     })
 }
