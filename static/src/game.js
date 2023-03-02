@@ -61,7 +61,7 @@ class Game {
         this.renderer.setClearColor(0x666666)
         this.renderer.setSize(600, 600)
 
-        this.scene.add(new THREE.AxesHelper(1000))
+        // this.scene.add(new THREE.AxesHelper(1000))
 
         const root = document.querySelector('#root')
         root.innerHTML = ''
@@ -222,11 +222,16 @@ class Game {
             return moveablePositions
         }
 
-        const resetColors = () =>
+        const resetColors = () => {
             this.#tiles.forEach((tile) => {
                 if (tile.isWhite) tile.material.color.set(0xdddddd)
                 else tile.material.color.set(0x333333)
             })
+            this.#pawns.forEach((pawn) => {
+                if (pawn.isWhite) pawn.material.color.set(0xffffff)
+                else pawn.material.color.set(0x000000)
+            })
+        }
 
         const intersectsPawns = this.raycaster.intersectObjects(
             this.#isWhiteTurn === this.#isWhite
@@ -239,6 +244,14 @@ class Game {
             this.#selected = pawn
 
             resetColors()
+
+            this.#pawns
+                .find(
+                    (pawn) =>
+                        pawn.tile.x === this.#selected.x &&
+                        pawn.tile.y === this.#selected.y
+                )
+                ?.material.color.set(0xff0000)
 
             getAvailablePositions(this.#selected)
                 .map(({x, y}) =>
