@@ -50,11 +50,19 @@ const serveFn = async (path) => {
 }
 
 class NodeHttpServer {
-    #server = null
+    #endpoints = {}
+    addEndpoint = (endpoint, fn) => (this.#endpoints[endpoint] = fn)
 
-    constructor(endpoints = []) {
+    #server = null
+    get server() {
+        return this.#server
+    }
+
+    constructor(endpoints = {}) {
+        this.#endpoints = endpoints
+
         this.#server = http.createServer(async (req, res) => {
-            const url = decodeURIComponent(req.url)
+            const [url, query] = decodeURIComponent(req.url).split('?')
             const path = url === '/' ? '/index.html' : url
 
             const sendError = (statusCode, message) => {
@@ -62,11 +70,17 @@ class NodeHttpServer {
                 res.end(message)
             }
 
-            const endpoint = endpoints[path]
+            const endpoint = this.#endpoints[path]
 
             try {
                 const {body, headers} = endpoint
-                    ? await endpoint(path, req.body)
+                    ? await endpoint({
+                          query: query.split('&').reduce((acc, curr) => {
+                              const [key, value] = curr.split('=')
+                              acc[key] = value
+                              return acc
+                          }, {}),
+                      })
                     : await serveFn(path)
 
                 res.writeHead(200, {

@@ -1,0 +1,116 @@
+html,
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: #1e1e2e;
+}
+
+#messages {
+    overflow: auto;
+    padding-bottom: 50px;
+    box-sizing: border-box;
+}
+    
+.right {
+    margin: 10px 10px 10px auto;
+}
+.left {
+    margin: 10px auto 10px 10px;
+}
+
+.message {
+    width: fit-content;
+    display: flex;
+    flex-direction: row;
+    box-sizing: border-box;
+}
+
+.message .msg__user {
+    max-width: 200px;
+    padding: 5px 10px 5px 20px;
+    box-sizing: border-box;
+    background-color: #fab387;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #11111b;
+    border-radius: 20px 0px 0px 20px;
+}
+
+.message .msg__message {
+    max-width: 500px;
+    padding: 5px 10px;
+    box-sizing: border-box;
+    color: #11111b;
+    overflow: hidden;
+}
+
+.message .msg__time {
+    max-width: 150px;
+    padding: 5px 20px 5px 10px;
+    box-sizing: border-box;
+    background-color: #313244;
+    color: #cdd6f4;
+    overflow: hidden;
+    border-radius: 0px 20px 20px 0px;
+}
+
+.self-join-msg {
+    background-color: #a6e3a1;
+}
+.join-msg {
+    background-color: #f38ba8;
+}
+
+.leave-msg {
+    background-color: #f38ba8;
+}
+.self-leave-msg {
+    background-color: #f38ba8;
+}
+
+.msg-msg {
+    background-color: #cdd6f4;
+}
+.self-msg-msg {
+    background-color: #f5e0dc;
+}
+
+#msg-form {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: 50px;
+    background-color: #313244;
+}
+
+#msg-form #new-msg {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    padding: 0 10px;
+    box-sizing: border-box;
+    border: none;
+    background-color: #313244;
+    color: #cdd6f4;
+}
+
+#msg-form #new-msg:focus {
+    outline: none;
+}
+
+#msg-form #send-msg {
+    position: absolute;
+    right: 0;
+    width: 100px;
+    height: 100%;
+    border: none;
+    background-color: #74c7ec;
+    font-size: large;
+    color: #11111b;
+}
+
+#msg-form #send-msg:focus {
+    outline: none;
+}
