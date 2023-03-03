@@ -66,7 +66,7 @@ class NodeHttpServer {
 
             try {
                 const {body, headers} = endpoint
-                    ? await endpoint(path, req.body)
+                    ? await endpoint({body: req.body})
                     : await serveFn(path)
 
                 res.writeHead(200, {
