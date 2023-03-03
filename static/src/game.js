@@ -149,6 +149,22 @@ class Game {
                 this.#dimensions.halfY +
                 this.#dimensions.tileSize.z / 2
         )
+
+        if (Math.abs(from.x - to.x) === 2)
+            this.killAt((from.x + to.x) / 2, (from.y + to.y) / 2)
+    }
+
+    killAt = (x, y) => {
+        const pawnToRemove = this.#pawns.find(
+            (pawn) => pawn.tile.x === x && pawn.tile.y === y
+        )
+
+        if (pawnToRemove) {
+            this.#board[y][x] = 0
+
+            this.scene.remove(pawnToRemove)
+            this.#pawns = this.#pawns.filter((pawn) => pawn !== pawnToRemove)
+        }
     }
 
     #selected = null

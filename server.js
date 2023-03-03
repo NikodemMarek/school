@@ -108,6 +108,9 @@ io.on('connection', (socket) => {
         board[to.y][to.x] = board[from.y][from.x]
         board[from.y][from.x] = 0
 
+        if (Math.abs(from.x - to.x) === 2)
+            board[(from.x + to.x) / 2][(from.y + to.y) / 2] = 0
+
         io.emit('turn', {
             from,
             to,
