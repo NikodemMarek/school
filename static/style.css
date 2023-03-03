@@ -27,7 +27,7 @@ body {
     box-sizing: border-box;
 }
 
-.message .msg__user {
+.message .msg-user {
     max-width: 200px;
     padding: 5px 10px 5px 20px;
     box-sizing: border-box;
@@ -38,7 +38,7 @@ body {
     border-radius: 20px 0px 0px 20px;
 }
 
-.message .msg__message {
+.message .msg-message {
     max-width: 500px;
     padding: 5px 10px;
     box-sizing: border-box;
@@ -46,7 +46,7 @@ body {
     overflow: hidden;
 }
 
-.message .msg__time {
+.message .msg-time {
     max-width: 150px;
     padding: 5px 20px 5px 10px;
     box-sizing: border-box;
