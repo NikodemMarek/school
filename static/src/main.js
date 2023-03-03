@@ -28,7 +28,7 @@ import UI from './ui.js'
     ui.loading(true)
     await net.awaitOpponent()
 
-    const {board, players, isWhiteTurn} = await net.getGame()
+    const {board, players, isWhiteTurn, time} = await net.getGame()
     ui.gameInfo(players, isWhiteTurn)
 
     const game = new Game(net.isWhite, board, (from, to) => {
@@ -38,7 +38,9 @@ import UI from './ui.js'
     ui.loading(!net.isWhite)
 
     net.onTurn((from, to, isWhiteTurn, time) => {
-        ui.loading(isWhiteTurn !== net.isWhite, time)
+        ui.loading(isWhiteTurn !== net.isWhite)
+        ui.turnTimer(time)
+
         game.moveFromTo(from, to)
         game.switchTurn(isWhiteTurn)
     })

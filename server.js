@@ -22,6 +22,7 @@ let board = [
     [2, 0, 2, 0, 2, 0, 2, 0],
     [0, 2, 0, 2, 0, 2, 0, 2],
 ]
+let timeout = null
 const TURN_TIME = 30
 
 app.use(express.static('static'))
@@ -92,10 +93,9 @@ app.get('/info', (req, res) => {
 app.get('/game', (req, res) => {
     res.setHeader('Content-Type', 'application/json')
 
-    res.send(JSON.stringify({board, players, isWhiteTurn}))
+    res.send(JSON.stringify({board, players, isWhiteTurn, time: TURN_TIME}))
 })
 
-let timeout = null
 io.on('connection', (socket) => {
     console.log('user connected')
 

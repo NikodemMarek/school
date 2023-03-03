@@ -1,6 +1,17 @@
 class UI {
     constructor() {
         this.container = document.querySelector('#ui')
+
+        const timer = document.querySelector('#turn-timer')
+        const turnTimer = timer.querySelector('#value')
+        setInterval(() => {
+            const turnTimerTime = parseInt(turnTimer.innerHTML)
+
+            if (turnTimerTime > 0) {
+                timer.classList.remove('hidden')
+                turnTimer.innerHTML = turnTimerTime - 1
+            } else timer.classList.add('hidden')
+        }, 1000)
     }
 
     login = async () => {
@@ -23,23 +34,13 @@ class UI {
         )
     }
 
-    loading = (isLoading, time) => {
-        const loading = document.querySelector('#loading')
-        loading.innerHTML = isLoading
-            ? '<div id="content"><div id="countdown"></div><svg width="48" height="48" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><style>.spinner_9y7u{animation:spinner_fUkk 2.4s linear infinite;animation-delay:-2.4s}.spinner_DF2s{animation-delay:-1.6s}.spinner_q27e{animation-delay:-.8s}@keyframes spinner_fUkk{8.33%{x:13px;y:1px}25%{x:13px;y:1px}33.3%{x:13px;y:13px}50%{x:13px;y:13px}58.33%{x:1px;y:13px}75%{x:1px;y:13px}83.33%{x:1px;y:1px}}</style><rect class="spinner_9y7u" x="1" y="1" rx="1" width="10" height="10"/><rect class="spinner_9y7u spinner_DF2s" x="1" y="1" rx="1" width="10" height="10"/><rect class="spinner_9y7u spinner_q27e" x="1" y="1" rx="1" width="10" height="10"/></svg></div>'
-            : ''
+    loading = (isLoading) =>
+        (document.querySelector('#loading').innerHTML = isLoading
+            ? '<div id="content"><svg width="48" height="48" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><style>.spinner_9y7u{animation:spinner_fUkk 2.4s linear infinite;animation-delay:-2.4s}.spinner_DF2s{animation-delay:-1.6s}.spinner_q27e{animation-delay:-.8s}@keyframes spinner_fUkk{8.33%{x:13px;y:1px}25%{x:13px;y:1px}33.3%{x:13px;y:13px}50%{x:13px;y:13px}58.33%{x:1px;y:13px}75%{x:1px;y:13px}83.33%{x:1px;y:1px}}</style><rect class="spinner_9y7u" x="1" y="1" rx="1" width="10" height="10"/><rect class="spinner_9y7u spinner_DF2s" x="1" y="1" rx="1" width="10" height="10"/><rect class="spinner_9y7u spinner_q27e" x="1" y="1" rx="1" width="10" height="10"/></svg></div>'
+            : '')
 
-        if (!isLoading || !time) return
-
-        const countdown = document.querySelector('#countdown')
-        countdown.innerHTML = time
-
-        const interval = setInterval(() => {
-            countdown.innerHTML = parseInt(countdown.innerHTML) - 1
-
-            if (time <= 0) clearInterval(interval)
-        }, 1000)
-    }
+    turnTimer = (time) =>
+        (document.querySelector('#turn-timer #value').innerHTML = time)
 
     gameInfo = (players, isWhite) => {
         this.container.innerHTML = `

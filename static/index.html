@@ -13,6 +13,11 @@
             padding: 0;
             height: 100%;
             width: 100%;
+            overflow: hidden;
+        }
+        
+        .hidden {
+            display: none;
         }
         
         #root {
@@ -126,13 +131,32 @@
             font-weight: bold;
             margin-right: 10px;
         }
+        
+        #turn-timer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            overflow: hidden;
+
+            margin: 10px;
+            background-color: #999;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            font-size: large;
+            color: #fff;
+            box-sizing: border-box;
+        }
     </style>
 </head>
 
 <body>
     <div id="root"></div>
-    <div id="loading"></div>
+    <div id="loading"><div id="countdown"></div></div>
     <div id="ui"></div>
+    <div id="turn-timer" class="hidden">
+        Time left: <span id="value">${time}</span>
+    </div>
 
     <script src="./lib/three145.js" defer></script>
     <script src="./lib/socket.io.js" defer></script>
