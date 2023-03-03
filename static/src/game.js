@@ -21,6 +21,11 @@ class Game {
     #isWhite = true
 
     #isWhiteTurn = true
+    switchTurn = (isWhiteTurn) => {
+        this.#isWhiteTurn = isWhiteTurn
+        this.#selected = null
+        this.resetColors()
+    }
 
     #onMove = () => {}
 
@@ -126,15 +131,25 @@ class Game {
         this.renderer.render(this.scene, this.camera)
     }
 
+    resetColors = () => {
+        this.#tiles.forEach((tile) => {
+            if (tile.isWhite) tile.material.color.set(0xdddddd)
+            else tile.material.color.set(0x333333)
+        })
+        this.#pawns.forEach((pawn) => {
+            if (pawn.isWhite) pawn.material.color.set(0xffffff)
+            else pawn.material.color.set(0x000000)
+        })
+    }
+
     moveFromTo = (from, to) => {
+        if (!from || !to) return
         if (this.#board[from.y][from.x] === 0) return
 
         const pawn = this.#pawns.find(
             (pawn) => pawn.tile.x === from.x && pawn.tile.y === from.y
         )
         if (!pawn) return
-
-        this.#isWhiteTurn = !this.#isWhiteTurn
 
         this.#board[to.y][to.x] = this.#board[from.y][from.x]
         this.#board[from.y][from.x] = 0
@@ -238,17 +253,6 @@ class Game {
             return moveablePositions
         }
 
-        const resetColors = () => {
-            this.#tiles.forEach((tile) => {
-                if (tile.isWhite) tile.material.color.set(0xdddddd)
-                else tile.material.color.set(0x333333)
-            })
-            this.#pawns.forEach((pawn) => {
-                if (pawn.isWhite) pawn.material.color.set(0xffffff)
-                else pawn.material.color.set(0x000000)
-            })
-        }
-
         const intersectsPawns = this.raycaster.intersectObjects(
             this.#isWhiteTurn === this.#isWhite
                 ? this.#pawns.filter((pawn) => pawn.isWhite === this.#isWhite)
@@ -259,7 +263,7 @@ class Game {
             const pawn = intersectsPawns[0].object.tile
             this.#selected = pawn
 
-            resetColors()
+            this.resetColors()
 
             this.#pawns
                 .find(
@@ -288,12 +292,11 @@ class Game {
         if (intersectsTiles.length > 0) {
             const tile = intersectsTiles[0].object.tile
 
-            resetColors()
+            this.resetColors()
 
             this.moveFromTo(this.#selected, tile)
             this.#onMove?.(this.#selected, tile)
-
-            this.#selected = null
+            this.switchTurn(!this.#isWhiteTurn)
         }
     }
 }

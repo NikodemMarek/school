@@ -22,6 +22,7 @@ let board = [
     [2, 0, 2, 0, 2, 0, 2, 0],
     [0, 2, 0, 2, 0, 2, 0, 2],
 ]
+const TURN_TIME = 30
 
 app.use(express.static('static'))
 app.use(express.json())
@@ -94,6 +95,7 @@ app.get('/game', (req, res) => {
     res.send(JSON.stringify({board, players, isWhiteTurn}))
 })
 
+let timeout = null
 io.on('connection', (socket) => {
     console.log('user connected')
 
@@ -103,6 +105,9 @@ io.on('connection', (socket) => {
     })
 
     socket.on('move', ({from, to}) => {
+        clearTimeout(timeout)
+        timeout = null
+
         isWhiteTurn = !isWhiteTurn
 
         board[to.y][to.x] = board[from.y][from.x]
@@ -111,10 +116,19 @@ io.on('connection', (socket) => {
         if (Math.abs(from.x - to.x) === 2)
             board[(from.x + to.x) / 2][(from.y + to.y) / 2] = 0
 
+        timeout = setTimeout(() => {
+            isWhiteTurn = !isWhiteTurn
+            io.emit('turn', {
+                isWhiteTurn,
+                time: TURN_TIME,
+            })
+        }, TURN_TIME * 1000)
+
         io.emit('turn', {
             from,
             to,
             isWhiteTurn,
+            time: TURN_TIME,
         })
     })
 })

@@ -63,8 +63,8 @@ class Net {
 
     moveFromTo = (from, to) => this.client.emit('move', {from, to})
     onTurn = (exec) =>
-        this.client.on('turn', ({from, to, isWhiteTurn}) =>
-            exec(from, to, isWhiteTurn)
+        this.client.on('turn', ({from, to, isWhiteTurn, time}) =>
+            exec(from, to, isWhiteTurn, time)
         )
 }
 

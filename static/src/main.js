@@ -1,8 +1,10 @@
 import Game from './game.js'
 import Net from './net.js'
 import UI from './ui.js'
+;(async () => {
+    const net = new Net()
+    const ui = new UI()
 
-const start = async () => {
     new Game(false, [
         [0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0],
@@ -31,20 +33,13 @@ const start = async () => {
 
     const game = new Game(net.isWhite, board, (from, to) => {
         net.moveFromTo(from, to)
-        ui.loading(true)
     })
 
     ui.loading(!net.isWhite)
 
-    net.onTurn((from, to, isWhiteTurn) => {
+    net.onTurn((from, to, isWhiteTurn, time) => {
+        ui.loading(isWhiteTurn !== net.isWhite, time)
         game.moveFromTo(from, to)
-        if (isWhiteTurn === net.isWhite) ui.loading(false)
+        game.switchTurn(isWhiteTurn)
     })
-}
-
-const net = new Net()
-const ui = new UI()
-
-start().then(() => {
-    console.log('logged in')
-})
+})()
