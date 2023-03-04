@@ -91,7 +91,6 @@ class Game {
                 const tileObject = new Tile(
                     position,
                     this.#dimensions.tileSize,
-                    isWhite ? 0xdddddd : 0x333333,
                     {x, y},
                     isWhite
                 )
@@ -103,7 +102,6 @@ class Game {
                 const pawnObject = new Pawn(
                     {...position, y: 0},
                     this.#dimensions.tileSize,
-                    tile === 1 ? 0xffffff : 0x000000,
                     {x, y},
                     tile === 1
                 )
@@ -134,14 +132,8 @@ class Game {
     }
 
     resetColors = () => {
-        this.#tiles.forEach((tile) => {
-            if (tile.isWhite) tile.material.color.set(0xdddddd)
-            else tile.material.color.set(0x333333)
-        })
-        this.#pawns.forEach((pawn) => {
-            if (pawn.isWhite) pawn.material.color.set(0xffffff)
-            else pawn.material.color.set(0x000000)
-        })
+        this.#tiles.forEach((tile) => tile.highlight(false))
+        this.#pawns.forEach((pawn) => pawn.highlight(false))
     }
 
     moveFromTo = (from, to) => {
@@ -202,6 +194,67 @@ class Game {
             .start()
     }
 
+    getAvailablePositions = (pawnPosition) => {
+        if (!pawnPosition) return []
+
+        const {x, y} = pawnPosition
+
+        const availablePositions = [
+            [
+                {x: x - 1, y: y - 1},
+                {x: x - 2, y: y - 2},
+            ],
+            [
+                {x: x - 1, y: y + 1},
+                {x: x - 2, y: y + 2},
+            ],
+            [
+                {x: x + 1, y: y - 1},
+                {x: x + 2, y: y - 2},
+            ],
+            [
+                {x: x + 1, y: y + 1},
+                {x: x + 2, y: y + 2},
+            ],
+        ]
+
+        const moveablePositions = availablePositions.reduce(
+            (acc, [closePosition, farPosition]) => {
+                if (
+                    closePosition.x < 0 ||
+                    closePosition.x >= this.#board[0].length ||
+                    closePosition.y < 0 ||
+                    closePosition.y >= this.#board.length
+                )
+                    return acc
+
+                if (this.#board[closePosition.y][closePosition.x] === 0)
+                    return [...acc, closePosition]
+
+                if (
+                    farPosition.x < 0 ||
+                    farPosition.x >= this.#board[0].length ||
+                    farPosition.y < 0 ||
+                    farPosition.y >= this.#board.length
+                )
+                    return acc
+
+                if (
+                    [false, !this.#isWhite, this.#isWhite][
+                        this.#board[closePosition.y][closePosition.x]
+                    ] &&
+                    this.#board[farPosition.y][farPosition.x] === 0
+                )
+                    return [...acc, farPosition]
+
+                return acc
+            },
+            []
+        )
+
+        return moveablePositions
+    }
+
     #selected = null
     onclick = (event) => {
         this.raycaster.setFromCamera(
@@ -211,67 +264,6 @@ class Game {
             ),
             this.camera
         )
-
-        const getAvailablePositions = (pawnPosition) => {
-            if (!pawnPosition) return []
-
-            const {x, y} = pawnPosition
-
-            const availablePositions = [
-                [
-                    {x: x - 1, y: y - 1},
-                    {x: x - 2, y: y - 2},
-                ],
-                [
-                    {x: x - 1, y: y + 1},
-                    {x: x - 2, y: y + 2},
-                ],
-                [
-                    {x: x + 1, y: y - 1},
-                    {x: x + 2, y: y - 2},
-                ],
-                [
-                    {x: x + 1, y: y + 1},
-                    {x: x + 2, y: y + 2},
-                ],
-            ]
-
-            const moveablePositions = availablePositions.reduce(
-                (acc, [closePosition, farPosition]) => {
-                    if (
-                        closePosition.x < 0 ||
-                        closePosition.x >= this.#board[0].length ||
-                        closePosition.y < 0 ||
-                        closePosition.y >= this.#board.length
-                    )
-                        return acc
-
-                    if (this.#board[closePosition.y][closePosition.x] === 0)
-                        return [...acc, closePosition]
-
-                    if (
-                        farPosition.x < 0 ||
-                        farPosition.x >= this.#board[0].length ||
-                        farPosition.y < 0 ||
-                        farPosition.y >= this.#board.length
-                    )
-                        return acc
-
-                    if (
-                        [false, !this.#isWhite, this.#isWhite][
-                            this.#board[closePosition.y][closePosition.x]
-                        ] &&
-                        this.#board[farPosition.y][farPosition.x] === 0
-                    )
-                        return [...acc, farPosition]
-
-                    return acc
-                },
-                []
-            )
-
-            return moveablePositions
-        }
 
         const intersectsPawns = this.raycaster.intersectObjects(
             this.#isWhiteTurn === this.#isWhite
@@ -291,19 +283,19 @@ class Game {
                         pawn.tile.x === this.#selected.x &&
                         pawn.tile.y === this.#selected.y
                 )
-                ?.material.color.set(0xff0000)
+                ?.highlight(true)
 
-            getAvailablePositions(this.#selected)
+            this.getAvailablePositions(this.#selected)
                 .map(({x, y}) =>
                     this.#tiles.find(
                         (tile) => tile.tile.x === x && tile.tile.y === y
                     )
                 )
-                .forEach((tile) => tile.material.color.set(0x00ff00))
+                .forEach((tile) => tile.highlight(true))
         }
 
         const intersectsTiles = this.raycaster.intersectObjects(
-            getAvailablePositions(this.#selected).map(({x, y}) =>
+            this.getAvailablePositions(this.#selected).map(({x, y}) =>
                 this.#tiles.find(
                     (tile) => tile.tile.x === x && tile.tile.y === y
                 )

@@ -1,9 +1,12 @@
 class Tile extends THREE.Mesh {
-    constructor(pos, size, color, tile, isWhite) {
+    #isHighlighted = false
+
+    constructor(pos, size, tile, isWhite) {
         super(
             new THREE.BoxGeometry(size.x, size.y, size.z),
             new THREE.MeshBasicMaterial({
-                color,
+                color: isWhite ? 0xdddddd : 0x333333,
+
                 side: THREE.DoubleSide,
             })
         )
@@ -11,6 +14,13 @@ class Tile extends THREE.Mesh {
 
         this.tile = tile
         this.isWhite = isWhite
+    }
+
+    highlight = (isHighlighted) => {
+        if (isHighlighted) this.material.color.set(0x00ff00)
+        else this.material.color.set(this.isWhite ? 0xdddddd : 0x333333)
+
+        this.#isHighlighted = isHighlighted
     }
 }
 
