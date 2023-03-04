@@ -215,24 +215,27 @@ class Game {
 
         const {x, y} = pawnPosition
 
-        const availablePositions = [
-            [
-                {x: x - 1, y: y - 1},
-                {x: x - 2, y: y - 2},
-            ],
-            [
-                {x: x - 1, y: y + 1},
-                {x: x - 2, y: y + 2},
-            ],
-            [
-                {x: x + 1, y: y - 1},
-                {x: x + 2, y: y - 2},
-            ],
-            [
-                {x: x + 1, y: y + 1},
-                {x: x + 2, y: y + 2},
-            ],
-        ]
+        const availablePositions = this.#isWhite
+            ? [
+                  [
+                      {x: x + 1, y: y + 1},
+                      {x: x + 2, y: y + 2},
+                  ],
+                  [
+                      {x: x - 1, y: y + 1},
+                      {x: x - 2, y: y + 2},
+                  ],
+              ]
+            : [
+                  [
+                      {x: x - 1, y: y - 1},
+                      {x: x - 2, y: y - 2},
+                  ],
+                  [
+                      {x: x + 1, y: y - 1},
+                      {x: x + 2, y: y - 2},
+                  ],
+              ]
 
         const moveablePositions = availablePositions.reduce(
             (acc, [closePosition, farPosition]) => {
