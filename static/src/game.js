@@ -35,20 +35,16 @@ class Game {
         this.#onMove = onMove
 
         this.#dimensions = {
-            tileSize: {
-                x: 100,
-                y: 50,
-                z: 100,
-            },
+            tileSize: 100,
             size: {
                 x: this.#board[0].length,
                 y: this.#board.length,
             },
         }
         this.#dimensions.fullX =
-            this.#dimensions.size.y * this.#dimensions.tileSize.z
+            this.#dimensions.size.y * this.#dimensions.tileSize
         this.#dimensions.fullY =
-            this.#dimensions.size.x * this.#dimensions.tileSize.x
+            this.#dimensions.size.x * this.#dimensions.tileSize
         this.#dimensions.halfX = this.#dimensions.fullY / 2
         this.#dimensions.halfY = this.#dimensions.fullX / 2
 
@@ -66,7 +62,26 @@ class Game {
         this.renderer.setClearColor(0x666666)
         this.renderer.setSize(600, 600)
 
-        // this.scene.add(new THREE.AxesHelper(1000))
+        const mats = {
+            'tile-white': new THREE.TextureLoader().load(
+                '/assets/tile-white.png'
+            ),
+            'tile-black': new THREE.TextureLoader().load(
+                '/assets/tile-black.jpg'
+            ),
+            'pawn-white-bottom': new THREE.TextureLoader().load(
+                '/assets/pawn-white-bottom.png'
+            ),
+            'pawn-white-top': new THREE.TextureLoader().load(
+                '/assets/pawn-white-top.png'
+            ),
+            'pawn-black-bottom': new THREE.TextureLoader().load(
+                '/assets/pawn-black-bottom.png'
+            ),
+            'pawn-black-top': new THREE.TextureLoader().load(
+                '/assets/pawn-black-top.png'
+            ),
+        }
 
         const root = document.querySelector('#root')
         root.innerHTML = ''
@@ -76,14 +91,14 @@ class Game {
             row.forEach((tile, x) => {
                 const position = {
                     x:
-                        x * this.#dimensions.tileSize.x -
+                        x * this.#dimensions.tileSize -
                         this.#dimensions.halfX +
-                        this.#dimensions.tileSize.x / 2,
-                    y: -this.#dimensions.tileSize.y,
+                        this.#dimensions.tileSize / 2,
+                    y: 0,
                     z:
-                        y * this.#dimensions.tileSize.z -
+                        y * this.#dimensions.tileSize -
                         this.#dimensions.halfY +
-                        this.#dimensions.tileSize.z / 2,
+                        this.#dimensions.tileSize / 2,
                 }
 
                 const isWhite =
@@ -92,7 +107,8 @@ class Game {
                     position,
                     this.#dimensions.tileSize,
                     {x, y},
-                    isWhite
+                    isWhite,
+                    mats
                 )
 
                 this.#tiles.push(tileObject)
@@ -100,10 +116,11 @@ class Game {
 
                 if (tile === 0) return
                 const pawnObject = new Pawn(
-                    {...position, y: 0},
+                    position,
                     this.#dimensions.tileSize,
                     {x, y},
-                    tile === 1
+                    tile === 1,
+                    mats
                 )
 
                 this.#pawns.push(pawnObject)
@@ -153,14 +170,13 @@ class Game {
             .to(
                 {
                     x:
-                        to.x * this.#dimensions.tileSize.x -
+                        to.x * this.#dimensions.tileSize -
                         this.#dimensions.halfX +
-                        this.#dimensions.tileSize.x / 2,
-                    // y: pawn.position.y,
+                        this.#dimensions.tileSize / 2,
                     z:
-                        to.y * this.#dimensions.tileSize.z -
+                        to.y * this.#dimensions.tileSize -
                         this.#dimensions.halfY +
-                        this.#dimensions.tileSize.z / 2,
+                        this.#dimensions.tileSize / 2,
                 },
                 500
             )
@@ -185,7 +201,7 @@ class Game {
         new TWEEN.Tween(pawnToRemove.position)
             .to(
                 {
-                    y: -this.#dimensions.tileSize.y + 1,
+                    y: -20,
                 },
                 300
             )
