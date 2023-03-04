@@ -37,7 +37,7 @@ class Game {
         this.#dimensions = {
             tileSize: {
                 x: 100,
-                y: 20,
+                y: 50,
                 z: 100,
             },
             size: {
@@ -79,7 +79,7 @@ class Game {
                         x * this.#dimensions.tileSize.x -
                         this.#dimensions.halfX +
                         this.#dimensions.tileSize.x / 2,
-                    y: this.#dimensions.tileSize.y / 2,
+                    y: -this.#dimensions.tileSize.y,
                     z:
                         y * this.#dimensions.tileSize.z -
                         this.#dimensions.halfY +
@@ -101,7 +101,7 @@ class Game {
 
                 if (tile === 0) return
                 const pawnObject = new Pawn(
-                    {...position, y: this.#dimensions.tileSize.y},
+                    {...position, y: 0},
                     this.#dimensions.tileSize,
                     tile === 1 ? 0xffffff : 0x000000,
                     {x, y},
@@ -125,6 +125,8 @@ class Game {
         this.camera.aspect = window.innerWidth / window.innerHeight
         this.camera.updateProjectionMatrix()
         this.renderer.setSize(window.innerWidth, window.innerHeight)
+
+        TWEEN.update()
 
         // Render the scene.
         requestAnimationFrame(this.render)
@@ -155,15 +157,23 @@ class Game {
         this.#board[from.y][from.x] = 0
 
         pawn.tile = to
-        pawn.position.set(
-            to.x * this.#dimensions.tileSize.x -
-                this.#dimensions.halfX +
-                this.#dimensions.tileSize.x / 2,
-            pawn.position.y,
-            to.y * this.#dimensions.tileSize.z -
-                this.#dimensions.halfY +
-                this.#dimensions.tileSize.z / 2
-        )
+        new TWEEN.Tween(pawn.position)
+            .to(
+                {
+                    x:
+                        to.x * this.#dimensions.tileSize.x -
+                        this.#dimensions.halfX +
+                        this.#dimensions.tileSize.x / 2,
+                    // y: pawn.position.y,
+                    z:
+                        to.y * this.#dimensions.tileSize.z -
+                        this.#dimensions.halfY +
+                        this.#dimensions.tileSize.z / 2,
+                },
+                500
+            )
+            .easing(TWEEN.Easing.Cubic.In)
+            .start()
 
         if (Math.abs(from.x - to.x) === 2)
             this.killAt((from.x + to.x) / 2, (from.y + to.y) / 2)
@@ -174,12 +184,22 @@ class Game {
             (pawn) => pawn.tile.x === x && pawn.tile.y === y
         )
 
-        if (pawnToRemove) {
-            this.#board[y][x] = 0
+        if (!pawnToRemove) return
 
-            this.scene.remove(pawnToRemove)
-            this.#pawns = this.#pawns.filter((pawn) => pawn !== pawnToRemove)
-        }
+        this.#board[y][x] = 0
+
+        this.#pawns = this.#pawns.filter((pawn) => pawn !== pawnToRemove)
+
+        new TWEEN.Tween(pawnToRemove.position)
+            .to(
+                {
+                    y: -this.#dimensions.tileSize.y + 1,
+                },
+                300
+            )
+            .easing(TWEEN.Easing.Cubic.Out)
+            .onComplete(() => this.scene.remove(pawnToRemove))
+            .start()
     }
 
     #selected = null
