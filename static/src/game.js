@@ -191,6 +191,8 @@ class Game {
                 y: from.y + (off > 0 ? -1 : 1) * (i + 1),
             }))
             .forEach(({x, y}) => this.killAt(x, y))
+        
+        if (to.y === 0 || to.y === 7) pawn.promote()
     }
 
     killAt = (x, y) => {

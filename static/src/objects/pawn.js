@@ -25,6 +25,7 @@ class Pawn extends THREE.Mesh {
 
         this.tile = tile
         this.isWhite = isWhite
+        this.isQueen = false
     }
 
     highlight = (isHighlighted) => {
@@ -36,30 +37,34 @@ class Pawn extends THREE.Mesh {
     }
 
     promote = () => {
-        new TWEEN.Tween(this.position)
-            .to(
-                {
-                    y: this.position.y + 100,
-                },
-                1200
-            )
-            .easing(TWEEN.Easing.Cubic.InOut)
-            .repeat(1)
-            .yoyo(true)
-            .start()
+        this.isQueen = true
 
         setTimeout(() => {
-            new TWEEN.Tween(this.rotation)
+            new TWEEN.Tween(this.position)
                 .to(
                     {
-                        x: Math.PI,
+                        y: this.position.y + 100,
                     },
-                    300
+                    1200
                 )
-                .easing(TWEEN.Easing.Linear.None)
-                .repeat(4)
+                .easing(TWEEN.Easing.Cubic.InOut)
+                .repeat(1)
+                .yoyo(true)
                 .start()
-        }, 300)
+
+            setTimeout(() => {
+                new TWEEN.Tween(this.rotation)
+                    .to(
+                        {
+                            x: Math.PI,
+                        },
+                        300
+                    )
+                    .easing(TWEEN.Easing.Linear.None)
+                    .repeat(4)
+                    .start()
+            }, 300)
+        }, 500)
     }
 }
 
