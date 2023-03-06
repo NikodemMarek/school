@@ -110,19 +110,19 @@ io.on('connection', (socket) => {
 
         isWhiteTurn = !isWhiteTurn
 
-        board[to.y][to.x] = board[from.y][from.x]
-        board[from.y][from.x] = 0
-
-        const off = from.x - to.x
-        Array(Math.abs(off) - 1)
+        const [offX, offY] = [from.x - to.x, from.y - to.y]
+        Array(Math.abs(offX) - 1)
             .fill(null)
             .map((_, i) => ({
-                x: from.x + (off > 0 ? -1 : 1) * (i + 1),
-                y: from.y + (off > 0 ? -1 : 1) * (i + 1),
+                x: from.x + (offX > 0 ? -1 : 1) * (i + 1),
+                y: from.y + (offY > 0 ? -1 : 1) * (i + 1),
             }))
             .forEach(({x, y}) => {
-                board[y][x] = 0
+                if (board[y][x] !== board[from.y][from.x]) board[y][x] = 0
             })
+
+        board[to.y][to.x] = board[from.y][from.x]
+        board[from.y][from.x] = 0
 
         timeout = setTimeout(() => {
             isWhiteTurn = !isWhiteTurn

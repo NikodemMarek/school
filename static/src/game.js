@@ -162,9 +162,6 @@ class Game {
         )
         if (!pawn) return
 
-        this.#board[to.y][to.x] = this.#board[from.y][from.x]
-        this.#board[from.y][from.x] = 0
-
         pawn.tile = to
         new TWEEN.Tween(pawn.position)
             .to(
@@ -183,15 +180,21 @@ class Game {
             .easing(TWEEN.Easing.Cubic.In)
             .start()
 
-        const off = from.x - to.x
-        Array(Math.abs(off) - 1)
+        const [offX, offY] = [from.x - to.x, from.y - to.y]
+        Array(Math.abs(offX) - 1)
             .fill(null)
             .map((_, i) => ({
-                x: from.x + (off > 0 ? -1 : 1) * (i + 1),
-                y: from.y + (off > 0 ? -1 : 1) * (i + 1),
+                x: from.x + (offX > 0 ? -1 : 1) * (i + 1),
+                y: from.y + (offY > 0 ? -1 : 1) * (i + 1),
             }))
-            .forEach(({x, y}) => this.killAt(x, y))
-        
+            .forEach(({x, y}) => {
+                if (this.#board[y][x] !== this.#board[from.y][from.x])
+                    this.killAt(x, y)
+            })
+
+        this.#board[to.y][to.x] = this.#board[from.y][from.x]
+        this.#board[from.y][from.x] = 0
+
         if (to.y === 0 || to.y === 7) pawn.promote()
     }
 
@@ -281,6 +284,50 @@ class Game {
 
         return moveablePositions
     }
+    getAvailableQueenPositions = (pawnPosition) => {
+        if (!pawnPosition) return []
+
+        const {x, y} = pawnPosition
+
+        const axisLength = [
+            7 - x > 7 - y ? 7 - y : 7 - x,
+            7 - y > x ? x : 7 - y,
+            x > y ? y : x,
+            y > 7 - x ? 7 - x : y,
+        ]
+        const ax = [
+            Array(axisLength[0])
+                .fill(null)
+                .map((_, i) => ({
+                    x: x + i + 1,
+                    y: y + i + 1,
+                })),
+            Array(axisLength[1])
+                .fill(null)
+                .map((_, i) => ({
+                    x: x - i - 1,
+                    y: y + i + 1,
+                })),
+            Array(axisLength[2])
+                .fill(null)
+                .map((_, i) => ({
+                    x: x - i - 1,
+                    y: y - i - 1,
+                })),
+            Array(axisLength[3])
+                .fill(null)
+                .map((_, i) => ({
+                    x: x + i + 1,
+                    y: y - i - 1,
+                })),
+        ]
+
+        const availablePositions = ax
+            .flat(2)
+            .filter(({x, y}) => this.#board[y][x] === 0)
+
+        return availablePositions
+    }
 
     #selected = null
     onclick = (event) => {
@@ -304,15 +351,16 @@ class Game {
 
             this.resetColors()
 
-            this.#pawns
-                .find(
-                    (pawn) =>
-                        pawn.tile.x === this.#selected.x &&
-                        pawn.tile.y === this.#selected.y
-                )
-                ?.highlight(true)
-
-            this.getAvailablePositions(this.#selected)
+            const pawnFound = this.#pawns.find(
+                (pawn) =>
+                    pawn.tile.x === this.#selected?.x &&
+                    pawn.tile.y === this.#selected?.y
+            )
+            pawnFound?.highlight(true)
+            ;(pawnFound.isQueen
+                ? this.getAvailableQueenPositions(this.#selected)
+                : this.getAvailablePositions(this.#selected)
+            )
                 .map(({x, y}) =>
                     this.#tiles.find(
                         (tile) => tile.tile.x === x && tile.tile.y === y
@@ -322,7 +370,14 @@ class Game {
         }
 
         const intersectsTiles = this.raycaster.intersectObjects(
-            this.getAvailablePositions(this.#selected).map(({x, y}) =>
+            (this.#pawns.find(
+                (pawn) =>
+                    pawn.tile.x === this.#selected?.x &&
+                    pawn.tile.y === this.#selected?.y
+            )?.isQueen || false
+                ? this.getAvailableQueenPositions(this.#selected)
+                : this.getAvailablePositions(this.#selected)
+            ).map(({x, y}) =>
                 this.#tiles.find(
                     (tile) => tile.tile.x === x && tile.tile.y === y
                 )

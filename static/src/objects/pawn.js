@@ -37,6 +37,8 @@ class Pawn extends THREE.Mesh {
     }
 
     promote = () => {
+        if (this.isQueen) return
+
         this.isQueen = true
 
         setTimeout(() => {
