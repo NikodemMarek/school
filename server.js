@@ -255,17 +255,19 @@ app.post('/mv/file', async (req, res) => {
 app.get('/edit', async (req, res) => {
     const {path} = req.query
 
-    const type = {
-        js: 'text',
-        html: 'text',
-        css: 'text',
-        json: 'text',
-        txt: 'text',
-        xml: 'text',
-        png: 'image',
-        jpg: 'image',
-        jpeg: 'image',
-    }[path.split('.').pop() || 'empty']
+    const type =
+        {
+            js: 'text',
+            html: 'text',
+            css: 'text',
+            json: 'text',
+            txt: 'text',
+            xml: 'text',
+            png: 'image',
+            jpg: 'image',
+            jpeg: 'image',
+            empty: 'text',
+        }[path.split('.').pop() || 'empty'] || 'text'
     res.redirect(`/edit/${type}?path=${path}`)
 })
 app.get('/edit/text', async (req, res) => {
