@@ -10,27 +10,44 @@
   </div>
 </div>
 
-<div id="filters-bar-drawer" class="hidden">
+<div id="filters-bar-drawer">
   {{> filters_bar}}
 </div>
 
 <script>
-  document.querySelector('#filters-btn').onclick = () =>
-    document.querySelector('#filters-bar-drawer').classList.toggle('hidden');
+  document.querySelector('#filters-btn').onclick = () => {
+    const drawer = document.querySelector('#filters-bar-drawer')
+    drawer.style.width = drawer.style.width === '0px' ? '200px' : '0px'
+  }
 
   const save = () => {
-    const content = text.value
+    let image = document.querySelector('#image')
 
-    fetch('/save', {
+    const canvas = document.createElement('canvas')
+    const context = canvas.getContext('2d')
+
+    canvas.width = image.width
+    canvas.height = image.height
+    context.filter = image.style.filter
+    context.drawImage(image, 0, 0, canvas.width, canvas.height)
+
+    const content = canvas.toDataURL("image/jpeg")
+    const body = JSON.stringify({
+      content,
+      path: '{{path}}',
+    }) 
+    
+    fetch('/save/image', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({
-        path: '{{path}}',
-        content,
-      })
-    });
+      body: body
+    })
+      .then(
+        data =>
+          alert("file saved")
+      )
   }
 
   document.querySelector('#save-changes').onclick = save

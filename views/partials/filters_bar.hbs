@@ -20,13 +20,19 @@
 </script>
 
 <style>
+    #filters-bar-drawer {
+        width: 0px;
+        overflow: hidden;
+        transition: width 1s;
+    }
+
     .filters-bar {
         display: flex;
         flex-direction: column;
         margin: 5px;
         gap: 5px;
     }
-
+    
     .filter-preview {
         width: 100px;
         height: 100px;

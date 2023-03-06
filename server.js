@@ -336,6 +336,17 @@ app.post('/save', async (req, res) => {
     res.redirect(`/edit?path=${path}`)
 })
 
+app.post('/save/image', async (req, res) => {
+    const {path, content} = req.body
+
+    const data = content.split(',')[1]
+    const buffer = Buffer.from(data, 'base64')
+
+    await fs.writeFile(absPath(path), buffer)
+
+    res.send('ok')
+})
+
 app.get('/preview', async (req, res) => {
     const {path} = req.query
 
