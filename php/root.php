@@ -1,6 +1,6 @@
 <?php
 
-session_start();
+require 'start_session.php';
 
 if (!isset($_SESSION['logged_in_root']) || $_SESSION['logged_in_root'] !== true) {
   header('location: login.php');

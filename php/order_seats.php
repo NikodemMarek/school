@@ -1,6 +1,6 @@
 <?php
 
-require 'start_session.php';
+session_start();
 
 require 'db.php';
 
