@@ -6,6 +6,7 @@ const hbs = require('express-handlebars')
 const formidable = require('formidable')
 
 const cookieparser = require('cookie-parser')
+const nocache = require('nocache')
 
 const PORT = 3000
 const app = express()
@@ -13,6 +14,7 @@ const app = express()
 app.set('views', path_util.join(__dirname, 'views'))
 app.use('/icons', express.static(path_util.join(__dirname, 'icons')))
 app.use(cookieparser())
+app.use(nocache())
 app.engine(
     'hbs',
     hbs({
