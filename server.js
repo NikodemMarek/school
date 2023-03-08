@@ -9,7 +9,7 @@ const PORT = 3000
 const app = express()
 
 app.set('views', path_util.join(__dirname, 'views'))
-app.set('', path_util.join(__dirname, 'icons'))
+app.use('/icons', express.static(path_util.join(__dirname, 'icons')))
 app.engine(
     'hbs',
     hbs({
@@ -164,10 +164,10 @@ app.get('/filemanager', async (req, res) => {
         files: files.map((file) => ({
             ...file,
             icon: [
-                'icons/default.svg',
-                'icons/image.svg',
-                'icons/video.svg',
-                'icons/audio.svg',
+                '/icons/default.svg',
+                '/icons/image.svg',
+                '/icons/video.svg',
+                '/icons/audio.svg',
             ][0],
         })),
     })
