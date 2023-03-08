@@ -44,10 +44,10 @@
       },
       body: body
     })
-      .then(
-        data =>
-          alert("file saved")
-      )
+      .then(data => {
+        alert("file saved")
+        location.reload()
+      })
   }
 
   document.querySelector('#save-changes').onclick = save
