@@ -313,16 +313,24 @@ app.get('/rm', async (req, res) => {
     res.redirect(`/filemanager?path=${req.query.currentPath}`)
 })
 app.post('/mv/folder', async (req, res) => {
-    const path = absPath(parsePath(req.body.oldPath))
-    const newPath = absPath(parsePath(req.body.path))
+    const path = absPath(
+        req.body.currentPath + '/' + parsePath(req.body.oldPath)
+    )
+    const newPath = absPath(
+        req.body.currentPath + '/' + parsePath(req.body.path)
+    )
 
     await mv(path, newPath, false)
 
     res.redirect(`/filemanager?path=${req.body.currentPath}`)
 })
 app.post('/mv/file', async (req, res) => {
-    const path = absPath(parsePath(req.body.oldPath))
-    const newPath = absPath(parsePath(req.body.path))
+    const path = absPath(
+        req.body.currentPath + '/' + parsePath(req.body.oldPath)
+    )
+    const newPath = absPath(
+        req.body.currentPath + '/' + parsePath(req.body.path)
+    )
 
     await mv(path, newPath, true)
 
