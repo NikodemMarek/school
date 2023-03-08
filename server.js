@@ -286,7 +286,7 @@ app.get('/edit/text', async (req, res) => {
     res.render('edit_text.hbs', {
         path,
         dirs,
-        content,
+        content: JSON.stringify(content),
         preferences: JSON.parse(preferences),
     })
 })

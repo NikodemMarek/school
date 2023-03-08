@@ -58,8 +58,6 @@
 
       const fontSize = document.querySelector('input[name="fontSize"]');
 
-      console.log(fontSize.value)
-
       fontSize.value = parseInt(fontSize.value) + { 'font-up': 1, 'font-down': -1 }[e.target.id]
 
       updateEditorPreferences({
@@ -67,6 +65,7 @@
         primaryColor: document.querySelector('input[name="primaryColor"]').value,
         secondaryColor: document.querySelector('input[name="secondaryColor"]').value,
       });
+      refreshLineNumbers();
     }
     document.querySelector('#theme-changer').onclick = () => {
       const text = document.querySelector('#text');

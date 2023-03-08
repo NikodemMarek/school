@@ -21,6 +21,9 @@
         font-family: monospace;
         font-size: 16px;
         outline: none;
+        white-space: pre;
+        overflow-wrap: normal;
+        overflow-x: scroll;
     }
 </style>
 
@@ -37,6 +40,9 @@
 <script>
     const lineNumbers = document.querySelector('#line-numbers');
     const text = document.querySelector('#text');
+                            const fontSize = document.querySelector('input[name="fontSize"]');
+
+                            text.value = JSON.parse(text.value)
 
     const updateEditorPreferences = ({ fontSize, primaryColor, secondaryColor }) => {
         text.style.fontSize = `${fontSize}px`;
@@ -47,8 +53,7 @@
     }
 
     const refreshLineNumbers = () =>
-        lineNumbers.innerHTML = text.value.split("\n").map((line, i) =>
-            `<div>${i + 1}</div>`).join('')
+        lineNumbers.innerHTML = text.value.split("\n").map((line, i) => `<div style="font-size: ${fontSize.value}px;">${i + 1}</div>`).join('')
 
     text.oninput = refreshLineNumbers
 
