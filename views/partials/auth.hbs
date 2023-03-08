@@ -1,0 +1,49 @@
+<style>
+    html,
+    body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    #auth-options {
+        width: 500px;
+        display: flex;
+        flex-direction: row;
+        margin: auto;
+        gap: 5px;
+    }
+
+    #auth-options .a {
+        width: 100%;
+    }
+
+    #auth-form {
+        max-width: 500px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin: 200px auto;
+        gap: 5px;
+    }
+
+    #auth-form input {
+        width: 100%;
+        height: 40px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 0 5px;
+        box-sizing: border-box;
+    }
+</style>
+
+<div id="auth-options">
+    <a href="/login" class="a">
+        <div class="button">login</div>
+    </a>
+
+    <a href="/register" class="a">
+        <div class="button">register</div>
+    </a>
+</div>

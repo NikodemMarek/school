@@ -1,5 +1,9 @@
 <div class="header">
-  <a href="/filemanager" class="a">
+  <a href="/index" class="a index-btn">
+    <img src="/icons/user.png">
+  </a>
+  
+  <a href="/filemanager" class="a home-btn">
     <h1>filemanager</h1>
   </a>
 </div>
@@ -7,7 +11,27 @@
   .header {
     background-color: #333;
     color: white;
-    padding: 16px;
+    display: flex;
+    width: 100%;
+  }
+  
+  .header .index-btn {
+    padding: 16px 16px;
+    background-color: #4CAF50;
+  }
+  .header .index-btn:hover {
+    background-color: #3e8e41;
+  }
+  
+  .header .index-btn img {
+    width: 64px;
+    height: 64px;
+  }
+  
+  .header .home-btn {
+    width: 100%;
+  }
+  .header .home-btn h1 {
     text-align: center;
   }
 </style>

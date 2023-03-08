@@ -5,11 +5,14 @@ const path_util = require('path')
 const hbs = require('express-handlebars')
 const formidable = require('formidable')
 
+const cookieparser = require('cookie-parser')
+
 const PORT = 3000
 const app = express()
 
 app.set('views', path_util.join(__dirname, 'views'))
 app.use('/icons', express.static(path_util.join(__dirname, 'icons')))
+app.use(cookieparser())
 app.engine(
     'hbs',
     hbs({
@@ -26,6 +29,7 @@ app.set('view engine', 'hbs')
 app.use(express.urlencoded({extended: true}))
 app.use(express.json())
 
+const SESSION_ALIVE = 60 * 60
 const Status = Object.freeze({
     SUCCESS: 0,
     ERROR: 1,
@@ -133,10 +137,72 @@ const pathDirs = (path) =>
 app.use(express.static(path_util.join(__dirname, 'data')))
 
 app.get('/', (req, res) => {
+    res.redirect('/login')
+})
+
+app.get('/login', async (req, res) => {
+    res.render('login.hbs')
+})
+app.post('/login', async (req, res) => {
+    const usersFile = path_util.join(__dirname, 'users.json')
+
+    const users = JSON.parse(await fs.readFile(usersFile))
+
+    const {username, password} = req.body
+
+    if (
+        !users.find(
+            (user) => user.username === username && user.password === password
+        )
+    )
+        return res.redirect('/login')
+
+    res.cookie('login', JSON.stringify({username}), {
+        httpOnly: true,
+        maxAge: SESSION_ALIVE * 1000,
+    })
+
     res.redirect('/filemanager')
 })
 
+app.get('/register', async (req, res) => {
+    res.render('register.hbs')
+})
+app.post('/register', async (req, res) => {
+    const usersFile = path_util.join(__dirname, 'users.json')
+
+    const users = JSON.parse(await fs.readFile(usersFile))
+
+    const {username, password, confirm} = req.body
+
+    if (password !== confirm) return res.redirect('/register')
+
+    if (users.find((user) => user.username === username))
+        return res.redirect('/register')
+
+    users.push({username, password})
+    await fs.writeFile(usersFile, JSON.stringify(users, null, 4))
+
+    res.redirect('/login')
+})
+
+app.get('/logout', async (req, res) => {
+    res.clearCookie('login')
+
+    res.redirect('/login')
+})
+
+app.get('/index', async (req, res) => {
+    if (!req.cookies.login) return res.redirect('/login')
+
+    res.render('index.hbs', {
+        username: JSON.parse(req.cookies.login).username,
+    })
+})
+
 app.get('/filemanager', async (req, res) => {
+    if (!req.cookies.login) return res.redirect('/login')
+
     const currentPath = absPath(req.query.path || '')
     const relativePath = relPath(currentPath)
 
@@ -253,6 +319,8 @@ app.post('/mv/file', async (req, res) => {
 })
 
 app.get('/edit', async (req, res) => {
+    if (!req.cookies.login) return res.redirect('/login')
+
     const {path} = req.query
 
     const type =
@@ -329,6 +397,8 @@ app.get('/edit/image', async (req, res) => {
 })
 
 app.post('/save', async (req, res) => {
+    if (!req.cookies.login) return res.redirect('/login')
+
     const {path, content} = req.body
 
     await fs.writeFile(absPath(path), content)
@@ -337,6 +407,8 @@ app.post('/save', async (req, res) => {
 })
 
 app.post('/save/image', async (req, res) => {
+    if (!req.cookies.login) return res.redirect('/login')
+
     const {path, content} = req.body
 
     const data = content.split(',')[1]
@@ -348,12 +420,16 @@ app.post('/save/image', async (req, res) => {
 })
 
 app.get('/preview', async (req, res) => {
+    if (!req.cookies.login) return res.redirect('/login')
+
     const {path} = req.query
 
     res.sendFile(absPath(path))
 })
 
 app.post('/preferences', async (req, res) => {
+    if (!req.cookies.login) return res.redirect('/login')
+
     const {path, fontSize, primaryColor, secondaryColor} = req.body
 
     await fs.writeFile(
