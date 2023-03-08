@@ -143,7 +143,9 @@ app.get('/', (req, res) => {
 })
 
 app.get('/login', async (req, res) => {
-    res.render('login.hbs')
+    res.render('login.hbs', {
+        error: req.query.error,
+    })
 })
 app.post('/login', async (req, res) => {
     const usersFile = path_util.join(__dirname, 'users.json')
@@ -157,7 +159,7 @@ app.post('/login', async (req, res) => {
             (user) => user.username === username && user.password === password
         )
     )
-        return res.redirect('/login')
+        return res.redirect('/login?error=invalid+username+or+password')
 
     res.cookie('login', JSON.stringify({username}), {
         httpOnly: true,
@@ -168,7 +170,9 @@ app.post('/login', async (req, res) => {
 })
 
 app.get('/register', async (req, res) => {
-    res.render('register.hbs')
+    res.render('register.hbs', {
+        error: req.query.error,
+    })
 })
 app.post('/register', async (req, res) => {
     const usersFile = path_util.join(__dirname, 'users.json')
@@ -177,10 +181,15 @@ app.post('/register', async (req, res) => {
 
     const {username, password, confirm} = req.body
 
-    if (password !== confirm) return res.redirect('/register')
-
     if (users.find((user) => user.username === username))
-        return res.redirect('/register')
+        return res.redirect('/register?error=username+already+exists')
+
+    if (password.length < 3)
+        return res.redirect(
+            '/register?error=password+too+short+min+3+characters'
+        )
+    if (password !== confirm)
+        return res.redirect('/register?error=passwords+do+not+match')
 
     users.push({username, password})
     await fs.writeFile(usersFile, JSON.stringify(users, null, 4))
