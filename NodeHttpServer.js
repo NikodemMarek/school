@@ -76,9 +76,28 @@ class NodeHttpServer {
 
             const endpoint = this.#endpoints[req.method.toLowerCase()]?.[path]
 
+            const reqBody = await new Promise((resolve) => {
+                const body = {}
+
+                req.on('data', (chunk) => {
+                    Object.assign(
+                        body,
+                        chunk
+                            .toString()
+                            ?.split('&')
+                            ?.reduce((acc, curr) => {
+                                const [key, value] = curr.split('=')
+                                acc[key] = value
+                                return acc
+                            }, {}) || {}
+                    )
+                })
+                req.on('end', async () => resolve(body))
+            })
+
             try {
                 const {body, headers} = endpoint
-                    ? await endpoint({query, body: req.body})
+                    ? await endpoint({query, body: reqBody})
                     : await sendFile(path)
 
                 res.writeHead(200, {
