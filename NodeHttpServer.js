@@ -10,7 +10,7 @@ const pathExists = async (path) =>
         .then(() => true)
         .catch(() => false)
 
-const serveFn = async (path) => {
+const sendFile = async (path) => {
     const extension = path_utils.extname(path)
 
     const contentType = {
@@ -52,22 +52,34 @@ const serveFn = async (path) => {
 class NodeHttpServer {
     #server = null
 
-    constructor(endpoints = []) {
-        this.#server = http.createServer(async (req, res) => {
-            const url = decodeURIComponent(req.url)
-            const path = url === '/' ? '/index.html' : url
+    #endpoints = {get: {}, post: {}}
 
+    constructor({get, post} = {get: {}, post: {}}) {
+        this.#endpoints.get = get
+        this.#endpoints.post = post
+
+        this.#server = http.createServer(async (req, res) => {
             const sendError = (statusCode, message) => {
                 res.statusCode = statusCode
                 res.end(message)
             }
 
-            const endpoint = endpoints[path]
+            const [url, rawQuery] = decodeURIComponent(req.url).split('?')
+
+            const path = url === '/' ? '/index.html' : url
+            const query =
+                rawQuery?.split('&')?.reduce((acc, curr) => {
+                    const [key, value] = curr.split('=')
+                    acc[key] = value
+                    return acc
+                }, {}) || {}
+
+            const endpoint = this.#endpoints[req.method.toLowerCase()]?.[path]
 
             try {
                 const {body, headers} = endpoint
-                    ? await endpoint(path, req.body)
-                    : await serveFn(path)
+                    ? await endpoint({query, body: req.body})
+                    : await sendFile(path)
 
                 res.writeHead(200, {
                     headers,
