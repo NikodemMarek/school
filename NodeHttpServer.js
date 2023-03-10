@@ -67,12 +67,7 @@ class NodeHttpServer {
             const [url, rawQuery] = decodeURIComponent(req.url).split('?')
 
             const path = url === '/' ? '/index.html' : url
-            const query =
-                rawQuery?.split('&')?.reduce((acc, curr) => {
-                    const [key, value] = curr.split('=')
-                    acc[key] = value
-                    return acc
-                }, {}) || {}
+            const query = Object.fromEntries(new URLSearchParams(rawQuery))
 
             const endpoint = this.#endpoints[req.method.toLowerCase()]?.[path]
 
@@ -82,14 +77,9 @@ class NodeHttpServer {
                 req.on('data', (chunk) => {
                     Object.assign(
                         body,
-                        chunk
-                            .toString()
-                            ?.split('&')
-                            ?.reduce((acc, curr) => {
-                                const [key, value] = curr.split('=')
-                                acc[key] = value
-                                return acc
-                            }, {}) || {}
+                        Object.fromEntries(
+                            new URLSearchParams(chunk.toString())
+                        )
                     )
                 })
                 req.on('end', async () => resolve(body))
