@@ -53,6 +53,8 @@ class NodeHttpServer {
     #server = null
 
     #endpoints = {get: {}, post: {}}
+    get = (endpoint, fn) => (this.#endpoints.get[endpoint] = fn)
+    post = (endpoint, fn) => (this.#endpoints.post[endpoint] = fn)
 
     constructor({get, post} = {get: {}, post: {}}) {
         this.#endpoints.get = get
