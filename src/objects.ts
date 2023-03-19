@@ -11,7 +11,7 @@ class Tile implements ITile {
 class Pill implements IPill {
     constructor(public x: number, public y: number, public tiles: ITile[]) {}
 
-    move = ({x, y}: Point) => {
+    move = ({x, y}: IPoint) => {
         this.x += x
         this.y += y
     }

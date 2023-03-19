@@ -1,5 +1,6 @@
 import {Color} from './types'
 import {Point, Tile, Pill} from './objects'
+import Board from './board'
 
 const pill = new Pill(0, 0, [
     new Tile(0, 0, Color.Red),
@@ -26,3 +27,8 @@ document.addEventListener('keydown', ({key}) => {
 
     if (rotate) return pill.rotate(rotate)
 })
+
+const game = document.createElement('div')
+document.body.appendChild(game)
+
+const board = new Board(game, new Point(10, 20))
