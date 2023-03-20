@@ -39,7 +39,8 @@ class Pill implements IPill {
 
         this.tiles.forEach((tile) => {
             const {x, y} = tile
-            tile.x = x * matrix[0][0] - y * matrix[0][1]
+
+            tile.x = x * matrix[0][0] + y * matrix[0][1]
             tile.y = x * matrix[1][0] + y * matrix[1][1]
         })
     }
