@@ -47,3 +47,48 @@ class Pill implements IPill {
 }
 
 export {Point, Tile, Pill}
+
+class ObjectsManager {
+    constructor(
+        private size: IPoint,
+        public tiles: Tile[],
+        public pill: Pill
+    ) {}
+
+    private isPillColliding = () => {
+        const isCollidingBorders = this.pill.tiles.some(({x, y}) => {
+            const [px, py] = [this.pill.x + x, this.pill.y + y]
+            return px < 0 || px >= this.size.x || py < 0 || py >= this.size.y
+        })
+
+        if (isCollidingBorders) return true
+
+        const isCollidingTiles = this.pill.tiles.some(({x, y}) => {
+            const [px, py] = [this.pill.x + x, this.pill.y + y]
+            return this.tiles.some(({x: tx, y: ty}) => px === tx && py === ty)
+        })
+
+        return isCollidingTiles
+    }
+
+    moveAll = ({x, y}: IPoint) => {
+        this.movePill({x, y})
+    }
+
+    movePill = ({x, y}: IPoint) => {
+        this.pill.move({x, y})
+
+        if (!this.isPillColliding()) return
+
+        this.pill.move({x: -x, y: -y})
+    }
+    rotatePill = (by: number) => {
+        this.pill.rotate(by)
+
+        if (!this.isPillColliding()) return
+
+        this.pill.rotate(-by)
+    }
+}
+
+export default ObjectsManager

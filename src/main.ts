@@ -1,27 +1,28 @@
-import {Color, IPill, ITile} from './types'
-import {Point, Tile, Pill} from './objects'
+import {Color} from './types'
+import ObjectsManager, {Point, Tile, Pill} from './objects'
 import Board from './board'
-
-const pill = new Pill(3, 3, [
-    new Tile(0, 0, Color.Red),
-    new Tile(1, 0, Color.Green),
-    new Tile(2, 0, Color.Blue),
-])
 
 const game = document.createElement('div')
 document.body.appendChild(game)
 
-const board = new Board(game, new Point(10, 20))
+const size = new Point(10, 20)
 
-const tiles: ITile[] = []
-const pills: IPill[] = []
+const board = new Board(size, game)
 
-pills.push(pill)
+const manager = new ObjectsManager(
+    new Point(10, 20),
+    [],
+    new Pill(3, 3, [
+        new Tile(0, 0, Color.Red),
+        new Tile(1, 0, Color.Green),
+        new Tile(2, 0, Color.Blue),
+    ])
+)
 
-board.refresh(tiles, pills)
+board.refresh(manager.tiles, [manager.pill])
 
 document.addEventListener('keydown', ({key}) => {
-    ;;(() => {
+    ;(() => {
         const move = {
             a: new Point(-1, 0),
             d: new Point(1, 0),
@@ -29,7 +30,7 @@ document.addEventListener('keydown', ({key}) => {
             s: new Point(0, 1),
         }[key]
 
-        if (move) return pill.move(move)
+        if (move) return manager.movePill(move)
 
         const rotate = {
             q: -1,
@@ -37,13 +38,13 @@ document.addEventListener('keydown', ({key}) => {
             f: 2,
         }[key]
 
-        if (rotate) return pill.rotate(rotate)
+        if (rotate) return manager.rotatePill(rotate)
     })()
 
-    board.refresh(tiles, pills)
+    board.refresh(manager.tiles, [manager.pill])
 })
 
 setInterval(() => {
-    pill.move(new Point(0, 1))
-    board.refresh(tiles, pills)
+    manager.moveAll(new Point(0, 1))
+    board.refresh(manager.tiles, [manager.pill])
 }, 1000)

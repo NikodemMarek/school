@@ -5,11 +5,9 @@ const TILE_SIZE = 40
 
 class Board {
     private board: HTMLDivElement
-    private size: IPoint
 
-    constructor(container: HTMLDivElement, size: IPoint) {
+    constructor(private size: IPoint, container: HTMLDivElement) {
         this.board = container
-        this.size = size
 
         this.board.style.width = `${this.size.x * TILE_SIZE}px`
         this.board.style.height = `${this.size.y * TILE_SIZE}px`
