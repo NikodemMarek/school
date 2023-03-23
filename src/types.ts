@@ -4,19 +4,28 @@ enum Color {
     Blue = 'blue',
 }
 
-export {Color}
+enum Direction {
+    Top = 0,
+    Bottom = 1,
+    Right = 2,
+    Left = 3,
+}
 
-interface IPoint {
+export {Color, Direction}
+
+interface Vectorial {
     x: number
     y: number
 }
 
-interface ITile extends IPoint {
-    color: Color
+interface Collidable {
+    isColliding: (points: Vectorial[]) => boolean
+}
+interface Moveable {
+    move: (vector: Vectorial) => void
+}
+interface Rotatable {
+    rotate: (by: number) => void
 }
 
-interface IPill extends IPoint {
-    tiles: ITile[]
-}
-
-export type {IPoint, ITile, IPill}
+export type {Collidable, Moveable, Rotatable, Vectorial}

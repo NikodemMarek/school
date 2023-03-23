@@ -12,14 +12,10 @@ const board = new Board(size, game)
 const manager = new ObjectsManager(
     new Point(10, 20),
     [],
-    new Pill(3, 3, [
-        new Tile(0, 0, Color.Red),
-        new Tile(1, 0, Color.Green),
-        new Tile(2, 0, Color.Blue),
-    ])
+    [new Pill(0, 0, [new Tile(0, 0, Color.Red), new Tile(1, 0, Color.Red)])]
 )
 
-board.refresh(manager.tiles, [manager.pill])
+board.refresh(manager.tiles, [manager.activePill, ...manager.pills])
 
 document.addEventListener('keydown', ({key}) => {
     ;(() => {
@@ -30,7 +26,7 @@ document.addEventListener('keydown', ({key}) => {
             s: new Point(0, 1),
         }[key]
 
-        if (move) return manager.movePill(move)
+        if (move) return manager.moveActivePill(move)
 
         const rotate = {
             q: -1,
@@ -38,13 +34,13 @@ document.addEventListener('keydown', ({key}) => {
             f: 2,
         }[key]
 
-        if (rotate) return manager.rotatePill(rotate)
+        if (rotate) return manager.rotateActivePill(rotate)
     })()
 
-    board.refresh(manager.tiles, [manager.pill])
+    board.refresh(manager.tiles, [manager.activePill, ...manager.pills])
 })
 
 setInterval(() => {
-    manager.moveAll(new Point(0, 1))
-    board.refresh(manager.tiles, [manager.pill])
+    manager.update(new Point(0, 1))
+    board.refresh(manager.tiles, [manager.activePill, ...manager.pills])
 }, 1000)

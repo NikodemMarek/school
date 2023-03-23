@@ -1,17 +1,41 @@
-import {IPoint, ITile, IPill, Color} from './types'
+import {
+    Vectorial,
+    Color,
+    Direction,
+    Collidable,
+    Moveable,
+    Rotatable,
+} from './types'
 
-class Point implements IPoint {
+class Point implements Vectorial {
     constructor(public x: number, public y: number) {}
 }
 
-class Tile implements ITile {
-    constructor(public x: number, public y: number, public color: Color) {}
+class Tile extends Point implements Collidable, Moveable {
+    constructor(x: number, y: number, public color: Color) {
+        super(x, y)
+    }
+
+    isColliding = (points: Vectorial[]) =>
+        points.some(({x, y}) => x === this.x && y === this.y)
+
+    move = (vector: Vectorial) => {
+        this.x += vector.x
+        this.y += vector.y
+    }
 }
 
-class Pill implements IPill {
-    constructor(public x: number, public y: number, public tiles: ITile[]) {}
+class Pill extends Point implements Collidable, Moveable, Rotatable {
+    constructor(x: number, y: number, public tiles: Tile[]) {
+        super(x, y)
+    }
 
-    move = ({x, y}: IPoint) => {
+    absTiles = (): Tile[] =>
+        this.tiles.map(
+            ({x, y, color}) => new Tile(this.x + x, this.y + y, color)
+        )
+
+    move = ({x, y}: Vectorial) => {
         this.x += x
         this.y += y
     }
@@ -44,50 +68,246 @@ class Pill implements IPill {
             tile.y = x * matrix[1][0] + y * matrix[1][1]
         })
     }
+
+    isColliding = (points: Vectorial[]) =>
+        this.absTiles().some((tile) => tile.isColliding(points))
 }
 
 export {Point, Tile, Pill}
 
 class ObjectsManager {
+    public activePill: Pill = new Pill(0, 0, [])
+
     constructor(
-        private size: IPoint,
+        private size: Vectorial,
         public tiles: Tile[],
-        public pill: Pill
-    ) {}
+        public pills: Pill[],
+        private gameDirection = Direction.Bottom
+    ) {
+        this.newPill()
+    }
 
-    private isPillColliding = () => {
-        const isCollidingBorders = this.pill.tiles.some(({x, y}) => {
-            const [px, py] = [this.pill.x + x, this.pill.y + y]
-            return px < 0 || px >= this.size.x || py < 0 || py >= this.size.y
+    private newPill = () => {
+        const colors = Object.values(Color)
+        const tiles = [
+            new Tile(0, 0, colors[Math.floor(Math.random() * colors.length)]),
+            new Tile(1, 0, colors[Math.floor(Math.random() * colors.length)]),
+        ]
+
+        this.activePill = new Pill(
+            Math.floor(this.size.x / 2),
+            [this.size.y - 1, 0, this.size.x - 1, 0][this.gameDirection],
+            tiles
+        )
+
+        this.activePill.rotate(Math.floor(Math.random() * 4))
+    }
+
+    private getOtherPills = (pill: Pill) => this.pills.filter((p) => p !== pill)
+    private getOtherTiles = (tile: Tile) => this.tiles.filter((t) => t !== tile)
+
+    private isPillCollidingBorders = (pill: Pill) =>
+        pill.tiles.some(({x, y}) => {
+            const [px, py] = [pill.x + x, pill.y + y]
+            return this.isTileCollidingBorders({x: px, y: py} as Tile)
+        })
+    private isTileCollidingBorders = ({x, y}: Tile) =>
+        x < 0 || x >= this.size.x || y < 0 || y >= this.size.y
+
+    private getAligned = ({x: sx, y: sy, color: scolor}: Tile) => {
+        const tiles = [
+            ...this.pills.map((pill) => pill.absTiles()).flat(),
+            ...this.tiles,
+        ]
+
+        const [bottom, top, right, left]: Tile[][] = [[], [], [], []]
+
+        for (let i = 1; i < tiles.length; i++) {
+            const tile = tiles.find(
+                ({x, y, color}) => x === sx + i && y === sy && scolor === color
+            )
+
+            if (!tile) break
+
+            bottom.push(tile)
+        }
+
+        for (let i = 1; i < tiles.length; i++) {
+            const tile = tiles.find(
+                ({x, y, color}) => x === sx - i && y === sy && scolor === color
+            )
+
+            if (!tile) break
+
+            top.push(tile)
+        }
+
+        for (let i = 1; i < tiles.length; i++) {
+            const tile = tiles.find(
+                ({x, y, color}) => x === sx && y === sy + i && scolor === color
+            )
+
+            if (!tile) break
+
+            left.push(tile)
+        }
+
+        for (let i = 1; i < tiles.length; i++) {
+            const tile = tiles.find(
+                ({x, y, color}) => x === sx && y === sy - i && scolor === color
+            )
+
+            if (!tile) break
+
+            right.push(tile)
+        }
+
+        return [bottom, top, right, left]
+    }
+
+    private popTiles = (tiles: Tile[]) => {
+        const pillsToPop = this.pills.filter((pill) =>
+            pill
+                .absTiles()
+                .some((tile) =>
+                    tiles.some(({x, y}) => x === tile.x && y === tile.y)
+                )
+        )
+        this.pills = this.pills.filter((pill) => !pillsToPop.includes(pill))
+        this.tiles.push(...pillsToPop.map((pill) => pill.absTiles()).flat())
+
+        console.log(pillsToPop)
+        const popActive = this.activePill
+            .absTiles()
+            .some((tile) =>
+                tiles.some(({x, y}) => x === tile.x && y === tile.y)
+            )
+
+        if (popActive) {
+            this.tiles.push(...this.activePill.absTiles())
+            this.activePill = new Pill(0, 0, [])
+        }
+
+        this.tiles = this.tiles.filter(
+            (tile) => !tiles.some(({x, y}) => x === tile.x && y === tile.y)
+        )
+    }
+
+    update = (vector: Vectorial) => {
+        this.tiles.forEach((tile) => this.updateTile(vector, tile))
+        this.pills.forEach((pill) => this.updatePill(vector, pill))
+
+        this.updateActivePill(vector)
+    }
+
+    public moveActivePill = (vector: Vectorial) => this.updateActivePill(vector)
+    public rotateActivePill = (by: number) => {
+        this.activePill.rotate(by)
+
+        if (
+            this.isPillCollidingBorders(this.activePill) ||
+            this.activePill.isColliding([
+                ...this.getOtherPills(this.activePill),
+                ...this.tiles,
+            ])
+        )
+            this.activePill.rotate(-by)
+    }
+
+    private updateActivePill = (vector: Vectorial) => {
+        const isRemoved = this.updatePill(vector, this.activePill)
+        if (!isRemoved) return
+
+        this.pills.push(this.activePill)
+        this.newPill()
+    }
+    private updatePill = (vector: Vectorial, pill: Pill) => {
+        const didCollide = this.movePill(vector, pill)
+
+        if (!didCollide) return false
+
+        pill.absTiles().forEach((tile) => {
+            const [bottom, top, right, left] = this.getAligned(tile)
+
+            if (bottom.length + top.length > 2)
+                this.popTiles([...bottom, ...top, tile])
+
+            if (right.length + left.length > 2)
+                this.popTiles([...right, ...left, tile])
         })
 
-        if (isCollidingBorders) return true
-
-        const isCollidingTiles = this.pill.tiles.some(({x, y}) => {
-            const [px, py] = [this.pill.x + x, this.pill.y + y]
-            return this.tiles.some(({x: tx, y: ty}) => px === tx && py === ty)
-        })
-
-        return isCollidingTiles
+        return true
     }
 
-    moveAll = ({x, y}: IPoint) => {
-        this.movePill({x, y})
+    private updateTile = (vectorial: Vectorial, tile: Tile) => {
+        const didCollide = this.moveTile(vectorial, tile)
+
+        if (!didCollide) return false
+
+        const [bottom, top, right, left] = this.getAligned(tile)
+
+        if (bottom.length + top.length > 2)
+            this.popTiles([...bottom, ...top, tile])
+
+        if (right.length + left.length > 2)
+            this.popTiles([...right, ...left, tile])
+
+        return true
     }
 
-    movePill = ({x, y}: IPoint) => {
-        this.pill.move({x, y})
+    private movePill = ({x, y}: Vectorial, pill: Pill) => {
+        const otherTiles = [
+            ...this.getOtherPills(pill)
+                .map((pill) => pill.absTiles())
+                .flat(),
+            ...this.tiles,
+        ]
 
-        if (!this.isPillColliding()) return
+        pill.move({x, y})
 
-        this.pill.move({x: -x, y: -y})
+        const isPillCollidingBorders = this.isPillCollidingBorders(pill)
+        const isPillCollidingTiles = pill.isColliding(otherTiles)
+
+        if (!isPillCollidingBorders && !isPillCollidingTiles) return false
+
+        pill.move({x: -x, y: -y})
+
+        const collisionSide =
+            x > 0
+                ? Direction.Right
+                : x < 0
+                ? Direction.Left
+                : y > 0
+                ? Direction.Bottom
+                : y < 0
+                ? Direction.Top
+                : null
+
+        return collisionSide === this.gameDirection
     }
-    rotatePill = (by: number) => {
-        this.pill.rotate(by)
 
-        if (!this.isPillColliding()) return
+    private moveTile = ({x, y}: Vectorial, tile: Tile) => {
+        tile.move({x, y})
 
-        this.pill.rotate(-by)
+        const isTileCollidingBorders = this.isTileCollidingBorders(tile)
+        const isTileCollidingTiles = tile.isColliding(this.getOtherTiles(tile))
+
+        if (!isTileCollidingBorders && !isTileCollidingTiles) return false
+
+        tile.move({x: -x, y: -y})
+
+        const collisionSide =
+            x > 0
+                ? Direction.Right
+                : x < 0
+                ? Direction.Left
+                : y > 0
+                ? Direction.Bottom
+                : y < 0
+                ? Direction.Top
+                : null
+
+        return collisionSide === this.gameDirection
     }
 }
 
