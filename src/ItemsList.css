@@ -1,0 +1,8 @@
+.ItemsList {
+    margin: 1rem;
+
+    display: grid;
+    grid-template: 1fr 1fr / 1fr 1fr;
+
+    gap: 1rem;
+}

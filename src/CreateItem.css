@@ -1,0 +1,30 @@
+.CreateItem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid #ccc;
+    border-radius: 5px;
+
+    box-shadow: 0 2px 3px #ccc;
+
+    padding: 1rem;
+}
+
+.CreateItem form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: 1rem;
+}
+
+.CreateItem form input {
+    width: 100%;
+}
+
+.CreateItem form textarea {
+    width: 100%;
+}
