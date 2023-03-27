@@ -1,5 +1,4 @@
-import {Color} from './types'
-import ObjectsManager, {Point, Tile, Pill} from './objects'
+import ObjectsManager, {Point} from './objects'
 import Board from './board'
 
 const game = document.createElement('div')
@@ -9,11 +8,7 @@ const size = new Point(10, 20)
 
 const board = new Board(size, game)
 
-const manager = new ObjectsManager(
-    new Point(10, 20),
-    [],
-    [new Pill(0, 0, [new Tile(0, 0, Color.Red), new Tile(1, 0, Color.Red)])]
-)
+const manager = new ObjectsManager(new Point(10, 20), [], [])
 
 board.refresh(manager.tiles, [manager.activePill, ...manager.pills])
 
@@ -43,4 +38,4 @@ document.addEventListener('keydown', ({key}) => {
 setInterval(() => {
     manager.update(new Point(0, 1))
     board.refresh(manager.tiles, [manager.activePill, ...manager.pills])
-}, 1000)
+}, 300)

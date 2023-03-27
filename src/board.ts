@@ -1,5 +1,5 @@
-import {Pill} from './objects'
-import {Pillable, Vectorial, Tileable} from './types'
+import {Pill, Tile} from './objects'
+import {Vectorial} from './types'
 
 const TILE_SIZE = 40
 
@@ -34,20 +34,37 @@ class Board {
             )
             .join(''))
 
-    public tile = ({x, y, color}: Tileable) => {
+    public tile = ({x, y, color}: Tile) => {
         const tile = this.board.querySelector(`[data-x="${x}"][data-y="${y}"]`)
 
         if (!tile) return
         ;(tile as HTMLDivElement).style.backgroundColor = color
     }
 
-    public pill = ({x, y, tiles}: Pillable) => {
-        tiles.forEach(({x: rx, y: ry, color}) =>
-            this.tile({x: x + rx, y: y + ry, color})
-        )
+    public pill = (pill: Pill) => {
+        const absTiles = pill.absTiles()
+        const xy = absTiles[0]?.x - absTiles[1]?.x !== 0
+        absTiles.sort((a, b) => (xy ? a.x - b.x : a.y - b.y))
+
+        absTiles.forEach(({x, y, color}, i) => {
+            let radius = '0'
+            if (xy) radius = i === 0 ? '50% 0 0 50%' : '0 50% 50% 0'
+            else
+                radius =
+                    i === absTiles.length - 1 ? '0 0 50% 50%' : '50% 50% 0 0'
+
+            const tile = this.board.querySelector(
+                `[data-x="${x}"][data-y="${y}"]`
+            )
+
+            if (!tile) return
+            ;(
+                tile as HTMLDivElement
+            ).innerHTML = `<div class="pill" style="background-color: ${color}; border-radius: ${radius};"></div>`
+        })
     }
 
-    public refresh = (tiles: Tileable[], pills: Pillable[]) => {
+    public refresh = (tiles: Tile[], pills: Pill[]) => {
         this.empty()
         tiles.forEach((tile) => this.tile(tile))
         pills.forEach((pill) => this.pill(pill))

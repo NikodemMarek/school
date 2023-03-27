@@ -24,6 +24,12 @@ body {
     border: 2px solid;
 }
 
+.pill {
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+}
+
 .tile {
     position: absolute;
     border: 1px solid;
