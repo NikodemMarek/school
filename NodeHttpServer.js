@@ -66,12 +66,26 @@ class NodeHttpServer {
                 res.end(message)
             }
 
+            const method = req.method.toLowerCase()
             const [url, rawQuery] = decodeURIComponent(req.url).split('?')
-
-            const path = url === '/' ? '/index.html' : url
             const query = Object.fromEntries(new URLSearchParams(rawQuery))
 
-            const endpoint = this.#endpoints[req.method.toLowerCase()]?.[path]
+            const parts = url.toLowerCase().split('/') || []
+            const endpointStr = parts
+                .reduce((acc) => {
+                    if (this.#endpoints[method]?.[acc.join('/')]) return acc
+
+                    acc.pop()
+                    return acc
+                }, parts)
+                .join('/')
+
+            const endpoint = this.#endpoints[method]?.[endpointStr]
+            const urlParams = endpointStr
+                .replace(parts.join('/'), '')
+                .split('/')
+
+            const path = url === '/' ? '/index.html' : url
 
             const reqBody = await new Promise((resolve) => {
                 const body = {}
@@ -89,7 +103,7 @@ class NodeHttpServer {
 
             try {
                 const {body, headers} = endpoint
-                    ? await endpoint({query, body: reqBody})
+                    ? await endpoint({query, body: reqBody, urlParams})
                     : await sendFile(path)
 
                 res.writeHead(200, {
@@ -97,9 +111,11 @@ class NodeHttpServer {
                 })
                 res.write(body)
                 res.end()
-            } catch ({code, msg}) {
-                console.error(`${code}: ${msg}`)
-                sendError(code, msg)
+            } catch (err) {
+                console.error(err)
+
+                if (err?.code && err?.msg) sendError(err.code, err.msg)
+                else sendError(500, 'Internal Server Error!')
             }
         })
     }
