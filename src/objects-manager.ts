@@ -7,8 +7,7 @@ class ObjectsManager {
     constructor(
         private size: Vectorial,
         public tiles: Tile[],
-        public pills: Pill[],
-        private gameDirection = Direction.Bottom
+        public pills: Pill[]
     ) {
         this.newPill()
     }
@@ -20,11 +19,7 @@ class ObjectsManager {
             new Tile(1, 0, colors[Math.floor(Math.random() * colors.length)]),
         ]
 
-        this.activePill = new Pill(
-            Math.floor(this.size.x / 2),
-            [this.size.y - 1, 0, this.size.x - 1, 0][this.gameDirection],
-            tiles
-        )
+        this.activePill = new Pill(Math.floor(this.size.x / 2), 0, tiles)
 
         this.activePill.rotate(Math.floor(Math.random() * 4))
     }
@@ -109,20 +104,10 @@ class ObjectsManager {
 
     update = (vector: Vectorial) => {
         this.tiles
-            .sort(
-                (a, b) =>
-                    [b.y - a.y, a.y - b.y, a.x - b.x, b.x - a.x][
-                        this.gameDirection
-                    ]
-            )
+            .sort((a, b) => a.y - b.y)
             .forEach((tile) => this.updateTile(vector, tile))
         this.pills
-            .sort(
-                (a, b) =>
-                    [b.y - a.y, a.y - b.y, a.x - b.x, b.x - a.x][
-                        this.gameDirection
-                    ]
-            )
+            .sort((a, b) => a.y - b.y)
             .forEach((pill) => this.updatePill(vector, pill))
 
         this.updateActivePill(vector)
@@ -212,7 +197,7 @@ class ObjectsManager {
                 ? Direction.Top
                 : null
 
-        return collisionSide === this.gameDirection
+        return collisionSide === Direction.Bottom
     }
 
     private moveTile = ({x, y}: Vectorial, tile: Tile) => {
@@ -244,7 +229,7 @@ class ObjectsManager {
                 ? Direction.Top
                 : null
 
-        return collisionSide === this.gameDirection
+        return collisionSide === Direction.Bottom
     }
 }
 
