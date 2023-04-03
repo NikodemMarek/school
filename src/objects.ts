@@ -176,26 +176,28 @@ class ObjectsManager {
         this.pills = this.pills.filter((pill) => !pillsToPop.includes(pill))
         this.tiles.push(...pillsToPop.map((pill) => pill.absTiles()).flat())
 
-        console.log(pillsToPop)
-        const popActive = this.activePill
-            .absTiles()
-            .some((tile) =>
-                tiles.some(({x, y}) => x === tile.x && y === tile.y)
-            )
-
-        if (popActive) {
-            this.tiles.push(...this.activePill.absTiles())
-            this.activePill = new Pill(0, 0, [])
-        }
-
         this.tiles = this.tiles.filter(
             (tile) => !tiles.some(({x, y}) => x === tile.x && y === tile.y)
         )
     }
 
     update = (vector: Vectorial) => {
-        this.tiles.forEach((tile) => this.updateTile(vector, tile))
-        this.pills.forEach((pill) => this.updatePill(vector, pill))
+        this.tiles
+            .sort(
+                (a, b) =>
+                    [b.y - a.y, a.y - b.y, a.x - b.x, b.x - a.x][
+                        this.gameDirection
+                    ]
+            )
+            .forEach((tile) => this.updateTile(vector, tile))
+        this.pills
+            .sort(
+                (a, b) =>
+                    [b.y - a.y, a.y - b.y, a.x - b.x, b.x - a.x][
+                        this.gameDirection
+                    ]
+            )
+            .forEach((pill) => this.updatePill(vector, pill))
 
         this.updateActivePill(vector)
     }
@@ -218,13 +220,14 @@ class ObjectsManager {
         const isRemoved = this.updatePill(vector, this.activePill)
         if (!isRemoved) return
 
-        this.pills.push(this.activePill)
         this.newPill()
     }
     private updatePill = (vector: Vectorial, pill: Pill) => {
         const didCollide = this.movePill(vector, pill)
 
         if (!didCollide) return false
+
+        if (pill === this.activePill) this.pills.push(this.activePill)
 
         pill.absTiles().forEach((tile) => {
             const [bottom, top, right, left] = this.getAligned(tile)
@@ -291,8 +294,16 @@ class ObjectsManager {
 
         const isTileCollidingBorders = this.isTileCollidingBorders(tile)
         const isTileCollidingTiles = tile.isColliding(this.getOtherTiles(tile))
+        const isTileCollidingPills = tile.isColliding(
+            this.pills.map((pill) => pill.absTiles()).flat()
+        )
 
-        if (!isTileCollidingBorders && !isTileCollidingTiles) return false
+        if (
+            !isTileCollidingBorders &&
+            !isTileCollidingTiles &&
+            !isTileCollidingPills
+        )
+            return false
 
         tile.move({x: -x, y: -y})
 
