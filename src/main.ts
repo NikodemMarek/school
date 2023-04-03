@@ -1,4 +1,5 @@
-import ObjectsManager, {Point} from './objects'
+import {Point} from './objects'
+import ObjectsManager from './objects-manager'
 import Board from './board'
 
 const game = document.createElement('div')
