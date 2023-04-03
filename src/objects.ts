@@ -66,4 +66,13 @@ class Pill extends Point implements Collidable, Moveable, Rotatable {
         this.absTiles().some((tile) => tile.isColliding(points))
 }
 
-export {Point, Tile, Pill}
+class Virus extends Point implements Collidable {
+    constructor(x: number, y: number, public color: Color) {
+        super(x, y)
+    }
+
+    isColliding = (points: Vectorial[]) =>
+        points.some(({x, y}) => x === this.x && y === this.y)
+}
+
+export {Point, Tile, Pill, Virus}

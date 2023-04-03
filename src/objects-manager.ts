@@ -1,5 +1,5 @@
 import {Color, Direction, Vectorial} from './types'
-import {Pill, Tile} from './objects'
+import {Pill, Tile, Virus} from './objects'
 
 class ObjectsManager {
     public activePill: Pill = new Pill(0, 0, [])
@@ -7,7 +7,8 @@ class ObjectsManager {
     constructor(
         private size: Vectorial,
         public tiles: Tile[],
-        public pills: Pill[]
+        public pills: Pill[],
+        public viruses: Virus[]
     ) {
         this.newPill()
     }
@@ -39,6 +40,7 @@ class ObjectsManager {
         const tiles = [
             ...this.pills.map((pill) => pill.absTiles()).flat(),
             ...this.tiles,
+            ...(this.viruses as Tile[]),
         ]
 
         const [bottom, top, right, left]: Tile[][] = [[], [], [], []]
@@ -87,15 +89,17 @@ class ObjectsManager {
     }
 
     private popTiles = (tiles: Tile[]) => {
-        const pillsToPop = this.pills.filter((pill) =>
-            pill
-                .absTiles()
-                .some((tile) =>
-                    tiles.some(({x, y}) => x === tile.x && y === tile.y)
-                )
-        )
+        const pillsToPop = this.pills.filter((pill) => pill.isColliding(tiles))
         this.pills = this.pills.filter((pill) => !pillsToPop.includes(pill))
         this.tiles.push(...pillsToPop.map((pill) => pill.absTiles()).flat())
+        
+        const virusesToPop = this.viruses.filter((virus) =>
+            virus.isColliding(tiles)
+        )
+        this.viruses = this.viruses.filter(
+            (virus) => !virusesToPop.includes(virus)
+        )
+        this.tiles.push(...(virusesToPop as Tile[]))
 
         this.tiles = this.tiles.filter(
             (tile) => !tiles.some(({x, y}) => x === tile.x && y === tile.y)
@@ -181,8 +185,14 @@ class ObjectsManager {
 
         const isPillCollidingBorders = this.isPillCollidingBorders(pill)
         const isPillCollidingTiles = pill.isColliding(otherTiles)
+        const isPillCollidingViruses = pill.isColliding(this.viruses)
 
-        if (!isPillCollidingBorders && !isPillCollidingTiles) return false
+        if (
+            !isPillCollidingBorders &&
+            !isPillCollidingTiles &&
+            !isPillCollidingViruses
+        )
+            return false
 
         pill.move({x: -x, y: -y})
 
@@ -208,11 +218,13 @@ class ObjectsManager {
         const isTileCollidingPills = tile.isColliding(
             this.pills.map((pill) => pill.absTiles()).flat()
         )
+        const isTileCollidingViruses = tile.isColliding(this.viruses)
 
         if (
             !isTileCollidingBorders &&
             !isTileCollidingTiles &&
-            !isTileCollidingPills
+            !isTileCollidingPills &&
+            !isTileCollidingViruses
         )
             return false
 

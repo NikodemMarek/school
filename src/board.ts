@@ -1,4 +1,4 @@
-import {Pill, Tile} from './objects'
+import {Pill, Tile, Virus} from './objects'
 import {Vectorial} from './types'
 
 const TILE_SIZE = 40
@@ -64,10 +64,22 @@ class Board {
         })
     }
 
-    public refresh = (tiles: Tile[], pills: Pill[]) => {
+    public virus = (virus: Virus) => {
+        const tile = this.board.querySelector(
+            `[data-x="${virus.x}"][data-y="${virus.y}"]`
+        )
+
+        if (!tile) return
+        ;(
+            tile as HTMLDivElement
+        ).innerHTML = `<div class="virus" style="background-color: ${virus.color}; border-radius: 50%;"></div>`
+    }
+
+    public refresh = (tiles: Tile[], pills: Pill[], viruses: Virus[]) => {
         this.empty()
         tiles.forEach((tile) => this.tile(tile))
         pills.forEach((pill) => this.pill(pill))
+        viruses.forEach((virus) => this.virus(virus))
     }
 }
 
