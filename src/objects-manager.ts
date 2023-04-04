@@ -108,10 +108,10 @@ class ObjectsManager {
 
     update = (vector: Vectorial) => {
         this.tiles
-            .sort((a, b) => a.y - b.y)
+            .sort((a, b) => b.y - a.y)
             .forEach((tile) => this.updateTile(vector, tile))
         this.pills
-            .sort((a, b) => a.y - b.y)
+            .sort((a, b) => b.y - a.y)
             .forEach((pill) => this.updatePill(vector, pill))
 
         this.updateActivePill(vector)
