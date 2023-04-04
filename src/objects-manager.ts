@@ -92,7 +92,7 @@ class ObjectsManager {
         const pillsToPop = this.pills.filter((pill) => pill.isColliding(tiles))
         this.pills = this.pills.filter((pill) => !pillsToPop.includes(pill))
         this.tiles.push(...pillsToPop.map((pill) => pill.absTiles()).flat())
-        
+
         const virusesToPop = this.viruses.filter((virus) =>
             virus.isColliding(tiles)
         )
