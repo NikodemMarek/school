@@ -106,18 +106,30 @@ class ObjectsManager {
         )
     }
 
-    update = (vector: Vectorial) => {
-        this.tiles
-            .sort((a, b) => b.y - a.y)
-            .forEach((tile) => this.updateTile(vector, tile))
-        this.pills
-            .sort((a, b) => b.y - a.y)
-            .forEach((pill) => this.updatePill(vector, pill))
+    public update = (vector: Vectorial) => {
+        const toPop: Tile[] = [
+            ...this.tiles
+                .sort((a, b) => b.y - a.y)
+                .map((tile) => this.updateTile(vector, tile))
+                .flat(),
+            ...this.pills
+                .sort((a, b) => b.y - a.y)
+                .map((pill) => this.updatePill(vector, pill))
+                .flat(),
+            ...this.updateActivePill(vector),
+        ]
 
-        this.updateActivePill(vector)
+        this.popTiles(toPop)
+
+        return toPop
     }
 
-    public moveActivePill = (vector: Vectorial) => this.updateActivePill(vector)
+    public moveActivePill = (vector: Vectorial) => {
+        const toPop = this.updateActivePill(vector)
+        this.popTiles(toPop)
+
+        return toPop
+    }
     public rotateActivePill = (by: number) => {
         this.activePill.rotate(by)
 
@@ -131,46 +143,46 @@ class ObjectsManager {
             this.activePill.rotate(-by)
     }
 
-    private updateActivePill = (vector: Vectorial) => {
-        const isRemoved = this.updatePill(vector, this.activePill)
-        if (!isRemoved) return
-
-        this.newPill()
-    }
+    private updateActivePill = (vector: Vectorial) =>
+        this.updatePill(vector, this.activePill)
     private updatePill = (vector: Vectorial, pill: Pill) => {
         const didCollide = this.movePill(vector, pill)
 
-        if (!didCollide) return false
+        if (!didCollide) return []
 
-        if (pill === this.activePill) this.pills.push(this.activePill)
+        if (pill === this.activePill) {
+            this.pills.push(this.activePill)
+            this.newPill()
+        }
 
-        pill.absTiles().forEach((tile) => {
-            const [bottom, top, right, left] = this.getAligned(tile)
+        return pill
+            .absTiles()
+            .map((tile) => {
+                const [bottom, top, right, left] = this.getAligned(tile)
 
-            if (bottom.length + top.length > 2)
-                this.popTiles([...bottom, ...top, tile])
+                const toPop: Tile[] = []
+                if (bottom.length + top.length > 2)
+                    toPop.push(...bottom, ...top, tile)
+                if (right.length + left.length > 2)
+                    toPop.push(...right, ...left, tile)
 
-            if (right.length + left.length > 2)
-                this.popTiles([...right, ...left, tile])
-        })
-
-        return true
+                return toPop
+            })
+            .flat()
     }
 
     private updateTile = (vectorial: Vectorial, tile: Tile) => {
         const didCollide = this.moveTile(vectorial, tile)
 
-        if (!didCollide) return false
+        if (!didCollide) return []
 
         const [bottom, top, right, left] = this.getAligned(tile)
 
-        if (bottom.length + top.length > 2)
-            this.popTiles([...bottom, ...top, tile])
+        const toPop: Tile[] = []
+        if (bottom.length + top.length > 2) toPop.push(...bottom, ...top, tile)
+        if (right.length + left.length > 2) toPop.push(...right, ...left, tile)
 
-        if (right.length + left.length > 2)
-            this.popTiles([...right, ...left, tile])
-
-        return true
+        return toPop
     }
 
     private movePill = ({x, y}: Vectorial, pill: Pill) => {
