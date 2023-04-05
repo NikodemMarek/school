@@ -1,5 +1,5 @@
 import Board from './board'
-import {Point, Virus} from './objects'
+import {Point, Tile, Virus} from './objects'
 import ObjectsManager from './objects-manager'
 import Scoreboard from './scoreboard'
 import {Color} from './types'
@@ -13,6 +13,8 @@ class GameManager {
     private manager: ObjectsManager
 
     private scoreboard: Scoreboard
+
+    private toPop: Tile[] = []
 
     constructor(size: Point) {
         this.size = size
@@ -91,7 +93,8 @@ class GameManager {
                     s: new Point(0, 1),
                 }[key]
 
-                if (move) return this.manager.moveActivePill(move)
+                if (move)
+                    return this.toPop.push(...this.manager.moveActivePill(move))
 
                 const rotate = {
                     q: -1,
@@ -126,7 +129,7 @@ class GameManager {
     private update = () => {
         const viruses = this.manager.viruses.length
 
-        this.manager.update(new Point(0, 1))
+        this.toPop.push(...this.manager.update(new Point(0, 1)))
         this.refresh()
 
         if (
@@ -151,8 +154,11 @@ class GameManager {
         this.board.refresh(
             this.manager.tiles,
             [this.manager.activePill, ...this.manager.pills],
-            this.manager.viruses
+            this.manager.viruses,
+            this.toPop
         )
+
+        this.toPop = []
     }
 
     private gameOver = (won: boolean) => {

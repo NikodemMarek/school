@@ -70,16 +70,32 @@ class Board {
         )
 
         if (!tile) return
-        ;(
+        ;;(
             tile as HTMLDivElement
-        ).innerHTML = `<div class="virus" style="background-color: ${virus.color}; border-radius: 50%;"></div>`
+        ).innerHTML = `<div class="virus" style="background-color: ${virus.color};"></div>`
     }
 
-    public refresh = (tiles: Tile[], pills: Pill[], viruses: Virus[]) => {
+    public refresh = (
+        tiles: Tile[],
+        pills: Pill[],
+        viruses: Virus[],
+        toPop: Tile[]
+    ) => {
         this.empty()
         tiles.forEach((tile) => this.tile(tile))
         pills.forEach((pill) => this.pill(pill))
         viruses.forEach((virus) => this.virus(virus))
+
+        toPop.forEach(({x, y, color}) => {
+            const tile = this.board.querySelector(
+                `[data-x="${x}"][data-y="${y}"]`
+            )
+
+            if (!tile) return
+            ;(
+                tile as HTMLDivElement
+            ).innerHTML = `<div class="pop" style="border: 2px solid ${color};"></div>`
+        })
     }
 }
 
