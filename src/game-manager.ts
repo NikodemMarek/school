@@ -1,6 +1,7 @@
 import Board from './board'
 import {Point, Virus} from './objects'
 import ObjectsManager from './objects-manager'
+import Scoreboard from './scoreboard'
 import {Color} from './types'
 
 class GameManager {
@@ -8,6 +9,8 @@ class GameManager {
 
     private board: Board
     private manager: ObjectsManager
+
+    private scoreboard: Scoreboard
 
     constructor(size: Point) {
         this.size = size
@@ -46,12 +49,11 @@ class GameManager {
             this.refresh()
         })
 
-        setInterval(() => {
-            this.manager.update(new Point(0, 1))
-            this.refresh()
-            
-            if (this.manager.viruses.length <= 0) alert('you won')
-        }, 300)
+        const scoreboard = document.createElement('div')
+        document.body.appendChild(scoreboard)
+        this.scoreboard = new Scoreboard(scoreboard)
+
+        setInterval(this.update, 300)
     }
 
     private newVirus = () => {
@@ -63,6 +65,23 @@ class GameManager {
             Math.floor((Math.random() * this.size.y * 2) / 3 + this.size.y / 3),
             color
         )
+    }
+
+    private update = () => {
+        const viruses = this.manager.viruses.length
+
+        this.manager.update(new Point(0, 1))
+        this.refresh()
+
+        if (this.manager.viruses.length >= viruses) return
+
+        const killed = viruses - this.manager.viruses.length
+        this.scoreboard.addKills(killed)
+
+        if (this.manager.viruses.length > 0) return
+
+        this.scoreboard.updateHighscore()
+        alert('you won')
     }
 
     private refresh = () => {
