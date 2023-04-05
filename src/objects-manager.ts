@@ -2,8 +2,20 @@ import {Color, Direction, Vectorial} from './types'
 import {Pill, Tile, Virus} from './objects'
 
 class ObjectsManager {
+    /**
+     * The active pill.
+     * Can be moved and rotated by a player.
+     */
     public activePill: Pill = new Pill(0, 0, [])
 
+    /**
+     * Adds the first pill.
+     *
+     * @param size - Size of the board in tiles
+     * @param tiles - Tiles on the board
+     * @param pills - Pills on the board
+     * @param viruses - Viruses on the board
+     */
     constructor(
         private size: Vectorial,
         public tiles: Tile[],
@@ -13,6 +25,9 @@ class ObjectsManager {
         this.newPill()
     }
 
+    /**
+     * Creates a new pill.
+     */
     private newPill = () => {
         const colors = Object.values(Color)
         const tiles = [
@@ -25,17 +40,47 @@ class ObjectsManager {
         this.activePill.rotate(Math.floor(Math.random() * 4))
     }
 
+    /**
+     * Returns the tiles that are not the provided pill.
+     *
+     * @param pill - Pill to exclude
+     * @returns Pills that are not the provided pill
+     */
     private getOtherPills = (pill: Pill) => this.pills.filter((p) => p !== pill)
+    /**
+     * Returns the tiles that are not the provided tile.
+     *
+     * @param tile - Tile to exclude
+     * @returns Tiles that are not the provided tile
+     */
     private getOtherTiles = (tile: Tile) => this.tiles.filter((t) => t !== tile)
 
+    /**
+     * Checks if the pill is colliding with borders.
+     *
+     * @param pill - Pill to check
+     * @returns Is the pill is colliding with borders
+     */
     private isPillCollidingBorders = (pill: Pill) =>
         pill.tiles.some(({x, y}) => {
             const [px, py] = [pill.x + x, pill.y + y]
             return this.isTileCollidingBorders({x: px, y: py} as Tile)
         })
+    /**
+     * Checks if the tile is colliding with borders.
+     *
+     * @param param0 - Tile to check
+     * @returns - Is the tile is colliding with borders
+     */
     private isTileCollidingBorders = ({x, y}: Tile) =>
         x < 0 || x >= this.size.x || y < 0 || y >= this.size.y
 
+    /**
+     * Finds the tiles that are aligned with the provided tile and have the same color.
+     *
+     * @param param0 - Tile to check
+     * @returns Arrays of tiles that are aligned with the provided tile and have the same color
+     */
     private getAligned = ({x: sx, y: sy, color: scolor}: Tile) => {
         const tiles = [
             ...this.pills.map((pill) => pill.absTiles()).flat(),
@@ -88,6 +133,12 @@ class ObjectsManager {
         return [bottom, top, right, left]
     }
 
+    /**
+     * Removes the provided tiles from the board.
+     * Splits the pills that are colliding with the provided tiles.
+     *
+     * @param tiles - Tiles to remove
+     */
     private popTiles = (tiles: Tile[]) => {
         const pillsToPop = this.pills.filter((pill) => pill.isColliding(tiles))
         this.pills = this.pills.filter((pill) => !pillsToPop.includes(pill))
@@ -106,6 +157,14 @@ class ObjectsManager {
         )
     }
 
+    /**
+     * Moves the active pill by the provided vector.
+     * Moves other pills and tiles.
+     * Returns the tiles that have been removed.
+     *
+     * @param vector - Vector to move the active pill by
+     * @returns Tiles that have been removed
+     */
     public update = (vector: Vectorial) => {
         const toPop: Tile[] = [
             ...this.tiles
@@ -124,12 +183,25 @@ class ObjectsManager {
         return toPop
     }
 
+    /**
+     * Moves the active pill by the provided vector.
+     * Returns the tiles that have been removed or empty array.
+     *
+     * @param vector - Vector to move the active pill by
+     * @returns Tiles that have been removed
+     */
     public moveActivePill = (vector: Vectorial) => {
         const toPop = this.updateActivePill(vector)
         this.popTiles(toPop)
 
         return toPop
     }
+    /**
+     * Rotate the active pill by the provided number of 90 degree rotations.
+     * Prevents the pill from rotating if it collides with borders or other tiles / pills.
+     *
+     * @param by - Number of 90 degree rotations to rotate the active pill by
+     */
     public rotateActivePill = (by: number) => {
         this.activePill.rotate(by)
 
@@ -143,6 +215,13 @@ class ObjectsManager {
             this.activePill.rotate(-by)
     }
 
+    /**
+     * Updates the active pill by the provided vector.
+     * Returns the tiles that have been removed or empty array.
+     *
+     * @param vector - Vector to move the active pill by
+     * @returns Tiles that have been removed
+     */
     private updateActivePill = (vector: Vectorial) =>
         this.updatePill(vector, this.activePill)
     private updatePill = (vector: Vectorial, pill: Pill) => {
@@ -171,6 +250,14 @@ class ObjectsManager {
             .flat()
     }
 
+    /**
+     * Moves the tile by the provided vector.
+     * Returns the tiles that have been removed or empty array.
+     *
+     * @param vectorial - Vector to move the tile by
+     * @param tile - Tile to move
+     * @returns Tile that have been removed or empty array
+     */
     private updateTile = (vectorial: Vectorial, tile: Tile) => {
         const didCollide = this.moveTile(vectorial, tile)
 
@@ -185,6 +272,14 @@ class ObjectsManager {
         return toPop
     }
 
+    /**
+     * Moves the pill by the provided vector.
+     * Prevents the pill from moving if it collides with borders or other tiles / pills.
+     *
+     * @param param0 - Vector to move the pill by
+     * @param pill - Pill to move
+     * @returns Whether the pill has collided with borders or other tiles / pills
+     */
     private movePill = ({x, y}: Vectorial, pill: Pill) => {
         const otherTiles = [
             ...this.getOtherPills(pill)
@@ -222,6 +317,14 @@ class ObjectsManager {
         return collisionSide === Direction.Bottom
     }
 
+    /**
+     * Moves the tile by the provided vector.
+     * Prevents the tile from moving if it collides with borders or other tiles / pills.
+     *
+     * @param param0 - Vector to move the tile by
+     * @param tile - Tile to move
+     * @returns Whether the tile has collided with borders or other tiles / pills
+     */
     private moveTile = ({x, y}: Vectorial, tile: Tile) => {
         tile.move({x, y})
 
