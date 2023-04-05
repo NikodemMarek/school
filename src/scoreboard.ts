@@ -31,7 +31,7 @@ class Scoreboard {
 
     private refresh = () => {
         this.scoreboard.innerHTML = `
-            Score: ${this._score}
+            Score: ${this._score}<br>
             Highscore: ${this._highscore}
         `
     }

@@ -7,6 +7,8 @@ import {Color} from './types'
 class GameManager {
     private size: Point
 
+    private timer
+
     private board: Board
     private manager: ObjectsManager
 
@@ -15,10 +17,64 @@ class GameManager {
     constructor(size: Point) {
         this.size = size
 
-        const game = document.createElement('div')
-        document.body.appendChild(game)
+        document.body.innerHTML = `
+            <style>
+                body {
+                    background-color: #000;
+                    color: #fff;
+                    font-family: sans-serif;
+                    font-size: 20px;
+                    display: flex;
+                    flex-direction: row;
+                    width: 100vw;
+                    height: 100vh;
+                    margin: 0;
+                    padding: 0;
+                }
+                
+                #overlay {
+                    position: absolute;
+                    width: 100%;
+                    height: 100%;
+                    background-color: #0009;
+                    z-index: 1;
+                    display: none;
+                    justify-content: center;
+                    align-items: center;
+                    font-size: 50px;
+                }
+                
+                #left {
+                    width: 20%;
+                    height: 100%;
+                }
+                
+                #game {
+                    width: 60%;
+                    height: 100%;
+                }
 
-        this.board = new Board(this.size, game)
+                #right {
+                    width: 20%;
+                    height: 100%;
+                }
+            </style>
+
+            <div id="overlay"></div>
+
+            <div id="left">
+                <div id="scoreboard"></div>
+            </div>
+
+            <div id="game"></div>
+
+            <div id="right">
+            </div>
+        `
+        this.board = new Board(
+            this.size,
+            document.querySelector('#game') as HTMLDivElement
+        )
         this.manager = new ObjectsManager(
             this.size,
             [],
@@ -49,11 +105,11 @@ class GameManager {
             this.refresh()
         })
 
-        const scoreboard = document.createElement('div')
-        document.body.appendChild(scoreboard)
-        this.scoreboard = new Scoreboard(scoreboard)
+        this.scoreboard = new Scoreboard(
+            document.querySelector('#scoreboard') as HTMLDivElement
+        )
 
-        setInterval(this.update, 300)
+        this.timer = setInterval(this.update, 300)
     }
 
     private newVirus = () => {
@@ -73,6 +129,14 @@ class GameManager {
         this.manager.update(new Point(0, 1))
         this.refresh()
 
+        if (
+            [
+                ...this.manager.pills.map((pill) => pill.absTiles()).flat(),
+                ...this.manager.tiles,
+            ].some((tile) => tile.y === 0)
+        )
+            return this.gameOver(false)
+
         if (this.manager.viruses.length >= viruses) return
 
         const killed = viruses - this.manager.viruses.length
@@ -80,8 +144,7 @@ class GameManager {
 
         if (this.manager.viruses.length > 0) return
 
-        this.scoreboard.updateHighscore()
-        alert('you won')
+        this.gameOver(true)
     }
 
     private refresh = () => {
@@ -90,6 +153,16 @@ class GameManager {
             [this.manager.activePill, ...this.manager.pills],
             this.manager.viruses
         )
+    }
+
+    private gameOver = (won: boolean) => {
+        if (won) this.scoreboard.updateHighscore()
+
+        clearInterval(this.timer)
+
+        const overlay = document.querySelector('#overlay') as HTMLDivElement
+        overlay.style.display = 'flex'
+        overlay.innerHTML = won ? 'you won' : 'game over'
     }
 }
 
