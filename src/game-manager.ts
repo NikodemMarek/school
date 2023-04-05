@@ -49,6 +49,8 @@ class GameManager {
         setInterval(() => {
             this.manager.update(new Point(0, 1))
             this.refresh()
+            
+            if (this.manager.viruses.length <= 0) alert('you won')
         }, 300)
     }
 
