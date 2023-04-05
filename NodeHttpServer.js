@@ -52,14 +52,61 @@ const sendFile = async (path) => {
 class NodeHttpServer {
     #server = null
 
-    #endpoints = {get: {}, post: {}}
-    get = (endpoint, fn) => (this.#endpoints.get[endpoint] = fn)
-    post = (endpoint, fn) => (this.#endpoints.post[endpoint] = fn)
+    #endpoints = {
+        endpoints: {},
+    }
 
-    constructor({get, post} = {get: {}, post: {}}) {
-        this.#endpoints.get = get
-        this.#endpoints.post = post
+    createEndpoint = (endpoints, parts, method, fn) => {
+        if (parts.length === 1)
+            return {
+                ...endpoints,
+                [`/${parts[0]}`]: {
+                    ...(endpoints?.[`/${parts[0]}`] || {}),
+                    [method]: fn,
+                },
+            }
 
+        return {
+            ...endpoints,
+            [`/${parts[0]}`]: {
+                ...(endpoints?.[`/${parts[0]}`] || {}),
+                endpoints: this.createEndpoint(
+                    endpoints[`/${parts[0]}`]?.endpoints,
+                    parts.slice(1),
+                    method,
+                    fn
+                ),
+            },
+        }
+    }
+    get = (endpoint, fn) => {
+        if (endpoint === '/') {
+            this.#endpoints['get'] = fn
+            return
+        }
+
+        this.#endpoints.endpoints = this.createEndpoint(
+            this.#endpoints.endpoints,
+            endpoint.split('/').slice(1),
+            'get',
+            fn
+        )
+    }
+    post = (endpoint, fn) => {
+        if (endpoint === '/') {
+            this.#endpoints['post'] = fn
+            return
+        }
+
+        this.#endpoints.endpoints = this.createEndpoint(
+            this.#endpoints.endpoints,
+            endpoint.split('/').slice(1),
+            'post',
+            fn
+        )
+    }
+
+    constructor() {
         this.#server = http.createServer(async (req, res) => {
             const sendError = (statusCode, message) => {
                 res.statusCode = statusCode
@@ -67,25 +114,24 @@ class NodeHttpServer {
             }
 
             const method = req.method.toLowerCase()
-            const [url, rawQuery] = decodeURIComponent(req.url).split('?')
+            const [rawUrl, rawQuery] = decodeURIComponent(req.url).split('?')
             const query = Object.fromEntries(new URLSearchParams(rawQuery))
 
-            const parts = url.toLowerCase().split('/') || []
-            const endpointStr = parts
-                .reduce((acc) => {
-                    if (this.#endpoints[method]?.[acc.join('/')]) return acc
+            let path = ''
 
-                    acc.pop()
-                    return acc
-                }, parts)
-                .join('/')
+            const url = rawUrl.toLowerCase()
+            const endpoint = url.split('/')?.reduce((acc, part) => {
+                const endpoint = acc?.endpoints?.[`/${part}`]
 
-            const endpoint = this.#endpoints[method]?.[endpointStr]
-            const urlParams = endpointStr
-                .replace(parts.join('/'), '')
-                .split('/')
+                if (!endpoint) return acc
 
-            const path = url === '/' ? '/index.html' : url
+                path += `/${part}`
+                return endpoint
+            }, this.#endpoints)?.[method]
+
+            const urlParams = url.replace(path, '').split('/')
+
+            if (!endpoint) path = url === '/' ? '/index.html' : url
 
             const reqBody = await new Promise((resolve) => {
                 const body = {}
