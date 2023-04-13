@@ -1,5 +1,6 @@
 const http = require('http')
 const fs = require('fs').promises
+const formidable = require('formidable')
 const path_utils = require('path')
 
 const ServerError = (code, msg) => ({code, msg})
@@ -112,7 +113,6 @@ class NodeHttpServer {
                 res.statusCode = statusCode
                 res.end(message)
             }
-
             const method = req.method.toLowerCase()
             const [rawUrl, rawQuery] = decodeURIComponent(req.url).split('?')
             const query = Object.fromEntries(new URLSearchParams(rawQuery))
@@ -133,23 +133,35 @@ class NodeHttpServer {
 
             if (!endpoint) path = url === '/' ? '/index.html' : url
 
-            const reqBody = await new Promise((resolve) => {
-                const body = {}
+            const form = formidable({multiples: true, keepExtensions: true})
+            form.uploadDir = path_utils.join(__dirname, 'uploads')
+            const {fields: reqBody, files} = await new Promise(
+                (resolve, reject) => {
+                    form.parse(req, (err, fields, rawFiles) => {
+                        if (err) return reject({err, fields: {}, files: []})
 
-                req.on('data', (chunk) => {
-                    Object.assign(
-                        body,
-                        Object.fromEntries(
-                            new URLSearchParams(chunk.toString())
-                        )
-                    )
-                })
-                req.on('end', async () => resolve(body))
-            })
+                        const files = Object.keys(rawFiles).map((key) => {
+                            const file = rawFiles[key]
+
+                            return {
+                                path: file.path,
+                                name: key,
+                                originalName: file.name,
+                                type: file.type,
+                            }
+                        })
+
+                        resolve({
+                            fields,
+                            files,
+                        })
+                    })
+                }
+            )
 
             try {
                 const {body, headers} = endpoint
-                    ? await endpoint({query, body: reqBody, urlParams})
+                    ? await endpoint({files, query, body: reqBody, urlParams})
                     : await sendFile(path)
 
                 res.writeHead(200, {
