@@ -106,6 +106,32 @@ class NodeHttpServer {
             fn
         )
     }
+    patch = (endpoint, fn) => {
+        if (endpoint === '/') {
+            this.#endpoints['patch'] = fn
+            return
+        }
+
+        this.#endpoints.endpoints = this.createEndpoint(
+            this.#endpoints.endpoints,
+            endpoint.split('/').slice(1),
+            'patch',
+            fn
+        )
+    }
+    delete = (endpoint, fn) => {
+        if (endpoint === '/') {
+            this.#endpoints['delete'] = fn
+            return
+        }
+
+        this.#endpoints.endpoints = this.createEndpoint(
+            this.#endpoints.endpoints,
+            endpoint.split('/').slice(1),
+            'delete',
+            fn
+        )
+    }
 
     constructor() {
         this.#server = http.createServer(async (req, res) => {
