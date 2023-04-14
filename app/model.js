@@ -2,7 +2,7 @@ const {path_utils, root, move} = require('./fileController')
 
 class Photo {
     constructor(name, url) {
-        this.id = Date.now()
+        this.id = id++
         this.name = name
         this.url = url
 
@@ -60,6 +60,7 @@ Album.prototype.addPhoto = async function (photo) {
     this.photos.push(photo)
 }
 
+let id = 0
 let albums = []
 
 module.exports = {

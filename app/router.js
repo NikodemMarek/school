@@ -2,11 +2,12 @@ const {albums, Album, Photo} = require('./model')
 
 const router = (server) => {
     server.get('/api', ({}) => ({
-        body: 'Hello World',
+        body: 'welcome to the api',
         headers: {
             'Content-Type': 'text/plain',
         },
     }))
+
     server.post('/api/photos', async ({body: {albumName}, files}) => {
         const photos = files.map(
             (file) => new Photo(file.originalName, file.path)
@@ -20,10 +21,16 @@ const router = (server) => {
         return {
             body: JSON.stringify(albums),
             headers: {
-                'Content-Type': 'text/plain',
+                'Content-Type': 'application/json',
             },
         }
     })
+    server.get('/api/photos', async () => ({
+        body: JSON.stringify(albums),
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    }))
 }
 
 module.exports = router
