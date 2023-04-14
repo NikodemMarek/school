@@ -1,4 +1,4 @@
-const fs = require('fs').promises
+const {albums, Album, Photo} = require('./model')
 
 const router = (server) => {
     server.get('/api', ({}) => ({
@@ -7,11 +7,18 @@ const router = (server) => {
             'Content-Type': 'text/plain',
         },
     }))
-    server.post('/api/photos', async ({body, files}) => {
-        console.log(body, files)
+    server.post('/api/photos', async ({body: {albumName}, files}) => {
+        const photos = files.map(
+            (file) => new Photo(file.originalName, file.path)
+        )
+
+        const album = Album.get(albumName)
+        for (const photo of photos) {
+            await album.addPhoto(photo)
+        }
 
         return {
-            body: 'uploaded',
+            body: JSON.stringify(albums),
             headers: {
                 'Content-Type': 'text/plain',
             },
