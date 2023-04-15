@@ -146,16 +146,28 @@ class NodeHttpServer {
             let path = ''
 
             const url = rawUrl.toLowerCase()
+            const urlParams = {}
             const endpoint = url.split('/')?.reduce((acc, part) => {
-                const endpoint = acc?.endpoints?.[`/${part}`]
+                const endpoints = acc?.endpoints
+                if (!endpoints) return acc
 
-                if (!endpoint) return acc
+                const endpoint = endpoints[`/${part}`]
 
-                path += `/${part}`
-                return endpoint
+                if (endpoint) {
+                    path += `/${part}`
+                    return endpoint
+                }
+
+                const paramEndpoint = Object.keys(endpoints).find((endpoint) =>
+                    endpoint.startsWith('/:')
+                )
+
+                if (!paramEndpoint) return acc
+
+                urlParams[paramEndpoint.slice(2)] = part
+                path += paramEndpoint
+                return endpoints[paramEndpoint]
             }, this.#endpoints)?.[method]
-
-            const urlParams = url.replace(path, '').split('/')
 
             if (!endpoint) path = url === '/' ? '/index.html' : url
 

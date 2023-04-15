@@ -31,6 +31,12 @@ const router = (server) => {
             'Content-Type': 'application/json',
         },
     }))
+    server.get('/api/photos/:id', async (ee) => ({
+        body: JSON.stringify(ee),
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    }))
 }
 
 module.exports = router
