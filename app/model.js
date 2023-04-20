@@ -60,6 +60,10 @@ Album.prototype.addPhoto = async function (photo) {
     this.photos.push(photo)
 }
 
+Album.prototype.getPhoto = function (id) {
+    return this.photos.filter(photo => photo.id === id)
+}
+
 let id = 0
 let albums = []
 
