@@ -33,10 +33,21 @@ const router = (server) => {
     }))
     server.get('/api/photos/:id', async ({urlParams: {id: rawId}}) => {
         const id = parseInt(rawId)
-        const found = albums.map(album => album.getPhoto(id))
+        const found = albums.map(album => album.getPhoto(id)).flat(Infinity)
 
         return {
             body: JSON.stringify(found),
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        }
+    })
+    server.delete('/api/photos/:id', async ({urlParams: {id: rawId}}) => {
+        const id = parseInt(rawId)
+        albums.map(album => album.deletePhoto(id))
+        
+        return {
+            body: JSON.stringify({ msg: 'removed' }),
             headers: {
                 'Content-Type': 'application/json',
             },

@@ -1,4 +1,4 @@
-const {path_utils, root, move} = require('./fileController')
+const {path_utils, root, move, remove} = require('./fileController')
 
 class Photo {
     constructor(name, url) {
@@ -22,6 +22,14 @@ Photo.prototype.move = async function (newPath) {
     this.url = newPath
     this.history.push({
         status: 'moved',
+        timestamp: new Date(),
+    })
+}
+Photo.prototype.remove = async function () {
+    remove(this.url)
+
+    this.history.push({
+        status: 'removed',
         timestamp: new Date(),
     })
 }
@@ -62,6 +70,11 @@ Album.prototype.addPhoto = async function (photo) {
 
 Album.prototype.getPhoto = function (id) {
     return this.photos.filter(photo => photo.id === id)
+}
+Album.prototype.deletePhoto = function (id) {
+    this.photos.filter(photo => photo.id === id).forEach(f => f.remove())
+
+    this.photos = this.photos.filter(photo => photo.id !== id)
 }
 
 let id = 0
