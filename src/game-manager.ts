@@ -1,4 +1,5 @@
 import Board from './board'
+import Loader from './loader'
 import {Point, Tile, Virus} from './objects'
 import ObjectsManager from './objects-manager'
 import Scoreboard from './scoreboard'
@@ -16,72 +17,19 @@ class GameManager {
 
     private toPop: Tile[] = []
 
-    constructor(size: Point) {
+    constructor(size: Point, loader: Loader) {
         this.size = size
 
-        document.body.innerHTML = `
-            <style>
-                body {
-                    background-color: #000;
-                    color: #fff;
-                    font-family: sans-serif;
-                    font-size: 20px;
-                    display: flex;
-                    flex-direction: row;
-                    width: 100vw;
-                    height: 100vh;
-                    margin: 0;
-                    padding: 0;
-                }
-                
-                #overlay {
-                    position: absolute;
-                    width: 100%;
-                    height: 100%;
-                    background-color: #0009;
-                    z-index: 1;
-                    display: none;
-                    justify-content: center;
-                    align-items: center;
-                    font-size: 50px;
-                }
-                
-                #left {
-                    width: 20%;
-                    height: 100%;
-                }
-                
-                #game {
-                    width: 60%;
-                    height: 100%;
-                }
-
-                #right {
-                    width: 20%;
-                    height: 100%;
-                }
-            </style>
-
-            <div id="overlay"></div>
-
-            <div id="left">
-                <div id="scoreboard"></div>
-            </div>
-
-            <div id="game"></div>
-
-            <div id="right">
-            </div>
-        `
-        this.board = new Board(
-            this.size,
-            document.querySelector('#game') as HTMLDivElement
-        )
         this.manager = new ObjectsManager(
             this.size,
             [],
             [],
             [this.newVirus(), this.newVirus(), this.newVirus()]
+        )
+        this.board = new Board(
+            this.size,
+            loader,
+            this.manager.viruses.map(({ x, y }) => ({ x, y }))
         )
 
         document.addEventListener('keydown', ({key}) => {
@@ -112,7 +60,7 @@ class GameManager {
             document.querySelector('#scoreboard') as HTMLDivElement
         )
 
-        this.timer = setInterval(this.update, 300)
+        this.timer = setInterval(() => this.update(300), 300)
     }
 
     private newVirus = () => {
@@ -126,10 +74,11 @@ class GameManager {
         )
     }
 
-    private update = () => {
+    private update = (delta: number) => {
         const viruses = this.manager.viruses.length
 
         this.toPop.push(...this.manager.update(new Point(0, 1)))
+        this.board.update(delta)
         this.refresh()
 
         if (

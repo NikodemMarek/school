@@ -1,3 +1,4 @@
+import Loader from './loader'
 import {Pill, Tile, Virus} from './objects'
 import {Vectorial} from './types'
 
@@ -6,8 +7,64 @@ const TILE_SIZE = 40
 class Board {
     private board: HTMLDivElement
 
-    constructor(private size: Vectorial, container: HTMLDivElement) {
-        this.board = container
+    constructor(private size: Vectorial, private loader: Loader, private virusPositions: Vectorial[]) {
+        document.body.innerHTML = `
+            <style>
+                body {
+                    background-color: #000;
+                    color: #fff;
+                    font-family: sans-serif;
+                    font-size: 20px;
+                    display: flex;
+                    flex-direction: row;
+                    width: 100vw;
+                    height: 100vh;
+                    margin: 0;
+                    padding: 0;
+                }
+                
+                #overlay {
+                    position: absolute;
+                    width: 100%;
+                    height: 100%;
+                    background-color: #0009;
+                    z-index: 1;
+                    display: none;
+                    justify-content: center;
+                    align-items: center;
+                    font-size: 50px;
+                }
+                
+                #left {
+                    width: 20%;
+                    height: 100%;
+                }
+                
+                #game {
+                    width: 60%;
+                    height: 100%;
+                }
+
+                #right {
+                    width: 20%;
+                    height: 100%;
+                }
+            </style>
+
+            <div id="overlay"></div>
+
+            <div id="left">
+                <div id="scoreboard"></div>
+            </div>
+
+            <div id="game"></div>
+
+            <div id="right">
+            </div>
+        `
+
+        this.board = document.querySelector('#game') as HTMLDivElement
+
 
         this.board.style.width = `${this.size.x * TILE_SIZE}px`
         this.board.style.height = `${this.size.y * TILE_SIZE}px`
@@ -38,7 +95,7 @@ class Board {
         const tile = this.board.querySelector(`[data-x="${x}"][data-y="${y}"]`)
 
         if (!tile) return
-        ;(tile as HTMLDivElement).style.backgroundColor = color
+        ;(tile as HTMLDivElement).style.backgroundImage = `url(${this.loader.get(`${color}_dot.png`).src})`
     }
 
     public pill = (pill: Pill) => {
@@ -48,10 +105,10 @@ class Board {
 
         absTiles.forEach(({x, y, color}, i) => {
             let radius = '0'
-            if (xy) radius = i === 0 ? '50% 0 0 50%' : '0 50% 50% 0'
+            if (xy) radius = i === 0 ? 'left' : 'right'
             else
                 radius =
-                    i === absTiles.length - 1 ? '0 0 50% 50%' : '50% 50% 0 0'
+                    i === absTiles.length - 1 ? 'down' : 'up'
 
             const tile = this.board.querySelector(
                 `[data-x="${x}"][data-y="${y}"]`
@@ -60,7 +117,7 @@ class Board {
             if (!tile) return
             ;(
                 tile as HTMLDivElement
-            ).innerHTML = `<div class="pill" style="background-color: ${color}; border-radius: ${radius};"></div>`
+            ).style.backgroundImage = `url(${this.loader.get(`${color}_${radius}.png`).src})`
         })
     }
 
@@ -72,7 +129,7 @@ class Board {
         if (!tile) return
         ;;(
             tile as HTMLDivElement
-        ).innerHTML = `<div class="virus" style="background-color: ${virus.color};"></div>`
+        ).style.backgroundImage = `url(${this.loader.get(`${virus.color}_smvirus`).src})`
     }
 
     public refresh = (
@@ -92,11 +149,19 @@ class Board {
             )
 
             if (!tile) return
+
+            const virus = this.virusPositions.find((v) => v.x === x && v.y === y)
+
+            if (virus)
+                this.virusPositions = this.virusPositions.filter(v => v !== virus)
+
             ;(
                 tile as HTMLDivElement
-            ).innerHTML = `<div class="pop" style="border: 2px solid ${color};"></div>`
+            ).style.backgroundImage = virus? `url(${this.loader.get(`${color}_x.png`).src})`: `url(${this.loader.get(`${color}_o.png`).src})`
         })
     }
+
+    public update = (delta: number) => Object.keys(this.loader.animatedSprites).forEach(key => this.loader.animatedSprites[key].update(delta))
 }
 
 export default Board

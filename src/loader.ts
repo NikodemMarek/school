@@ -1,38 +1,32 @@
 import map from './assets/spritesheet.json'
 import spritesheet from './assets/spritesheet.png'
-
-enum Sprite {
-    Num0 = '0.png',
-    Num1 = '1.png',
-    Num2 = '2.png',
-    Num3 = '3.png',
-    Num4 = '4.png',
-    Num5 = '5.png',
-    Num6 = '6.png',
-    Num7 = '7.png',
-    Num8 = '8.png',
-    Num9 = '9.png',
-    BlueBigVirusActive = 'bl_bgvirus_active.png'
-}
+import { AnimatedSprite, Sprite } from './sprite'
 
 class Loader {
-    private loaded: { [file: string]: string }
+    sprites: { [file: string]: Sprite } = {}
+    animatedSprites: { [file: string]: AnimatedSprite } = {}
 
     constructor() {
-        this.loaded = {}
+        this.sprites = {}
     }
 
     public loadAll = async () => {
-        for(const val of Object.values(Sprite)) {
-            await this.loadSprite(val as Sprite)
+        for(const key of Object.keys(map.frames)) {
+            await this.loadSprite(key)
         }
 
-        console.log(this.loaded)
-        console.log(map)
+        for(const key of Object.keys(map.animations)) {
+            this.animatedSprites[key] = new AnimatedSprite(
+                map.animations[key].map((sprite) => ({
+                    sprite: this.sprites[sprite],
+                    duration: 1000,
+                }))
+            )
+        }
     }
 
-    private loadSprite = async (sprite: Sprite) => new Promise((resolve) => {
-        const { x, y, w, h } = map.frames[sprite].frame
+    private loadSprite = async (name: string) => new Promise((resolve) => {
+        const { x, y, w, h } = map.frames[name].frame
 
         const cvs = document.createElement('canvas')
         cvs.width = w
@@ -45,13 +39,15 @@ class Loader {
         img.onload = () => {
             ctx.drawImage(img, x, y, w, h, 0, 0, w, h);
 
-            this.loaded[sprite] = cvs.toDataURL('image/png')
+            this.sprites[name] = {
+                src: cvs.toDataURL('image/png'),
+            }
+
             resolve({})
         }
     })
 
-    public get = (sprite: Sprite) => this.loaded[sprite]
+    public get = (name: string) => this.animatedSprites[name] || this.sprites[name]
 }
 
-export {Sprite}
 export default Loader
