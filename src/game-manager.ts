@@ -115,9 +115,7 @@ class GameManager {
 
         clearInterval(this.timer)
 
-        const overlay = document.querySelector('#overlay') as HTMLDivElement
-        overlay.style.display = 'flex'
-        overlay.innerHTML = won ? 'you won' : 'game over'
+        this.board.finish(won)
     }
 }
 

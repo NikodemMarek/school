@@ -2,7 +2,7 @@ import Loader from './loader'
 import {Pill, Tile, Virus} from './objects'
 import {Vectorial} from './types'
 
-const TILE_SIZE = 40
+const TILE_SIZE = 25
 
 class Board {
     private board: HTMLDivElement
@@ -10,29 +10,35 @@ class Board {
     constructor(private size: Vectorial, private loader: Loader, private virusPositions: Vectorial[]) {
         document.body.innerHTML = `
             <style>
+                html {
+                  width: 100%;
+                  height: 100%;
+                  margin: 0;
+                  padding: 0;
+                  background: #fff;
+                }
+
                 body {
                     background-color: #000;
                     color: #fff;
-                    font-family: sans-serif;
-                    font-size: 20px;
-                    display: flex;
-                    flex-direction: row;
-                    width: 100vw;
-                    height: 100vh;
+                    width: 1280px;
+                    height: 768px;
+                    position: relative;
                     margin: 0;
                     padding: 0;
+                    background-size: cover;
+                    background-image: url(${this.loader.get('pf.png').src})
                 }
                 
                 #overlay {
-                    position: absolute;
+                    position: relative;
                     width: 100%;
                     height: 100%;
-                    background-color: #0009;
                     z-index: 1;
                     display: none;
-                    justify-content: center;
-                    align-items: center;
-                    font-size: 50px;
+                    background-repeat: no-repeat;
+                    background-position: center;
+                    background-image: url(${this.loader.get('go.png').src})
                 }
                 
                 #left {
@@ -41,13 +47,22 @@ class Board {
                 }
                 
                 #game {
-                    width: 60%;
-                    height: 100%;
+                    position: absolute;
+                    top: 195px;
+                    left: 545px;
+                    width: ${size.x * TILE_SIZE}px;
+                    height: ${size.y * TILE_SIZE}px;
                 }
 
                 #right {
                     width: 20%;
                     height: 100%;
+                }
+
+                .tile {
+                  position: absolute;
+                  box-sizing: border-box;
+                  background-size: cover;
                 }
             </style>
 
@@ -64,11 +79,6 @@ class Board {
         `
 
         this.board = document.querySelector('#game') as HTMLDivElement
-
-
-        this.board.style.width = `${this.size.x * TILE_SIZE}px`
-        this.board.style.height = `${this.size.y * TILE_SIZE}px`
-        this.board.classList.add('board')
 
         this.empty()
     }
@@ -127,7 +137,7 @@ class Board {
         )
 
         if (!tile) return
-        ;;(
+        ;(
             tile as HTMLDivElement
         ).style.backgroundImage = `url(${this.loader.get(`${virus.color}_smvirus`).src})`
     }
@@ -162,6 +172,13 @@ class Board {
     }
 
     public update = (delta: number) => Object.keys(this.loader.animatedSprites).forEach(key => this.loader.animatedSprites[key].update(delta))
+
+    public finish = (won: boolean) => {
+        const overlay = document.querySelector('#overlay') as HTMLDivElement
+
+        overlay.style.backgroundImage = `url(${this.loader.get(`${won ? 'sc' : 'go'}.png`).src})`
+        overlay.style.display = 'flex'
+    }
 }
 
 export default Board
