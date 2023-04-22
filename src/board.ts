@@ -31,7 +31,7 @@ class Board {
                 }
                 
                 #overlay {
-                    position: relative;
+                    position: absolute;
                     width: 100%;
                     height: 100%;
                     z-index: 1;
@@ -41,9 +41,15 @@ class Board {
                     background-image: url(${this.loader.get('go.png').src})
                 }
                 
-                #left {
-                    width: 20%;
-                    height: 100%;
+                #highscore {
+                    position: absolute;
+                    top: 160px;
+                    left: 250px;
+                }
+                #score {
+                    position: absolute;
+                    top: 270px;
+                    left: 250px;
                 }
                 
                 #game {
@@ -54,31 +60,50 @@ class Board {
                     height: ${size.y * TILE_SIZE}px;
                 }
 
-                #right {
-                    width: 20%;
-                    height: 100%;
-                }
-
                 .tile {
                   position: absolute;
                   box-sizing: border-box;
                   background-size: cover;
                 }
+
+                #level {
+                    position: absolute;
+                    top: 480px;
+                    left: 1170px;
+                }
+                #speed {
+                    position: absolute;
+                    top: 580px;
+                    left: 1170px;
+                }
+                #virus-count {
+                    position: absolute;
+                    top: 680px;
+                    left: 1170px;
+                }
+
+                .value {
+                    display: flex;
+                }
             </style>
 
             <div id="overlay"></div>
 
-            <div id="left">
-                <div id="scoreboard"></div>
-            </div>
+            <div id="score"></div>
+            <div id="highscore"></div>
 
             <div id="game"></div>
 
-            <div id="right">
-            </div>
+            <div id="level"></div>
+            <div id="speed"></div>
+            <div id="virus-count"></div>
         `
 
         this.board = document.querySelector('#game') as HTMLDivElement
+
+        document.querySelector('#level')!.innerHTML = this.value(1, 2)
+        document.querySelector('#speed')!.innerHTML = this.value(1, 2)
+        this.virusCount(0)
 
         this.empty()
     }
@@ -179,6 +204,22 @@ class Board {
         overlay.style.backgroundImage = `url(${this.loader.get(`${won ? 'sc' : 'go'}.png`).src})`
         overlay.style.display = 'flex'
     }
+
+    private value = (val: number, places: number) => {
+        let digits = `${val}`
+        digits = `${Array(places - digits.length).fill(0).reduce((acc) => acc + '0', '')}${digits}`
+
+        return `<div class='value'>${
+            digits.split('').reduce((ac, digit) => ac + `<img src='${this.loader.get(`${digit}.png`).src}'>`, '')
+        }</div>`
+    }
+
+    public score = (highscore: number, score: number) => {
+        document.querySelector('#highscore')!.innerHTML = this.value(highscore, 7)
+        document.querySelector('#score')!.innerHTML = this.value(score, 7)
+    }
+    public virusCount = (count: number) => 
+        document.querySelector('#virus-count')!.innerHTML = this.value(count, 2)
 }
 
 export default Board

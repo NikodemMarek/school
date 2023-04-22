@@ -56,9 +56,8 @@ class GameManager {
             this.refresh()
         })
 
-        this.scoreboard = new Scoreboard(
-            document.querySelector('#scoreboard') as HTMLDivElement
-        )
+        this.scoreboard = new Scoreboard(this.board.score)
+        this.board.virusCount(this.manager.viruses.length)
 
         this.timer = setInterval(() => this.update(300), 300)
     }
@@ -93,6 +92,7 @@ class GameManager {
 
         const killed = viruses - this.manager.viruses.length
         this.scoreboard.addKills(killed)
+        this.board.virusCount(this.manager.viruses.length)
 
         if (this.manager.viruses.length > 0) return
 

@@ -26,9 +26,7 @@ class Scoreboard {
      *
      * @param scoreboard Scoreboard element
      */
-    constructor(scoreboard: HTMLDivElement) {
-        this.scoreboard = scoreboard
-
+    constructor(private refreshFn: (highscore: number, score: number) => void) {
         this._highscore = parseInt(localStorage.getItem('highscore') || '0')
 
         this.refresh()
@@ -62,12 +60,7 @@ class Scoreboard {
     /**
      * Refreshes the scoreboard.
      */
-    private refresh = () => {
-        this.scoreboard.innerHTML = `
-            Score: ${this._score}<br>
-            Highscore: ${this._highscore}
-        `
-    }
+    private refresh = () => this.refreshFn(this._highscore, this._score)
 }
 
 export default Scoreboard
