@@ -186,18 +186,23 @@ class ObjectsManager {
      * @param by - Number of 90 degree rotations to rotate the active pill by
      */
     public rotateActivePill = (by: number) => {
-        if (!this.activePill) return
+        if (!this.activePill) return true
 
         this.activePill.rotate(by)
 
         if (
             this.isPillCollidingBorders(this.activePill) ||
             this.activePill.isColliding([
-                ...this.getOtherPills(this.activePill),
+                ...this.getOtherPills(this.activePill).map(p => p.absTiles()).flat(1),
                 ...this.tiles,
+                ...this.viruses,
             ])
-        )
+        ) {
             this.activePill.rotate(-by)
+            return false
+        }
+
+        return true
     }
 
     /**

@@ -11,7 +11,7 @@ class Board {
 
     public dance: boolean
 
-    constructor(private size: Vectorial, private loader: Loader, private virusPositions: Vectorial[]) {
+    constructor(private size: Vectorial, private loader: Loader) {
         document.body.innerHTML = `
             <style>
                 html {
@@ -236,21 +236,16 @@ class Board {
         pills.forEach((pill) => this.pill(pill))
         viruses.forEach((virus) => this.virus(virus))
 
-        toPop.forEach(({x, y, color}) => {
+        toPop.forEach((v) => {
             const tile = this.board.querySelector(
-                `[data-x="${x}"][data-y="${y}"]`
+                `[data-x="${v.x}"][data-y="${v.y}"]`
             )
 
             if (!tile) return
 
-            const virus = this.virusPositions.find((v) => v.x === x && v.y === y)
-
-            if (virus)
-                this.virusPositions = this.virusPositions.filter(v => v !== virus)
-
             ;(
                 tile as HTMLDivElement
-            ).style.backgroundImage = virus? `url(${this.loader.get(`${color}_x.png`).src})`: `url(${this.loader.get(`${color}_o.png`).src})`
+            ).style.backgroundImage = !v.move? `url(${this.loader.get(`${v.color}_x.png`).src})`: `url(${this.loader.get(`${v.color}_o.png`).src})`
         })
 
         document.querySelector('#mario')!.style.backgroundImage = `url(${this.mario.src})`
