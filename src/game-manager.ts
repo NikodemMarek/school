@@ -27,14 +27,15 @@ class GameManager {
             this.size,
             [],
             [],
-            [this.newVirus(), this.newVirus(), this.newVirus()],
-            this.newPill
+            [this.newVirus(), this.newVirus(), this.newVirus()]
         )
         this.board = new Board(
             this.size,
             loader,
             this.manager.viruses.map(({ x, y }) => ({ x, y }))
         )
+
+        this.board.dance = true
 
         document.addEventListener('keydown', ({key}) => {
             ;(() => {
@@ -116,7 +117,6 @@ class GameManager {
         const viruses = this.manager.viruses.length
 
         this.toPop.push(...this.manager.update(new Point(0, 1)))
-        this.board.update(delta)
         this.refresh()
 
         if (

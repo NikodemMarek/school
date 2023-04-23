@@ -19,7 +19,7 @@ class Loader {
             this.animatedSprites[key] = new AnimatedSprite(
                 map.animations[key].map((sprite) => ({
                     sprite: this.sprites[sprite],
-                    duration: 1000,
+                    duration: 300,
                 })), true
             )
         }

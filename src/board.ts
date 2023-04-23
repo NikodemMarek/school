@@ -9,6 +9,8 @@ class Board {
     private board: HTMLDivElement
     private mario: AnimatedSprite
 
+    public dance: boolean
+
     constructor(private size: Vectorial, private loader: Loader, private virusPositions: Vectorial[]) {
         document.body.innerHTML = `
             <style>
@@ -52,6 +54,15 @@ class Board {
                     position: absolute;
                     top: 270px;
                     left: 250px;
+                }
+
+                #red-virus, #blue-virus, #yellow-virus {
+                    position: absolute;
+                    top: 420px;
+                    left: 200px;
+                    height: 72px;
+                    width: 96px;
+                    background-size: cover;
                 }
                 
                 #game {
@@ -116,6 +127,10 @@ class Board {
             <div id="score"></div>
             <div id="highscore"></div>
 
+            <div id="red-virus"></div>
+            <div id="blue-virus"></div>
+            <div id="yellow-virus"></div>
+
             <div id="game"></div>
 
             <div id="mario"></div>
@@ -134,6 +149,19 @@ class Board {
 
         this.mario = new AnimatedSprite(["dr_idle.png"].map((s) => ({ sprite: this.loader.get(s), duration: 200 }), false))
         document.querySelector('#mario')!.style.backgroundImage = `url(${this.mario.src})`
+
+        this.dance = false
+
+        let pos = 0
+        setInterval(() => {
+            this.update(300)
+
+            this.danceVirus('red', Math.floor(pos) % 6, this.dance)
+            this.danceVirus('blue', (Math.floor(pos) + 2) % 6, this.dance)
+            this.danceVirus('yellow', (Math.floor(pos) + 4) % 6, this.dance)
+            
+            if (this.dance) pos += 0.2
+        }, 300)
 
         this.empty()
     }
@@ -241,6 +269,8 @@ class Board {
 
         document.querySelector('#mario')!.style.backgroundImage = `url(${this.loader.get('dr_idle.png').src})`
         document.querySelector('#pill-throw')!.innerHTML = ''
+
+        this.dance = false
     }
 
     private value = (val: number, places: number) => {
@@ -303,6 +333,14 @@ class Board {
                 resolve(pill)
             }, positions.length * 100)
          })
+    }
+
+    public danceVirus = (color: string, position: number, active: boolean) => {
+        const virus = document.querySelector(`#${color}-virus`)! as HTMLDivElement
+
+        virus.style.backgroundImage = `url(${this.loader.get(`${color}_bgvirus_${active? 'active': 'idle'}`).src})`
+        virus.style.top = `${[450, 500, 600, 650, 600, 500][position]}px`
+        virus.style.left = `${[200, 110, 110, 200, 290, 290][position]}px`
     }
 }
 
