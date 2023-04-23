@@ -6,7 +6,7 @@ class ObjectsManager {
      * The active pill.
      * Can be moved and rotated by a player.
      */
-    public activePill: Pill = new Pill(0, 0, [])
+    public activePill: Pill | undefined
 
     /**
      * Adds the first pill.
@@ -20,25 +20,9 @@ class ObjectsManager {
         private size: Vectorial,
         public tiles: Tile[],
         public pills: Pill[],
-        public viruses: Virus[]
-    ) {
-        this.newPill()
-    }
-
-    /**
-     * Creates a new pill.
-     */
-    private newPill = () => {
-        const colors = Object.values(Color)
-        const tiles = [
-            new Tile(0, 0, colors[Math.floor(Math.random() * colors.length)]),
-            new Tile(1, 0, colors[Math.floor(Math.random() * colors.length)]),
-        ]
-
-        this.activePill = new Pill(Math.floor(this.size.x / 2), 0, tiles)
-
-        this.activePill.rotate(Math.floor(Math.random() * 4))
-    }
+        public viruses: Virus[],
+        private newPill: () => void
+    ) {}
 
     /**
      * Returns the tiles that are not the provided pill.
@@ -203,6 +187,8 @@ class ObjectsManager {
      * @param by - Number of 90 degree rotations to rotate the active pill by
      */
     public rotateActivePill = (by: number) => {
+        if (!this.activePill) return
+
         this.activePill.rotate(by)
 
         if (
@@ -222,8 +208,11 @@ class ObjectsManager {
      * @param vector - Vector to move the active pill by
      * @returns Tiles that have been removed
      */
-    private updateActivePill = (vector: Vectorial) =>
-        this.updatePill(vector, this.activePill)
+    private updateActivePill = (vector: Vectorial) => {
+        if (!this.activePill) return []
+
+        return this.updatePill(vector, this.activePill)
+    }
     private updatePill = (vector: Vectorial, pill: Pill) => {
         const didCollide = this.movePill(vector, pill)
 

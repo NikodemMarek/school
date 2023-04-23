@@ -20,7 +20,7 @@ class Loader {
                 map.animations[key].map((sprite) => ({
                     sprite: this.sprites[sprite],
                     duration: 1000,
-                }))
+                })), true
             )
         }
     }

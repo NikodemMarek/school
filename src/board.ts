@@ -1,11 +1,13 @@
 import Loader from './loader'
 import {Pill, Tile, Virus} from './objects'
+import { AnimatedSprite } from './sprite'
 import {Vectorial} from './types'
 
 const TILE_SIZE = 25
 
 class Board {
     private board: HTMLDivElement
+    private mario: AnimatedSprite
 
     constructor(private size: Vectorial, private loader: Loader, private virusPositions: Vectorial[]) {
         document.body.innerHTML = `
@@ -66,6 +68,15 @@ class Board {
                   background-size: cover;
                 }
 
+                #mario {    
+                    position: absolute;
+                    top: 120px;
+                    left: 970px;
+                    height: 200px;
+                    width: 200px;
+                    background-size: cover;
+                }
+
                 #level {
                     position: absolute;
                     top: 480px;
@@ -94,6 +105,8 @@ class Board {
 
             <div id="game"></div>
 
+            <div id="mario"></div>
+
             <div id="level"></div>
             <div id="speed"></div>
             <div id="virus-count"></div>
@@ -104,6 +117,9 @@ class Board {
         document.querySelector('#level')!.innerHTML = this.value(1, 2)
         document.querySelector('#speed')!.innerHTML = this.value(1, 2)
         this.virusCount(0)
+
+        this.mario = new AnimatedSprite(["dr_idle.png"].map((s) => ({ sprite: this.loader.get(s), duration: 200 }), false))
+        document.querySelector('#mario')!.style.backgroundImage = `url(${this.mario.src})`
 
         this.empty()
     }
@@ -194,15 +210,22 @@ class Board {
                 tile as HTMLDivElement
             ).style.backgroundImage = virus? `url(${this.loader.get(`${color}_x.png`).src})`: `url(${this.loader.get(`${color}_o.png`).src})`
         })
+
+        document.querySelector('#mario')!.style.backgroundImage = `url(${this.mario.src})`
     }
 
-    public update = (delta: number) => Object.keys(this.loader.animatedSprites).forEach(key => this.loader.animatedSprites[key].update(delta))
+    public update = (delta: number) => {
+        Object.keys(this.loader.animatedSprites).forEach(key => this.loader.animatedSprites[key].update(delta))
+        this.mario.update(delta)
+    }
 
     public finish = (won: boolean) => {
         const overlay = document.querySelector('#overlay') as HTMLDivElement
 
         overlay.style.backgroundImage = `url(${this.loader.get(`${won ? 'sc' : 'go'}.png`).src})`
         overlay.style.display = 'flex'
+
+        document.querySelector('#mario')!.style.backgroundImage = `url(${this.loader.get('dr_idle.png').src})`
     }
 
     private value = (val: number, places: number) => {
@@ -220,6 +243,10 @@ class Board {
     }
     public virusCount = (count: number) => 
         document.querySelector('#virus-count')!.innerHTML = this.value(count, 2)
+
+    public throw = (pill: Pill) => {
+         this.mario = new AnimatedSprite(["dr_up.png", "dr_middle.png", "dr_down.png", "dr_middle.png", "dr_up.png"].map((s) => ({ sprite: this.loader.get(s), duration: 300 })), false)
+    }
 }
 
 export default Board

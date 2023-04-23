@@ -1,6 +1,6 @@
 import Board from './board'
 import Loader from './loader'
-import {Point, Tile, Virus} from './objects'
+import {Pill, Point, Tile, Virus} from './objects'
 import ObjectsManager from './objects-manager'
 import Scoreboard from './scoreboard'
 import {Color} from './types'
@@ -24,7 +24,8 @@ class GameManager {
             this.size,
             [],
             [],
-            [this.newVirus(), this.newVirus(), this.newVirus()]
+            [this.newVirus(), this.newVirus(), this.newVirus()],
+            this.newPill
         )
         this.board = new Board(
             this.size,
@@ -64,7 +65,26 @@ class GameManager {
         this.scoreboard = new Scoreboard(this.board.score)
         this.board.virusCount(this.manager.viruses.length)
 
+        this.newPill()
+
         this.timer = setInterval(() => this.update(300), 300)
+    }
+
+    /**
+     * Creates a new pill.
+     */
+    private newPill = () => {
+        const colors = Object.values(Color)
+        const tiles = [
+            new Tile(0, 0, colors[Math.floor(Math.random() * colors.length)]),
+            new Tile(1, 0, colors[Math.floor(Math.random() * colors.length)]),
+        ]
+
+        const pill = new Pill(4, 0, tiles)
+
+        this.board.throw(pill)
+
+        this.manager.activePill = pill
     }
 
     private newVirus = () => {
@@ -107,7 +127,7 @@ class GameManager {
     private refresh = () => {
         this.board.refresh(
             this.manager.tiles,
-            [this.manager.activePill, ...this.manager.pills],
+            this.manager.activePill? [this.manager.activePill, ...this.manager.pills]: this.manager.pills,
             this.manager.viruses,
             this.toPop
         )

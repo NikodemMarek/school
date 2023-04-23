@@ -18,11 +18,13 @@ class AnimatedSprite implements Sprite {
     }
 
     public update = (delta: number) => {
+        if (this.current >= this.sprites.length - 1 && !this.loop) return
+
         this.toSwitch -= delta
 
         if (this.toSwitch > 0) return
 
-        this.current = this.current === this.sprites.length - 1? 0: this.current + 1
+        this.current = this.current >= this.sprites.length - 1? 0: this.current + 1
 
         const frame = this.sprites[this.current]
         
