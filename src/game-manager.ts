@@ -36,9 +36,11 @@ class GameManager {
             ;(() => {
                 const move = {
                     a: new Point(-1, 0),
+                    ArrowLeft: new Point(-1, 0),
                     d: new Point(1, 0),
-                    // w: new Point(0, -1),
+                    ArrowRight: new Point(1, 0),
                     s: new Point(0, 1),
+                    ArrowDown: new Point(0, 1),
                 }[key]
 
                 if (move)
@@ -46,8 +48,11 @@ class GameManager {
 
                 const rotate = {
                     q: -1,
+                    w: -1,
+                    ArrowUp: -1,
                     e: 1,
                     f: 2,
+                    Shift: 1,
                 }[key]
 
                 if (rotate) return this.manager.rotateActivePill(rotate)
