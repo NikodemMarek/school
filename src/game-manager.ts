@@ -17,6 +17,9 @@ class GameManager {
 
     private toPop: Tile[] = []
 
+    private nextPill: Pill
+    private waitForPill = false
+
     constructor(size: Point, loader: Loader) {
         this.size = size
 
@@ -65,7 +68,12 @@ class GameManager {
         this.scoreboard = new Scoreboard(this.board.score)
         this.board.virusCount(this.manager.viruses.length)
 
-        this.newPill()
+        const colors = Object.values(Color)
+        this.nextPill = new Pill(4, 0, [
+            new Tile(0, 0, colors[Math.floor(Math.random() * colors.length)]),
+            new Tile(1, 0, colors[Math.floor(Math.random() * colors.length)]),
+        ])
+        this.board.nextPill(this.nextPill)
 
         this.timer = setInterval(() => this.update(300), 300)
     }
@@ -74,17 +82,23 @@ class GameManager {
      * Creates a new pill.
      */
     private newPill = () => {
+        if (this.waitForPill) return
+
+        this.waitForPill = true
+
+        this.board.throw(this.nextPill).then((pill) => {
+            this.manager.activePill = pill
+            this.waitForPill = false
+            this.board.nextPill(this.nextPill)
+        })
+
         const colors = Object.values(Color)
         const tiles = [
             new Tile(0, 0, colors[Math.floor(Math.random() * colors.length)]),
             new Tile(1, 0, colors[Math.floor(Math.random() * colors.length)]),
         ]
 
-        const pill = new Pill(4, 0, tiles)
-
-        this.board.throw(pill)
-
-        this.manager.activePill = pill
+        this.nextPill = new Pill(4, 0, tiles)
     }
 
     private newVirus = () => {
@@ -112,6 +126,8 @@ class GameManager {
             ].some((tile) => tile.y === 0)
         )
             return this.gameOver(false)
+
+        if (!this.manager.activePill) this.newPill()
 
         if (this.manager.viruses.length >= viruses) return
 

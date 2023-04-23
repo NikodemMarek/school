@@ -77,6 +77,19 @@ class Board {
                     background-size: cover;
                 }
 
+                #pill-throw {
+                    display: flex;
+                    position: absolute;
+                    top: 100px;
+                    left: 1000px;
+                    height: ${TILE_SIZE}px;
+                    width: ${TILE_SIZE * 2}px;
+                }
+                #pill-throw div {
+                    height: ${TILE_SIZE}px;
+                    width: ${TILE_SIZE}px;
+                }
+
                 #level {
                     position: absolute;
                     top: 480px;
@@ -106,6 +119,7 @@ class Board {
             <div id="game"></div>
 
             <div id="mario"></div>
+            <div id="pill-throw"></div>
 
             <div id="level"></div>
             <div id="speed"></div>
@@ -226,6 +240,7 @@ class Board {
         overlay.style.display = 'flex'
 
         document.querySelector('#mario')!.style.backgroundImage = `url(${this.loader.get('dr_idle.png').src})`
+        document.querySelector('#pill-throw')!.innerHTML = ''
     }
 
     private value = (val: number, places: number) => {
@@ -244,8 +259,50 @@ class Board {
     public virusCount = (count: number) => 
         document.querySelector('#virus-count')!.innerHTML = this.value(count, 2)
 
+    public nextPill = (pill: Pill) => {
+        const pillPrev = document.querySelector('#pill-throw')! as HTMLDivElement
+        pillPrev.style.left = `1000px`
+        pillPrev.style.top = `100px`
+        pillPrev.innerHTML = `
+            <div style='background-size: cover; background-image: url(${this.loader.get(`${pill.tiles[0].color}_left.png`).src})'></div>
+            <div style='background-size: cover; background-image: url(${this.loader.get(`${pill.tiles[1].color}_right.png`).src})'></div>
+        `
+    }
     public throw = (pill: Pill) => {
          this.mario = new AnimatedSprite(["dr_up.png", "dr_middle.png", "dr_down.png", "dr_middle.png", "dr_up.png"].map((s) => ({ sprite: this.loader.get(s), duration: 300 })), false)
+        document.querySelector('#mario')!.style.backgroundImage = `url(${this.mario.src})`
+
+         const pillThrow = document.querySelector('#pill-throw')! as HTMLDivElement
+
+         const positions: Vectorial[] = [
+             { x: 1000, y: 100 },
+             { x: 950, y: 80 },
+             { x: 900, y: 60 },
+             { x: 850, y: 40 },
+             { x: 800, y: 30 },
+             { x: 750, y: 20 },
+             { x: 700, y: 50 },
+             { x: 680, y: 90 },
+             { x: 660, y: 140 },
+             { x: 640, y: 180 },
+             { x: 630, y: 130 },
+         ]
+
+         let i = 0
+
+         return new Promise((resolve) => {
+             const time = setInterval(() => {
+                pillThrow.style.left = `${positions[i].x}px`
+                pillThrow.style.top = `${positions[i].y}px`
+
+                i ++
+            }, 100)
+
+            setTimeout(() => {
+                clearInterval(time)
+                resolve(pill)
+            }, positions.length * 100)
+         })
     }
 }
 

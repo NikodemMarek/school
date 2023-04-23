@@ -21,7 +21,6 @@ class ObjectsManager {
         public tiles: Tile[],
         public pills: Pill[],
         public viruses: Virus[],
-        private newPill: () => void
     ) {}
 
     /**
@@ -220,7 +219,7 @@ class ObjectsManager {
 
         if (pill === this.activePill) {
             this.pills.push(this.activePill)
-            this.newPill()
+            this.activePill = undefined
         }
 
         return pill
