@@ -53,23 +53,32 @@ class GameManager {
                     return this.toPop.push(...this.manager.moveActivePill(move))
 
                 const isVert = this.manager.activePill.tiles[0].y === this.manager.activePill.tiles[1].y
-                const isReversed = isVert? this.manager.activePill.tiles[0].x < this.manager.activePill.tiles[1].x: this.manager.activePill.tiles[0].y < this.manager.activePill.tiles[1].y
-                const rotate = {
-                    q: -1,
-                    w: -1,
-                    ArrowUp: isVert? -1: 1,
-                    e: 1,
-                    f: 2,
-                    Shift: isVert? 1: -1,
-                }[key]
+                const isReversed = isVert? this.manager.activePill.tiles[0].x > this.manager.activePill.tiles[1].x: this.manager.activePill.tiles[0].y < this.manager.activePill.tiles[1].y
+                const [rotate, moveBy] = {
+                    q: [-1, new Point(0, 0)],
+                    w: [-1, new Point(0, 0)],
+                    ArrowUp: isReversed
+                        ? isVert? [-1, new Point(-1, -1)]: [1, new Point(1, 1)]
+                        : isVert? [-1, new Point(0, 0)]: [1, new Point(0, 0)],
+                    e: [1, new Point(0, 0)],
+                    f: [2, new Point(0, 0)],
+                    Shift: isReversed
+                        ? isVert? [1, new Point(0, 0)]: [-1, new Point(-1, 1)]
+                        : isVert? [1, new Point(1, -1)]: [-1, new Point(0, 0)],
+                }[key] || [0, new Point(0, 0)]
 
-                if (rotate) {
-                    if (this.manager.rotateActivePill(rotate)) return
+                if (rotate && moveBy) {
+                    if (!this.manager.rotateAndMoveActivePill(rotate as number, moveBy as Point)) return
 
-                    this.manager.rotateActivePill({
-                        ArrowUp: -1,
-                        Shift: 1,
-                    }[key] || 0)
+                    const [r, m] = {
+                        ArrowUp: isReversed
+                            ? isVert? [1, new Point(0, 0)]: [-1, new Point(-1, 1)]
+                            : isVert? [1, new Point(1, -1)]: [-1, new Point(0, 0)],
+                        Shift: isReversed
+                            ? isVert? [-1, new Point(-1, -1)]: [1, new Point(1, 1)]
+                            : isVert? [-1, new Point(0, 0)]: [1, new Point(0, 0)],
+                    }[key] || [0, new Point(0, 0)]
+                    this.manager.rotateAndMoveActivePill(r as number, m as Point)
                 }
             })()
 

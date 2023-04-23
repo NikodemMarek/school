@@ -211,6 +211,8 @@ class Board {
             ;(
                 tile as HTMLDivElement
             ).style.backgroundImage = `url(${this.loader.get(`${color}_${radius}.png`).src})`
+            
+            // if (x == pill.x && y == pill.y) tile.style.border = 'thick solid #ffffff'
         })
     }
 

@@ -206,6 +206,45 @@ class ObjectsManager {
     }
 
     /**
+     * Rotate the active pill by the provided number of 90 degree rotations.
+     * Moves the active pill by the provided vector.
+     * Prevents the pill from rotating if it collides with borders or other tiles / pills.
+     *
+     * @param by - Number of 90 degree rotations to rotate the active pill by
+     * @param param0 - Vector to move the pill by
+     * @returns Did rotate
+     */
+    public rotateAndMoveActivePill = (by: number, {x, y}: Vectorial) => {
+        if (!this.activePill) return false
+
+        this.activePill.move({x, y})
+        this.activePill.rotate(by)
+
+        const otherTiles = [
+            ...this.pills
+                .map((pill) => pill.absTiles())
+                .flat(),
+            ...this.tiles,
+        ]
+
+        const isPillCollidingBorders = this.isPillCollidingBorders(this.activePill)
+        const isPillCollidingTiles = this.activePill.isColliding(otherTiles)
+        const isPillCollidingViruses = this.activePill.isColliding(this.viruses)
+
+        if (
+            !isPillCollidingBorders &&
+            !isPillCollidingTiles &&
+            !isPillCollidingViruses
+        )
+            return false
+
+        this.activePill.move({x: -x, y: -y})
+        this.activePill.rotate(-by)
+
+        return true
+    }
+
+    /**
      * Updates the active pill by the provided vector.
      * Returns the tiles that have been removed or empty array.
      *
