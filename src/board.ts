@@ -5,6 +5,13 @@ import {Vectorial} from './types'
 
 const TILE_SIZE = 25
 
+/**
+ * Board
+ * Handles the game graphics
+ * 
+ * @param size - Size of the board
+ * @param loader - Loader
+ */
 class Board {
     private board: HTMLDivElement
     private mario: AnimatedSprite
