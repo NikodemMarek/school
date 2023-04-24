@@ -58,13 +58,13 @@ class GameManager {
                     q: [-1, new Point(0, 0)],
                     w: [-1, new Point(0, 0)],
                     ArrowUp: isReversed
-                        ? isVert? [-1, new Point(-1, -1)]: [1, new Point(1, 1)]
-                        : isVert? [-1, new Point(0, 0)]: [1, new Point(0, 0)],
+                        ? isVert? [-1, new Point(-1, -1)]: [-1, new Point(0, 1)]
+                        : isVert? [-1, new Point(0, 0)]: [-1, new Point(1, 0)],
                     e: [1, new Point(0, 0)],
                     f: [2, new Point(0, 0)],
                     Shift: isReversed
-                        ? isVert? [1, new Point(0, 0)]: [-1, new Point(-1, 1)]
-                        : isVert? [1, new Point(1, -1)]: [-1, new Point(0, 0)],
+                        ? isVert? [1, new Point(-1, 0)]: [1, new Point(1, 1)]
+                        : isVert? [1, new Point(0, -1)]: [1, new Point(0, 0)],
                 }[key] || [0, new Point(0, 0)]
 
                 if (rotate && moveBy) {
@@ -72,11 +72,11 @@ class GameManager {
 
                     const [r, m] = {
                         ArrowUp: isReversed
-                            ? isVert? [1, new Point(0, 0)]: [-1, new Point(-1, 1)]
-                            : isVert? [1, new Point(1, -1)]: [-1, new Point(0, 0)],
+                            ? isVert? [0, new Point(0, 0)]: [-1, new Point(-1, 1)]
+                            : isVert? [0, new Point(0, 0)]: [-1, new Point(0, 0)],
                         Shift: isReversed
-                            ? isVert? [-1, new Point(-1, -1)]: [1, new Point(1, 1)]
-                            : isVert? [-1, new Point(0, 0)]: [1, new Point(0, 0)],
+                            ? isVert? [0, new Point(0, 0)]: [1, new Point(0, 1)]
+                            : isVert? [0, new Point(0, 0)]: [1, new Point(-1, 0)],
                     }[key] || [0, new Point(0, 0)]
                     this.manager.rotateAndMoveActivePill(r as number, m as Point)
                 }
