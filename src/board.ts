@@ -328,6 +328,7 @@ class Board {
              const time = setInterval(() => {
                 pillThrow.style.left = `${positions[i].x}px`
                 pillThrow.style.top = `${positions[i].y}px`
+                pillThrow.style.transform = `rotate(${(Math.floor(i / 2) - 1) * 90}deg)`
 
                 i ++
             }, 100)
