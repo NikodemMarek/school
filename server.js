@@ -1,5 +1,5 @@
 const NodeHttpServer = require('./NodeHttpServer')
-const router = require('./app/imageRouter')
+const router = require('./app/images/router')
 
 const server = new NodeHttpServer()
 router(server)

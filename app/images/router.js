@@ -1,4 +1,4 @@
-const {albums, Album, Photo} = require('./imageModel')
+const {albums, Album, Photo} = require('./model')
 
 const router = (server) => {
     server.get('/api', ({}) => ({

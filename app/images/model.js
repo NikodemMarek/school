@@ -1,4 +1,4 @@
-const {path_utils, root, move, remove} = require('./fileController')
+const {path_utils, root, move, remove} = require('./../fileController')
 
 class Photo {
     constructor(name, url) {
