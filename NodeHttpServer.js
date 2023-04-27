@@ -146,7 +146,7 @@ class NodeHttpServer {
             let path = ''
 
             const url = rawUrl.toLowerCase()
-            const urlParams = {}
+            const params = {}
             const endpoint = url.split('/')?.reduce((acc, part) => {
                 const endpoints = acc?.endpoints
                 if (!endpoints) return acc
@@ -164,7 +164,7 @@ class NodeHttpServer {
 
                 if (!paramEndpoint) return acc
 
-                urlParams[paramEndpoint.slice(2)] = part
+                params[paramEndpoint.slice(2)] = part
                 path += paramEndpoint
                 return endpoints[paramEndpoint]
             }, this.#endpoints)?.[method]
@@ -199,7 +199,7 @@ class NodeHttpServer {
 
             try {
                 const {body, headers} = endpoint
-                    ? await endpoint({files, query, body: reqBody, urlParams})
+                    ? await endpoint({files, query, body: reqBody, params})
                     : await sendFile(path)
 
                 res.writeHead(200, {
