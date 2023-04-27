@@ -94,6 +94,7 @@ class GameManager {
             new Tile(1, 0, colors[Math.floor(Math.random() * colors.length)]),
         ])
         this.board.nextPill(this.nextPill)
+        this.newPill()
 
         this.timer = setInterval(() => this.update(300), 300)
     }
@@ -135,7 +136,14 @@ class GameManager {
     private update = (delta: number) => {
         const viruses = this.manager.viruses.length
 
-        this.toPop.push(...this.manager.update(new Point(0, 1)))
+        const toPop = this.manager.update(new Point(0, 1))
+        console.log(toPop)
+        if (toPop) {
+            this.toPop.push(...toPop)
+
+            if (this.toPop.length === 0) this.newPill()
+        }
+
         this.refresh()
 
         const killed = viruses - this.manager.viruses.length
@@ -150,15 +158,12 @@ class GameManager {
         )
             return this.gameOver(false)
 
-        if (!this.manager.activePill) this.newPill()
-
         if (this.manager.viruses.length > 0) return
 
         this.gameOver(true)
     }
 
     private refresh = () => {
-
         this.board.refresh(
             this.manager.tiles,
             this.manager.activePill? [this.manager.activePill, ...this.manager.pills]: this.manager.pills,

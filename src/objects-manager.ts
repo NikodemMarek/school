@@ -1,4 +1,4 @@
-import {Color, Direction, Vectorial} from './types'
+import {Direction, Vectorial} from './types'
 import {Pill, Tile, Virus} from './objects'
 
 class ObjectsManager {
@@ -149,21 +149,42 @@ class ObjectsManager {
      * @returns Tiles that have been removed
      */
     public update = (vector: Vectorial) => {
-        const toPop: Tile[] = [
-            ...this.tiles
-                .sort((a, b) => b.y - a.y)
-                .map((tile) => this.updateTile(vector, tile))
-                .flat(),
-            ...this.pills
-                .sort((a, b) => b.y - a.y)
-                .map((pill) => this.updatePill(vector, pill))
-                .flat(),
-            ...this.updateActivePill(vector),
-        ]
+        const pills = this.activePill? [this.activePill, ...this.pills] : this.pills
 
-        this.popTiles(toPop)
+        const didMove = [...pills, ...this.tiles]
+            .sort((a, b) => {
+                a = a instanceof Pill ? a.absTiles().sort((a, b) => b.y - a.y)[0] : a
+                b = b instanceof Pill ? b.absTiles().sort((a, b) => b.y - a.y)[0] : b
 
-        return toPop
+                return b.y - a.y
+            })
+            .map((obj) => !(obj instanceof Pill ? this.movePill(vector, obj) : this.moveTile(vector, obj)))
+            .some(v => v)
+
+        if (didMove) return false
+
+        if (this.activePill) {
+            this.pills.push(this.activePill)
+            this.activePill = undefined
+        }
+
+        const toPop = new Set<Tile>()
+        ;[...pills.map((pill) => pill.absTiles()).flat(), ...this.tiles]
+            .forEach((obj) => {
+                if (toPop.has(obj)) return
+
+                const [bottom, top, right, left] = this.getAligned(obj)
+
+                if (bottom.length + top.length > 2)
+                    [...bottom, ...top, obj].forEach(toPop.add, toPop)
+                if (right.length + left.length > 2)
+                    [...right, ...left, obj].forEach(toPop.add, toPop)
+            })
+
+        const toPopArray = Array.from(toPop)
+
+        this.popTiles(toPopArray)
+        return toPopArray
     }
 
     /**
@@ -376,6 +397,8 @@ class ObjectsManager {
             return false
 
         tile.move({x: -x, y: -y})
+
+        return true
 
         const collisionSide =
             x > 0
