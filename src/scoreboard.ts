@@ -16,11 +16,6 @@ class Scoreboard {
     private _highscore: number = 0
 
     /**
-     * Container to display the scoreboard in.
-     */
-    private scoreboard: HTMLDivElement
-
-    /**
      * Creates an instance of Scoreboard.
      * Reads the highscore from localStorage or sets it to 0.
      *

@@ -50,7 +50,7 @@ class GameManager {
                 }[key]
 
                 if (move)
-                    return this.toPop.push(...this.manager.moveActivePill(move))
+                    this.manager.rotateAndMoveActivePill(0, move)
 
                 const isVert = this.manager.activePill.tiles[0].y === this.manager.activePill.tiles[1].y
                 const isReversed = isVert? this.manager.activePill.tiles[0].x > this.manager.activePill.tiles[1].x: this.manager.activePill.tiles[0].y < this.manager.activePill.tiles[1].y
@@ -96,7 +96,7 @@ class GameManager {
         this.board.nextPill(this.nextPill)
         this.newPill()
 
-        this.timer = setInterval(() => this.update(300), 300)
+        this.timer = setInterval(this.update, 300)
     }
 
     /**
@@ -108,7 +108,7 @@ class GameManager {
         this.waitForPill = true
 
         this.board.throw(this.nextPill).then((pill) => {
-            this.manager.activePill = pill
+            this.manager.activePill = pill as Pill
             this.waitForPill = false
             this.board.nextPill(this.nextPill)
         })
@@ -133,11 +133,10 @@ class GameManager {
         )
     }
 
-    private update = (delta: number) => {
+    private update = () => {
         const viruses = this.manager.viruses.length
 
         const toPop = this.manager.update(new Point(0, 1))
-        console.log(toPop)
         if (toPop) {
             this.toPop.push(...toPop)
 

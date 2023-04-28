@@ -188,19 +188,6 @@ class ObjectsManager {
     }
 
     /**
-     * Moves the active pill by the provided vector.
-     * Returns the tiles that have been removed or empty array.
-     *
-     * @param vector - Vector to move the active pill by
-     * @returns Tiles that have been removed
-     */
-    public moveActivePill = (vector: Vectorial) => {
-        const toPop = this.updateActivePill(vector)
-        this.popTiles(toPop)
-
-        return toPop
-    }
-    /**
      * Rotate the active pill by the provided number of 90 degree rotations.
      * Prevents the pill from rotating if it collides with borders or other tiles / pills.
      *
@@ -263,66 +250,6 @@ class ObjectsManager {
         this.activePill.rotate(-by)
 
         return true
-    }
-
-    /**
-     * Updates the active pill by the provided vector.
-     * Returns the tiles that have been removed or empty array.
-     *
-     * @param vector - Vector to move the active pill by
-     * @returns Tiles that have been removed
-     */
-    private updateActivePill = (vector: Vectorial) => {
-        if (!this.activePill) return []
-
-        return this.updatePill(vector, this.activePill)
-    }
-    private updatePill = (vector: Vectorial, pill: Pill) => {
-        const didCollide = this.movePill(vector, pill)
-
-        if (!didCollide) return []
-
-        if (pill === this.activePill) {
-            this.pills.push(this.activePill)
-            this.activePill = undefined
-        }
-
-        return pill
-            .absTiles()
-            .map((tile) => {
-                const [bottom, top, right, left] = this.getAligned(tile)
-
-                const toPop: Tile[] = []
-                if (bottom.length + top.length > 2)
-                    toPop.push(...bottom, ...top, tile)
-                if (right.length + left.length > 2)
-                    toPop.push(...right, ...left, tile)
-
-                return toPop
-            })
-            .flat()
-    }
-
-    /**
-     * Moves the tile by the provided vector.
-     * Returns the tiles that have been removed or empty array.
-     *
-     * @param vectorial - Vector to move the tile by
-     * @param tile - Tile to move
-     * @returns Tile that have been removed or empty array
-     */
-    private updateTile = (vectorial: Vectorial, tile: Tile) => {
-        const didCollide = this.moveTile(vectorial, tile)
-
-        if (!didCollide) return []
-
-        const [bottom, top, right, left] = this.getAligned(tile)
-
-        const toPop: Tile[] = []
-        if (bottom.length + top.length > 2) toPop.push(...bottom, ...top, tile)
-        if (right.length + left.length > 2) toPop.push(...right, ...left, tile)
-
-        return toPop
     }
 
     /**
