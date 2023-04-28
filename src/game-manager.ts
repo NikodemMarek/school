@@ -5,6 +5,10 @@ import ObjectsManager from './objects-manager'
 import Scoreboard from './scoreboard'
 import {Color} from './types'
 
+/**
+ * The game manager.
+ * It manages the game.
+ */
 class GameManager {
     private size: Point
 
@@ -29,10 +33,7 @@ class GameManager {
             [],
             [this.newVirus(), this.newVirus(), this.newVirus()]
         )
-        this.board = new Board(
-            this.size,
-            loader,
-        )
+        this.board = new Board(this.size, loader)
 
         this.board.dance = true
 
@@ -49,36 +50,66 @@ class GameManager {
                     ArrowDown: new Point(0, 1),
                 }[key]
 
-                if (move)
-                    this.manager.rotateAndMoveActivePill(0, move)
+                if (move) this.manager.rotateAndMoveActivePill(0, move)
 
-                const isVert = this.manager.activePill.tiles[0].y === this.manager.activePill.tiles[1].y
-                const isReversed = isVert? this.manager.activePill.tiles[0].x > this.manager.activePill.tiles[1].x: this.manager.activePill.tiles[0].y < this.manager.activePill.tiles[1].y
+                const isVert =
+                    this.manager.activePill.tiles[0].y ===
+                    this.manager.activePill.tiles[1].y
+                const isReversed = isVert
+                    ? this.manager.activePill.tiles[0].x >
+                      this.manager.activePill.tiles[1].x
+                    : this.manager.activePill.tiles[0].y <
+                      this.manager.activePill.tiles[1].y
                 const [rotate, moveBy] = {
                     q: [-1, new Point(0, 0)],
                     w: [-1, new Point(0, 0)],
                     ArrowUp: isReversed
-                        ? isVert? [-1, new Point(-1, -1)]: [-1, new Point(0, 1)]
-                        : isVert? [-1, new Point(0, 0)]: [-1, new Point(1, 0)],
+                        ? isVert
+                            ? [-1, new Point(-1, -1)]
+                            : [-1, new Point(0, 1)]
+                        : isVert
+                        ? [-1, new Point(0, 0)]
+                        : [-1, new Point(1, 0)],
                     e: [1, new Point(0, 0)],
                     f: [2, new Point(0, 0)],
                     Shift: isReversed
-                        ? isVert? [1, new Point(-1, 0)]: [1, new Point(1, 1)]
-                        : isVert? [1, new Point(0, -1)]: [1, new Point(0, 0)],
+                        ? isVert
+                            ? [1, new Point(-1, 0)]
+                            : [1, new Point(1, 1)]
+                        : isVert
+                        ? [1, new Point(0, -1)]
+                        : [1, new Point(0, 0)],
                 }[key] || [0, new Point(0, 0)]
 
                 if (rotate && moveBy) {
-                    if (!this.manager.rotateAndMoveActivePill(rotate as number, moveBy as Point)) return
+                    if (
+                        !this.manager.rotateAndMoveActivePill(
+                            rotate as number,
+                            moveBy as Point
+                        )
+                    )
+                        return
 
                     const [r, m] = {
                         ArrowUp: isReversed
-                            ? isVert? [0, new Point(0, 0)]: [-1, new Point(-1, 1)]
-                            : isVert? [0, new Point(0, 0)]: [-1, new Point(0, 0)],
+                            ? isVert
+                                ? [0, new Point(0, 0)]
+                                : [-1, new Point(-1, 1)]
+                            : isVert
+                            ? [0, new Point(0, 0)]
+                            : [-1, new Point(0, 0)],
                         Shift: isReversed
-                            ? isVert? [0, new Point(0, 0)]: [1, new Point(0, 1)]
-                            : isVert? [0, new Point(0, 0)]: [1, new Point(-1, 0)],
+                            ? isVert
+                                ? [0, new Point(0, 0)]
+                                : [1, new Point(0, 1)]
+                            : isVert
+                            ? [0, new Point(0, 0)]
+                            : [1, new Point(-1, 0)],
                     }[key] || [0, new Point(0, 0)]
-                    this.manager.rotateAndMoveActivePill(r as number, m as Point)
+                    this.manager.rotateAndMoveActivePill(
+                        r as number,
+                        m as Point
+                    )
                 }
             })()
 
@@ -122,6 +153,11 @@ class GameManager {
         this.nextPill = new Pill(4, 0, tiles)
     }
 
+    /**
+     * Creates a new virus.
+     *
+     * @returns A new virus.
+     */
     private newVirus = () => {
         const colors = Object.values(Color)
         const color = colors[Math.floor(Math.random() * colors.length)]
@@ -133,6 +169,9 @@ class GameManager {
         )
     }
 
+    /**
+     * Updates and refreshes the game.
+     */
     private update = () => {
         const viruses = this.manager.viruses.length
 
@@ -162,10 +201,15 @@ class GameManager {
         this.gameOver(true)
     }
 
+    /**
+     * Refreshes the game.
+     */
     private refresh = () => {
         this.board.refresh(
             this.manager.tiles,
-            this.manager.activePill? [this.manager.activePill, ...this.manager.pills]: this.manager.pills,
+            this.manager.activePill
+                ? [this.manager.activePill, ...this.manager.pills]
+                : this.manager.pills,
             this.manager.viruses,
             this.toPop
         )
@@ -173,6 +217,11 @@ class GameManager {
         this.toPop = []
     }
 
+    /**
+     * Finishes the game.
+     *
+     * @param won Whether the player won or not.
+     */
     private gameOver = (won: boolean) => {
         if (won) this.scoreboard.updateHighscore()
 

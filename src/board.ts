@@ -154,8 +154,15 @@ class Board {
         document.querySelector('#speed')!.innerHTML = this.value(1, 2)
         this.virusCount(0)
 
-        this.mario = new AnimatedSprite(["dr_idle.png"].map((s) => ({ sprite: this.loader.get(s), duration: 200 }), false))
-        document.querySelector('#mario')!.style.backgroundImage = `url(${this.mario.src})`
+        this.mario = new AnimatedSprite(
+            ['dr_idle.png'].map(
+                (s) => ({sprite: this.loader.get(s), duration: 200}),
+                false
+            )
+        )
+        document.querySelector(
+            '#mario'
+        )!.style.backgroundImage = `url(${this.mario.src})`
 
         this.dance = false
 
@@ -166,13 +173,16 @@ class Board {
             this.danceVirus('red', Math.floor(pos) % 6, this.dance)
             this.danceVirus('blue', (Math.floor(pos) + 2) % 6, this.dance)
             this.danceVirus('yellow', (Math.floor(pos) + 4) % 6, this.dance)
-            
+
             if (this.dance) pos += 0.2
         }, 300)
 
         this.empty()
     }
 
+    /**
+     * Draws a empty board.
+     */
     private empty = () =>
         (this.board.innerHTML = Array(this.size.y)
             .fill(0)
@@ -191,13 +201,25 @@ class Board {
             )
             .join(''))
 
+    /**
+     * Draws a tile
+     *
+     * @param param0 Tile - Tile to draw
+     */
     public tile = ({x, y, color}: Tile) => {
         const tile = this.board.querySelector(`[data-x="${x}"][data-y="${y}"]`)
 
         if (!tile) return
-        ;(tile as HTMLDivElement).style.backgroundImage = `url(${this.loader.get(`${color}_dot.png`).src})`
+        ;(tile as HTMLDivElement).style.backgroundImage = `url(${
+            this.loader.get(`${color}_dot.png`).src
+        })`
     }
 
+    /**
+     * Draws a pill.
+     *
+     * @param pill Pill - Pill to draw
+     */
     public pill = (pill: Pill) => {
         const absTiles = pill.absTiles()
         const xy = absTiles[0]?.x - absTiles[1]?.x !== 0
@@ -206,34 +228,45 @@ class Board {
         absTiles.forEach(({x, y, color}, i) => {
             let radius = '0'
             if (xy) radius = i === 0 ? 'left' : 'right'
-            else
-                radius =
-                    i === absTiles.length - 1 ? 'down' : 'up'
+            else radius = i === absTiles.length - 1 ? 'down' : 'up'
 
             const tile = this.board.querySelector(
                 `[data-x="${x}"][data-y="${y}"]`
             )
 
             if (!tile) return
-            ;(
-                tile as HTMLDivElement
-            ).style.backgroundImage = `url(${this.loader.get(`${color}_${radius}.png`).src})`
-            
+            ;(tile as HTMLDivElement).style.backgroundImage = `url(${
+                this.loader.get(`${color}_${radius}.png`).src
+            })`
+
             // if (x == pill.x && y == pill.y) tile.style.border = 'thick solid #ffffff'
         })
     }
 
+    /**
+     * Draws a virus.
+     *
+     * @param virus - Virus to draw
+     */
     public virus = (virus: Virus) => {
         const tile = this.board.querySelector(
             `[data-x="${virus.x}"][data-y="${virus.y}"]`
         )
 
         if (!tile) return
-        ;(
-            tile as HTMLDivElement
-        ).style.backgroundImage = `url(${this.loader.get(`${virus.color}_smvirus`).src})`
+        ;(tile as HTMLDivElement).style.backgroundImage = `url(${
+            this.loader.get(`${virus.color}_smvirus`).src
+        })`
     }
 
+    /**
+     * Draws all objects.
+     *
+     * @param tiles - Tiles to draw
+     * @param pills - Pills to draw
+     * @param viruses - Viruses to draw
+     * @param toPop - Tiles to pop
+     */
     public refresh = (
         tiles: Tile[],
         pills: Pill[],
@@ -251,99 +284,185 @@ class Board {
             )
 
             if (!tile) return
-
-            ;(
-                tile as HTMLDivElement
-            ).style.backgroundImage = !v.move? `url(${this.loader.get(`${v.color}_x.png`).src})`: `url(${this.loader.get(`${v.color}_o.png`).src})`
+            ;(tile as HTMLDivElement).style.backgroundImage = !v.move
+                ? `url(${this.loader.get(`${v.color}_x.png`).src})`
+                : `url(${this.loader.get(`${v.color}_o.png`).src})`
         })
 
-        document.querySelector('#mario')!.style.backgroundImage = `url(${this.mario.src})`
+        document.querySelector(
+            '#mario'
+        )!.style.backgroundImage = `url(${this.mario.src})`
     }
 
     public update = (delta: number) => {
-        Object.keys(this.loader.animatedSprites).forEach(key => this.loader.animatedSprites[key].update(delta))
+        Object.keys(this.loader.animatedSprites).forEach((key) =>
+            this.loader.animatedSprites[key].update(delta)
+        )
         this.mario.update(delta)
     }
 
+    /**
+     * Shows game over screen.
+     *
+     * @param won - Whether the player won or not
+     */
     public finish = (won: boolean) => {
         const overlay = document.querySelector('#overlay') as HTMLDivElement
 
-        overlay.style.backgroundImage = `url(${this.loader.get(`${won ? 'sc' : 'go'}.png`).src})`
+        overlay.style.backgroundImage = `url(${
+            this.loader.get(`${won ? 'sc' : 'go'}.png`).src
+        })`
         overlay.style.display = 'flex'
 
-        document.querySelector('#mario')!.style.backgroundImage = `url(${this.loader.get('dr_idle.png').src})`
+        document.querySelector('#mario')!.style.backgroundImage = `url(${
+            this.loader.get('dr_idle.png').src
+        })`
         document.querySelector('#pill-throw')!.innerHTML = ''
 
         this.dance = false
     }
 
+    /**
+     * Creates a value display.
+     *
+     * @param val - Value to display
+     * @param places - Number of digits to display
+     * @returns HTML string
+     */
     private value = (val: number, places: number) => {
         let digits = `${val}`
-        digits = `${Array(places - digits.length).fill(0).reduce((acc) => acc + '0', '')}${digits}`
+        digits = `${Array(places - digits.length)
+            .fill(0)
+            .reduce((acc) => acc + '0', '')}${digits}`
 
-        return `<div class='value'>${
-            digits.split('').reduce((ac, digit) => ac + `<img src='${this.loader.get(`${digit}.png`).src}'>`, '')
-        }</div>`
+        return `<div class='value'>${digits
+            .split('')
+            .reduce(
+                (ac, digit) =>
+                    ac + `<img src='${this.loader.get(`${digit}.png`).src}'>`,
+                ''
+            )}</div>`
     }
 
+    /**
+     * Updates the score display.
+     *
+     * @param highscore - Highscore
+     * @param score - Current score
+     */
     public score = (highscore: number, score: number) => {
-        document.querySelector('#highscore')!.innerHTML = this.value(highscore, 7)
+        document.querySelector('#highscore')!.innerHTML = this.value(
+            highscore,
+            7
+        )
         document.querySelector('#score')!.innerHTML = this.value(score, 7)
     }
-    public virusCount = (count: number) => 
-        document.querySelector('#virus-count')!.innerHTML = this.value(count, 2)
+    /**
+     * Updates the virus display.
+     *
+     * @param count - Number of viruses
+     */
+    public virusCount = (count: number) =>
+        (document.querySelector('#virus-count')!.innerHTML = this.value(
+            count,
+            2
+        ))
 
+    /**
+     * Shows the next pill.
+     *
+     * @param pill - Pill to preview
+     */
     public nextPill = (pill: Pill) => {
-        const pillPrev = document.querySelector('#pill-throw')! as HTMLDivElement
+        const pillPrev = document.querySelector(
+            '#pill-throw'
+        )! as HTMLDivElement
         pillPrev.style.left = `1000px`
         pillPrev.style.top = `100px`
         pillPrev.innerHTML = `
-            <div style='background-size: cover; background-image: url(${this.loader.get(`${pill.tiles[0].color}_left.png`).src})'></div>
-            <div style='background-size: cover; background-image: url(${this.loader.get(`${pill.tiles[1].color}_right.png`).src})'></div>
+            <div style='background-size: cover; background-image: url(${
+                this.loader.get(`${pill.tiles[0].color}_left.png`).src
+            })'></div>
+            <div style='background-size: cover; background-image: url(${
+                this.loader.get(`${pill.tiles[1].color}_right.png`).src
+            })'></div>
         `
     }
+    /**
+     * Animates the pill throw.
+     *
+     * @param pill - Pill to throw
+     * @returns Promise that resolves when the pill lands
+     */
     public throw = (pill: Pill) => {
-         this.mario = new AnimatedSprite(["dr_up.png", "dr_middle.png", "dr_down.png", "dr_middle.png", "dr_up.png"].map((s) => ({ sprite: this.loader.get(s), duration: 300 })), false)
-        document.querySelector('#mario')!.style.backgroundImage = `url(${this.mario.src})`
+        this.mario = new AnimatedSprite(
+            [
+                'dr_up.png',
+                'dr_middle.png',
+                'dr_down.png',
+                'dr_middle.png',
+                'dr_up.png',
+            ].map((s) => ({sprite: this.loader.get(s), duration: 300})),
+            false
+        )
+        document.querySelector(
+            '#mario'
+        )!.style.backgroundImage = `url(${this.mario.src})`
 
-         const pillThrow = document.querySelector('#pill-throw')! as HTMLDivElement
+        const pillThrow = document.querySelector(
+            '#pill-throw'
+        )! as HTMLDivElement
 
-         const positions: Vectorial[] = [
-             { x: 1000, y: 100 },
-             { x: 950, y: 80 },
-             { x: 900, y: 60 },
-             { x: 850, y: 40 },
-             { x: 800, y: 30 },
-             { x: 750, y: 20 },
-             { x: 700, y: 50 },
-             { x: 680, y: 90 },
-             { x: 660, y: 140 },
-             { x: 640, y: 180 },
-             { x: 630, y: 130 },
-         ]
+        const positions: Vectorial[] = [
+            {x: 1000, y: 100},
+            {x: 950, y: 80},
+            {x: 900, y: 60},
+            {x: 850, y: 40},
+            {x: 800, y: 30},
+            {x: 750, y: 20},
+            {x: 700, y: 50},
+            {x: 680, y: 90},
+            {x: 660, y: 140},
+            {x: 640, y: 180},
+            {x: 630, y: 130},
+        ]
 
-         let i = 0
+        let i = 0
 
-         return new Promise((resolve) => {
-             const time = setInterval(() => {
+        return new Promise((resolve) => {
+            const time = setInterval(() => {
                 pillThrow.style.left = `${positions[i].x}px`
                 pillThrow.style.top = `${positions[i].y}px`
-                pillThrow.style.transform = `rotate(${(Math.floor(i / 2) - 1) * 90}deg)`
+                pillThrow.style.transform = `rotate(${
+                    (Math.floor(i / 2) - 1) * 90
+                }deg)`
 
-                i ++
+                i++
             }, 100)
 
             setTimeout(() => {
                 clearInterval(time)
                 resolve(pill)
             }, positions.length * 100)
-         })
+        })
     }
 
+    /**
+     * Animates the virus.
+     *
+     * @param color - Color of the virus
+     * @param position - Position of the virus
+     * @param active - Whether the virus should dance or not
+     */
     public danceVirus = (color: string, position: number, active: boolean) => {
-        const virus = document.querySelector(`#${color}-virus`)! as HTMLDivElement
+        const virus = document.querySelector(
+            `#${color}-virus`
+        )! as HTMLDivElement
 
-        virus.style.backgroundImage = `url(${this.loader.get(`${color}_bgvirus_${active? 'active': 'idle'}`).src})`
+        virus.style.backgroundImage = `url(${
+            this.loader.get(`${color}_bgvirus_${active ? 'active' : 'idle'}`)
+                .src
+        })`
         virus.style.top = `${[450, 500, 600, 650, 600, 500][position]}px`
         virus.style.left = `${[200, 110, 110, 200, 290, 290][position]}px`
     }
