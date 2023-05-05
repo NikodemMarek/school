@@ -18,14 +18,14 @@ import { Component, Input } from '@angular/core';
   styles: [
     `
     :host table {
-        width: 100%;
-        height: 100%;
         border-collapse: collapse;
         table-layout: fixed;
       }
 
       :host table td {
         border: 1px solid black;
+        aspect-ratio: 1;
+        width: 100px;
       }
     `,
   ],
@@ -34,7 +34,6 @@ export class GameBoardComponent {
   private _size: { x: number; y: number } = { x: 5, y: 5 };
   @Input()
   set size(value: { x: number; y: number }) {
-    console.log('size', value);
     this._size = value;
     this.board = this.newBoard(value.x, value.y);
   }
@@ -51,6 +50,8 @@ export class GameBoardComponent {
   newBoard = (x: number, y: number) => JSON.parse(JSON.stringify(Array(y).fill(Array(x).fill(Mark.None))))
 
   setMark = (x: number, y: number) => {
+    if (this.board[y][x] !== Mark.None) return;
+
     this.board[y][x] = this.nextMark;
 
     this.nextMark = this.nextMark === Mark.X ? Mark.O : Mark.X;

@@ -1,8 +1,12 @@
 import { Component, Input } from '@angular/core';
+import { Router } from '@angular/router';
+import { Mark } from '../types';
 
 @Component({
   selector: 'app-game',
   template: `
+    <app-game-bar [score]="score" (restartChange)="restart()"></app-game-bar>
+
     <app-game-board [size]="{ x, y }"></app-game-board>
   `,
   styles: [
@@ -11,10 +15,17 @@ import { Component, Input } from '@angular/core';
         padding: 1rem;
 
         display: flex;
-        justify-content: center;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
 
         width: 100%;
         height: 100%;
+      }
+
+      :host app-game-board {
+        width: 80%;
+        height: 80%;
       }
     `,
   ],
@@ -36,4 +47,8 @@ export class GameComponent {
       this.y = 5;
     }
   }
+
+  score = { [Mark.X]: 0, [Mark.O]: 0 };
+
+  restart = () => location.reload();
 }

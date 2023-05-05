@@ -10,6 +10,7 @@ import { SettingsDimensionsComponent } from './settings/dimensions.component';
 import { SettingsSizeComponent } from './settings/size.component';
 
 import { GameComponent } from './game/game.component';
+import { GameBarComponent } from './game/bar.component';
 import { GameBoardComponent } from './game/board.component';
 import { GameTileComponent } from './game/tile.component';
 
@@ -20,6 +21,7 @@ import { GameTileComponent } from './game/tile.component';
     SettingsDimensionsComponent,
     SettingsSizeComponent,
     GameComponent,
+    GameBarComponent,
     GameBoardComponent,
     GameTileComponent,
   ],
