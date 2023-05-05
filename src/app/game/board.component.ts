@@ -15,20 +15,24 @@ import { Component, Input } from '@angular/core';
       </tr>
     </table>
   `,
-  styles: [
-    `
-    :host table {
-        border-collapse: collapse;
-        table-layout: fixed;
-      }
+  styles: [`
+    :host {
+      overflow: auto;
+      padding: 1rem;
+      box-sizing: border-box;
+    }
 
-      :host table td {
-        border: 1px solid black;
-        aspect-ratio: 1;
-        width: 100px;
-      }
-    `,
-  ],
+    :host table {
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    :host table td {
+      border: 1px solid black;
+      aspect-ratio: 1;
+      width: 100px;
+    }
+  `],
 })
 export class GameBoardComponent {
   private _size: { x: number; y: number } = { x: 5, y: 5 };

@@ -23,10 +23,15 @@ import { Mark } from '../types';
         display: flex;
         align-items: center;
 
+        padding: 1rem;
         width: 100%;
         gap: 1rem;
 
         font-size: 2rem;
+
+        box-sizing: border-box;
+
+        background-color: #2E3440;
       }
 
       :host #score {

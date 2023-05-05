@@ -12,20 +12,14 @@ import { Mark } from '../types';
   styles: [
     `
       :host {
-        padding: 1rem;
-
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 1rem;
 
         width: 100%;
         height: 100%;
-      }
 
-      :host app-game-board {
-        width: 80%;
-        height: 80%;
+        box-sizing: border-box;
       }
     `,
   ],
