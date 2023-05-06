@@ -4,7 +4,7 @@ import { Mark } from '../types';
 @Component({
   selector: 'app-game',
   template: `
-    <app-game-bar [score]="score" (restartChange)="restart()"></app-game-bar>
+    <app-game-bar [score]="score"></app-game-bar>
 
     <div id="main">
       <app-game-board [board]="board" (setMarkEvent)="setMark($event.x, $event.y)"></app-game-board>
@@ -90,8 +90,6 @@ export class GameComponent {
 
     this.board = JSON.parse(JSON.stringify(Array(this.y).fill(Array(this.x).fill(Mark.None))))
   }
-
-  protected restart = () => location.reload();
 
   private nextMark: Mark = Mark.O;
   protected setMark = (x: number, y: number) => {

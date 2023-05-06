@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { Mark } from '../types';
 
 @Component({
@@ -16,6 +16,7 @@ import { Mark } from '../types';
     </div>
 
     <button id="restart" (click)="restart()">restart</button>
+    <button id="new-game" (click)="newGame()">new</button>
   `,
   styles: [
     `
@@ -65,7 +66,7 @@ import { Mark } from '../types';
         border-radius: 50px 0 0 50px;
       }
 
-      :host #restart {
+      :host button {
         flex: 0;
         padding: 0.5rem 1rem;
         border-radius: 50px;
@@ -75,7 +76,7 @@ import { Mark } from '../types';
         border: none;
         outline: none;
       }
-      :host #restart:hover {
+      :host button:hover {
         cursor: pointer;
         background-color: #BF616A;
       }
@@ -85,6 +86,6 @@ import { Mark } from '../types';
 export class GameBarComponent {
   @Input() score: { [Mark.X]: number, [Mark.O]: number } = { [Mark.X]: 0, [Mark.O]: 0 };
 
-  @Output() restartChange = new EventEmitter<void>();
-  restart = () => this.restartChange.emit();
+  protected restart = () => location.reload();
+  protected newGame = () => location.href = '/';
 }
