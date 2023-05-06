@@ -5,16 +5,16 @@ import { FormControl, Validators } from '@angular/forms';
   selector: 'app-settings-size',
   template: `
     <div id="input" [class.error]="size.invalid && (size.dirty || size.touched)">
-      {{ name }}: <input type="number" [formControl]="size" (change)="change()">
+      {{ name }} <input type="number" [formControl]="size" (change)="change()">
     </div>
 
     <div id="error" *ngIf="size.invalid && (size.dirty || size.touched)">
       <div *ngIf="size.errors?.['required']">
-        size {{ name }} is required
+        {{ name }} is required
       </div>
 
       <div *ngIf="size.errors?.['min']">
-        size {{ name }} must be at least 5
+        {{ name }} must be at least {{ min }}
       </div>
     </div>
   `,
@@ -24,7 +24,11 @@ import { FormControl, Validators } from '@angular/forms';
         display: flex;
         flex-direction: column;
 
+        width: 100%;
+
         box-sizing: border-box;
+
+        margin: 5px 0;
       }
 
       :host #input {
@@ -32,14 +36,16 @@ import { FormControl, Validators } from '@angular/forms';
         flex-direction: row;
         align-items: center;
 
-        border-bottom: 1px solid black;
+        background-color: #4C566A;
+        padding: 10px;
+        border-radius: 10px;
       }
       :host #input:has(input:focus) {
-        border-bottom: 2px solid black;
+        background-color: #434C5E;
       }
 
       .error {
-        border-bottom: 2px solid #BF616A !important;
+        background-color: #BF616A !important;
       }
 
       :host #input input {
@@ -66,9 +72,14 @@ import { FormControl, Validators } from '@angular/forms';
 
 export class SettingsSizeComponent {
   @Input() name = 'size';
+  @Input() min = 0;
 
-  protected size = new FormControl(0, [Validators.required, Validators.min(5)]);
+  protected size = new FormControl(0, [Validators.required, Validators.min(this.min)]);
   @Output() sizeChange = new EventEmitter();
 
   protected change = () => this.sizeChange.emit(this.size.valid? this.size.value : null);
+
+  ngOnInit() {
+    this.size = new FormControl(0, [Validators.required, Validators.min(this.min)]);
+  }
 }

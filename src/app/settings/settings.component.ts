@@ -6,7 +6,7 @@ import { Router } from '@angular/router';
   template: `
     <h1>game settings</h1>
 
-    <app-settings-dimensions (onConfirm)="start($event.x, $event.y)"></app-settings-dimensions>
+    <app-settings-dimensions (onConfirm)="start($event.x, $event.y, $event.points)"></app-settings-dimensions>
   `,
   styles: [
     `
@@ -29,8 +29,8 @@ import { Router } from '@angular/router';
 export class SettingsComponent {
   constructor(private router: Router) {}
 
-  start = (x: number, y: number) =>
+  start = (x: number, y: number, points: number) =>
     this.router.navigate(['/game'], {
-      queryParams: { x, y },
+      queryParams: { x, y, points },
     });
 }
