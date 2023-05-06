@@ -5,13 +5,13 @@ import { Mark } from '../types';
   selector: 'app-game-bar',
   template: `
     <div id="score">
-      <div id="x" [style.flex]="score['X'] + 1">
-        <img src="/assets/x.png" />
-        <span>{{ score['X'] }}</span>
-      </div>
       <div id="o" [style.flex]="score['O'] + 1">
-        <span>{{ score['O'] }}</span>
         <img src="/assets/o.png" />
+        <span>{{ score['O'] }}</span>
+      </div>
+      <div id="x" [style.flex]="score['X'] + 1">
+        <span>{{ score['X'] }}</span>
+        <img src="/assets/x.png" />
       </div>
     </div>
 
@@ -57,12 +57,12 @@ import { Mark } from '../types';
       #x {
         flex: 1;
         background-color: #5E81AC;
-        border-radius: 50px 0 0 50px;
+        border-radius: 0 50px 50px 0;
       }
       #o {
         flex: 1;
         background-color: #88C0D0;
-        border-radius: 0 50px 50px 0;
+        border-radius: 50px 0 0 50px;
       }
 
       :host #restart {

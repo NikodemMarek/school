@@ -9,13 +9,17 @@ import { Mark } from '../types';
   styles: [
     `
        :host {
-        aspect-ratio: 1;
-        width: 100%;
         display: flex;
         justify-content: center;
         align-items: center;
+
         font-size: 50px;
+
         box-sizing: border-box;
+
+        margin: 5px;
+        border-radius: 10px;
+        overflow: hidden;
       }
 
       :host img {
@@ -28,14 +32,18 @@ import { Mark } from '../types';
         background-color: #5E81AC;
       }
       .x_used {
-        background-color: #BF616A;
+        background-color: #3B4252;
       }
 
       .o {
         background-color: #88C0D0;
       }
       .o_used {
-        background-color: #A3BE8C;
+        background-color: #3B4252;
+      }
+
+      .none {
+        background-color: #4C566A;
       }
     `,
   ],
@@ -77,7 +85,9 @@ export class GameTileComponent {
           o_used: true,
         }
       default:
-        return {}
+        return {
+          none: true,
+        }
     }
   }
 }

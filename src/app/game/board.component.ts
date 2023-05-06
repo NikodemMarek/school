@@ -24,6 +24,8 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
       width: 100%;
       display: flex;
       justify-content: center;
+
+      background-color: #3B4252;
     }
 
     :host table {
@@ -32,7 +34,6 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
     }
 
     :host table td {
-      border: 1px solid black;
       aspect-ratio: 1;
       width: 100px;
     }
