@@ -32,14 +32,14 @@ import { FormControl, Validators } from '@angular/forms';
         flex-direction: row;
         align-items: center;
 
-        border-bottom: 1px solid darkgray;
+        border-bottom: 1px solid black;
       }
       :host #input:has(input:focus) {
         border-bottom: 2px solid black;
       }
 
       .error {
-        border-bottom: 2px solid red !important;
+        border-bottom: 2px solid #BF616A !important;
       }
 
       :host #input input {
@@ -50,7 +50,7 @@ import { FormControl, Validators } from '@angular/forms';
 
         outline: none;
         border: none;
-        background-color: none;
+        background-color: transparent;
       }
       :host #input input:focus {
         outline: none;
@@ -58,7 +58,7 @@ import { FormControl, Validators } from '@angular/forms';
       }
 
       :host #error {
-        color: red;
+        color: #BF616A;
       }
     `,
   ],

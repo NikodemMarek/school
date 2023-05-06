@@ -44,6 +44,11 @@ import { Mark } from '../types';
 
       .none {
         background-color: #4C566A;
+
+        cursor: pointer;
+      }
+      .none:hover {
+        background-color: #434C5E;
       }
     `,
   ],

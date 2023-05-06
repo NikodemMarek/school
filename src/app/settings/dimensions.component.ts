@@ -35,10 +35,11 @@ import { Component, EventEmitter, Output } from '@angular/core';
         outline: none;
         border: none;
 
-        background-color: lightgray;
+        cursor: pointer;
+        background-color: #4C566A;
       }
       :host button:hover {
-        background-color: gray;
+        background-color: #434C5E;
       }
 
       :host .presets {
