@@ -6,7 +6,12 @@ import { Mark } from '../types';
   template: `
     <app-game-bar [score]="score" (restartChange)="restart()"></app-game-bar>
 
-    <app-game-board [board]="board" (setMarkEvent)="setMark($event.x, $event.y)"></app-game-board>
+    <div id="main">
+      <app-game-board [board]="board" (setMarkEvent)="setMark($event.x, $event.y)"></app-game-board>
+      <div class="overlay" *ngIf="gameOver">
+        {{ ["draw", "you won", "you lost"][won] }}
+      </div>
+    </div>
   `,
   styles: [
     `
@@ -20,10 +25,49 @@ import { Mark } from '../types';
 
         box-sizing: border-box;
       }
+
+      :host #main {
+        position: relative;
+
+        width: 100%;
+        height: 100%;
+        box-sizing: border-box;
+      }
+
+      :host #main app-game-board {
+        position: absolute;
+        top: 0;
+        left: 0;
+
+        width: 100%;
+      }
+
+      :host #main .overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
+        font-size: 50px;
+        color: #D8DEE9;
+
+        z-index: 1;
+      }
     `,
   ],
 })
 export class GameComponent {
+  protected gameOver: boolean = false;
+  protected won: 0 | 1 | 2 = 0;
+
   @Input('x') x: number = 5;
   @Input('y') y: number = 5;
 
@@ -42,6 +86,8 @@ export class GameComponent {
       this.y = 5;
     }
 
+    if (!this.pointsLimit || this.pointsLimit < 0) this.pointsLimit = 0;
+
     this.board = JSON.parse(JSON.stringify(Array(this.y).fill(Array(this.x).fill(Mark.None))))
   }
 
@@ -57,8 +103,22 @@ export class GameComponent {
     aligned.flat().forEach(({ x, y }) => this.board[y][x] = this.nextMark === Mark.X ? Mark.X_USED : Mark.O_USED);
     aligned.forEach(line => this.addScoreToCurrent(line.length));
 
+    if (this.pointsLimit > 0) {
+      if (this.score[this.nextMark === Mark.X ? Mark.X : Mark.O] >= this.pointsLimit) {
+        this.gameOver = true;
+        this.won = this.nextMark === Mark.O? 1: 2;
+      }
+    } else {
+      if (!this.board.flat().some(mark => mark === Mark.None)) {
+        this.gameOver = true;
+        this.won = this.score[Mark.X] === this.score[Mark.O] ? 0 : this.score[Mark.X] > this.score[Mark.O] ? 2 : 1;
+      }
+    }
+
     this.nextMark = this.nextMark === Mark.X ? Mark.O : Mark.X;
   }
+
+  @Input('points') pointsLimit: number = 0;
 
   protected score = { [Mark.X]: 0, [Mark.O]: 0 };
   private addScoreToCurrent = (lineLength: number) =>
