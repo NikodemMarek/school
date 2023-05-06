@@ -1,5 +1,5 @@
 import { Mark } from './../types';
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
   selector: 'app-game-board',
@@ -20,6 +20,10 @@ import { Component, Input } from '@angular/core';
       overflow: auto;
       padding: 1rem;
       box-sizing: border-box;
+
+      width: 100%;
+      display: flex;
+      justify-content: center;
     }
 
     :host table {
@@ -35,29 +39,8 @@ import { Component, Input } from '@angular/core';
   `],
 })
 export class GameBoardComponent {
-  private _size: { x: number; y: number } = { x: 5, y: 5 };
-  @Input()
-  set size(value: { x: number; y: number }) {
-    this._size = value;
-    this.board = this.newBoard(value.x, value.y);
-  }
+  @Input() board: Array<Array<Mark>> = [];
 
-  protected board: Array<Array<Mark>>
-
-  private nextMark: Mark = Mark.O;
-
-  constructor() {
-    this.board = this.newBoard(5, 5);
-    this.size = { x: 5, y: 5 }
-  }
-
-  newBoard = (x: number, y: number) => JSON.parse(JSON.stringify(Array(y).fill(Array(x).fill(Mark.None))))
-
-  setMark = (x: number, y: number) => {
-    if (this.board[y][x] !== Mark.None) return;
-
-    this.board[y][x] = this.nextMark;
-
-    this.nextMark = this.nextMark === Mark.X ? Mark.O : Mark.X;
-  }
+  @Output() setMarkEvent = new EventEmitter<{ x: number, y: number }>();
+  setMark = (x: number, y: number) => this.setMarkEvent.emit({ x, y });
 }
