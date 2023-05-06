@@ -1,4 +1,5 @@
 import { Component, Input } from '@angular/core';
+import { Opponent } from '../opponentai';
 import { Mark } from '../types';
 
 @Component({
@@ -7,7 +8,7 @@ import { Mark } from '../types';
     <app-game-bar [score]="score"></app-game-bar>
 
     <div id="main">
-      <app-game-board [board]="board" (setMarkEvent)="setMark($event.x, $event.y)"></app-game-board>
+      <app-game-board [board]="board" (setMarkEvent)="makeMove($event.x, $event.y)"></app-game-board>
       <div class="overlay" *ngIf="gameOver">
         {{ ["draw", "you won", "you lost"][won] }}
       </div>
@@ -73,6 +74,8 @@ export class GameComponent {
 
   protected board: Array<Array<Mark>> = []
 
+  private ai: Opponent = new Opponent(this.x);
+
   ngOnInit() {
     this.x = parseInt(this.x as any, 10);
     this.y = parseInt(this.y as any, 10);
@@ -92,6 +95,14 @@ export class GameComponent {
   }
 
   private nextMark: Mark = Mark.O;
+  public makeMove = (x: number, y: number) => {
+    this.setMark(x, y);
+
+    if (this.gameOver) return;
+
+    const move = this.ai.makeMove(this.board, { x, y });
+    this.setMark(move.x, move.y);
+  }
   protected setMark = (x: number, y: number) => {
     if (this.board[y][x] !== Mark.None) return;
 
