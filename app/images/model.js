@@ -6,6 +6,8 @@ class Photo {
         this.name = name
         this.url = url
 
+        this.tags = []
+
         this.lastChange = 'original'
         this.history = [
             {
@@ -30,6 +32,27 @@ Photo.prototype.remove = async function () {
 
     this.history.push({
         status: 'removed',
+        timestamp: new Date(),
+    })
+}
+
+// Tags api integration
+
+Photo.prototype.addTag = function (tagId) {
+    if (this.tags.includes(tagId)) return
+
+    this.tags.push(tagId)
+
+    this.history.push({
+        status: `added tag with id ${tagId}`,
+        timestamp: new Date(),
+    })
+}
+Photo.prototype.removeTag = function (tagId) {
+    this.tags = this.tags.filter(tag => tag !== tagId)
+
+    this.history.push({
+        status: `removed tag with id ${tagId}`,
         timestamp: new Date(),
     })
 }

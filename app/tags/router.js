@@ -1,23 +1,21 @@
-const {tags, Tag, add} = require('./model')
+const {getAll, getRaw, get, post} = require('./controller')
 
 const router = (entry, server) => {
     server.get(`${entry}`, () => ({
-            body: JSON.stringify(tags),
+            body: JSON.stringify(getAll()),
             headers: {
                 'Content-Type': 'application/json',
             },
     }))
     server.get(`${entry}/raw`, () => ({
-            body: JSON.stringify(tags.map(tag => tag.name)),
+            body: JSON.stringify(getRaw()),
             headers: {
                 'Content-Type': 'application/json',
             },
     }))
 
     server.get(`${entry}/:id`, ({params: {id}}) => {
-        id = parseInt(id)
-
-        const tag = tags.find(tag => tag.id === id)
+        const tag = get(parseInt(id))
 
         if (tag)
             return {
@@ -35,16 +33,12 @@ const router = (entry, server) => {
         }
     })
 
-    server.post(`${entry}`, ({body: {name}}) => {
-        const tag = add(name, 1)
-
-        return {
-            body: JSON.stringify(tag),
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        }
-    })
+    server.post(`${entry}`, ({body: {name}}) => ({
+        body: JSON.stringify(post(name)),
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    }))
 }
 
 module.exports = router
