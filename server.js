@@ -1,7 +1,6 @@
-const NodeHttpServer = require('./NodeHttpServer')
-const images = require('./app/images/router')
-const tags = require('./app/tags/router')
+require('dotenv').config()
 
+const NodeHttpServer = require('./NodeHttpServer')
 const server = new NodeHttpServer()
 
 server.get('/api', ({}) => ({
@@ -11,7 +10,7 @@ server.get('/api', ({}) => ({
     },
 }))
 
-images('/api/photos', server)
-tags('/api/tags', server)
+require('./app/images/router')('/api/photos', server)
+require('./app/tags/router')('/api/tags', server)
 
-server.start(3000)
+server.start(process.env.PORT)
