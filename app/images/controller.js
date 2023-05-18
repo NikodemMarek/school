@@ -42,7 +42,7 @@ const getTags = (id) => {
     try {
         return tagIds.map(tagId => getTag(tagId))
     } catch (err) {
-        return 'unprocessable_entity'
+        throw 'unprocessable_entity'
     }
 }
 
