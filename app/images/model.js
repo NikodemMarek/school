@@ -95,9 +95,12 @@ Album.prototype.getPhoto = function (id) {
     return this.photos.filter(photo => photo.id === id)
 }
 Album.prototype.deletePhoto = function (id) {
-    this.photos.filter(photo => photo.id === id).forEach(f => f.remove())
+    const initialLength = this.photos.length
 
+    this.photos.filter(photo => photo.id === id).forEach(f => f.remove())
     this.photos = this.photos.filter(photo => photo.id !== id)
+
+    return initialLength !== this.photos.length
 }
 
 let id = 0

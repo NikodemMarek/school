@@ -2,7 +2,12 @@ const {albums, Album, Photo} = require('./model')
 const getTag = require('../tags/controller').get
 
 const getAll = () => albums
-const get = (id) => albums.map(album => album.getPhoto(id)).flat(Infinity)
+const get = (id) => {
+    const photos = albums.map(album => album.getPhoto(id)).flat(Infinity)
+
+    if (!photos.length) throw 'not_found'
+    return photos
+}
 
 const post = async (name, files) => {
     const photos = files.map(
@@ -18,8 +23,10 @@ const post = async (name, files) => {
 }
 
 const remove = (id) => {
-    albums.map(album => album.deletePhoto(id))
-    return albums
+    albums.every(album => !album.deletePhoto(id))
+
+    if (!albums.length) throw 'not_found'
+    return 'success'
 }
 
 // Tags api integration
@@ -31,7 +38,12 @@ const getTags = (id) => {
             acc.push(tagId)
             return acc
         }, [])
-    return tagIds.map(tagId => getTag(tagId))
+
+    try {
+        return tagIds.map(tagId => getTag(tagId))
+    } catch (err) {
+        return 'unprocessable_entity'
+    }
 }
 
 const patchTags = (id, tagIds) => {
@@ -43,7 +55,7 @@ const patchTags = (id, tagIds) => {
         }
     }
 
-    return "success"
+    return 'success'
 }
 const patchTag = (id, tagId) => patchTags(id, [tagId])
 

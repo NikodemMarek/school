@@ -43,6 +43,7 @@ const sendFile = async (path) => {
     const body = await fs.readFile(absolutePath, 'utf-8')
 
     return {
+        code: 200,
         body,
         headers: {
             'Content-Type': contentType.mimeType,
@@ -198,11 +199,11 @@ class NodeHttpServer {
             )
 
             try {
-                const {body, headers} = endpoint
+                const {code, body, headers} = endpoint
                     ? await endpoint({files, query, body: reqBody, params})
                     : await sendFile(path)
 
-                res.writeHead(200, {
+                res.writeHead(code || 200, {
                     headers,
                 })
                 res.write(body)
