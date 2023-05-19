@@ -1,15 +1,18 @@
 const {albums, Album, Photo} = require('./model')
-const getTag = require('../tags/controller').get
+const { getTagById } = require('../tags/controller')
 
 const getAll = () => albums
-const get = (id) => {
-    const photos = albums.map(album => album.getPhoto(id)).flat(Infinity)
+const getImageById = (id) => {
+    for (const album of albums) {
+        for (const photo of album.photos) {
+            if (photo.id === id) return photo
+        }
+    }
 
-    if (!photos.length) throw 'not_found'
-    return photos
+    throw 'photo_not_found'
 }
 
-const post = async (name, files) => {
+const addImagesToAlbum = async (name, files) => {
     const photos = files.map(
         (file) => new Photo(file.originalName, file.path)
     )
@@ -19,10 +22,10 @@ const post = async (name, files) => {
         await album.addPhoto(photo)
     }
 
-    return albums
+    return 'success'
 }
 
-const remove = (id) => {
+const deleteImage = (id) => {
     albums.every(album => !album.deletePhoto(id))
 
     if (!albums.length) throw 'not_found'
@@ -31,39 +34,36 @@ const remove = (id) => {
 
 // Tags api integration
 
-const getTags = (id) => {
-    const tagIds = get(id).map(photo => photo.tags).flat(Infinity)
-        .reduce((acc, tagId) => {
-            if (acc.includes(tagId)) return acc
-            acc.push(tagId)
-            return acc
-        }, [])
+const getImageTags = (id) => {
+    const tagIds = getImageById(id).tags
 
     try {
-        return tagIds.map(tagId => getTag(tagId))
+        return tagIds.map(tagId => getTagById(tagId))
     } catch (err) {
-        throw 'unprocessable_entity'
+        throw 'unknown_tag'
     }
 }
 
-const patchTags = (id, tagIds) => {
-    const photos = get(id)
+const patchImageTags = (id, tagIds) => {
+    try {
 
-    for (const photo of photos) {
-        for (const tagId of tagIds) {
-            photo.addTag(tagId)
-        }
+    const photo = getImageById(id)
+
+    for (const tagId of tagIds) {
+        photo.addTag(tagId)
     }
 
     return 'success'
+    } catch (err) {
+        console.log(err)
+    }
 }
-const patchTag = (id, tagId) => patchTags(id, [tagId])
 
 module.exports = {
-    getAll, get,
-    post,
-    remove,
+    getAll, getImageById,
+    addImagesToAlbum,
+    deleteImage,
     // Tags api integration
-    getTags,
-    patchTags, patchTag,
+    getImageTags,
+    patchImageTags,
 }

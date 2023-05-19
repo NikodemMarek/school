@@ -13,12 +13,12 @@ const add = (name, popularity) => {
 
     if (tag){
         tag.popularity += popularity
-        return tag
+        return 'success'
     }
 
     tag = new Tag(name, popularity)
     tags.push(tag)
-    return tag
+    return 'success'
 }
 
 let id = 0

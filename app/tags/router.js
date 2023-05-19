@@ -1,14 +1,13 @@
 const { handleRes } = require('../helpers')
 
-const {getAll, getRaw, get, post} = require('./controller')
+const {getAllTags, getRawTags, getTagById, addTag} = require('./controller')
 
 const router = (entry, server) => {
-    server.get(`${entry}`, handleRes(getAll))
-    server.get(`${entry}/raw`, handleRes(getRaw))
+    server.get(`${entry}`, handleRes(getAllTags))
+    server.get(`${entry}/raw`, handleRes(getRawTags))
+    server.get(`${entry}/:id`, ({params: {id}}) => handleRes(getTagById, parseInt(id))())
 
-    server.get(`${entry}/:id`, ({params: {id}}) => handleRes(get, parseInt(id))())
-
-    server.post(`${entry}`, ({body: {name}}) => handleRes(post, name)())
+    server.post(`${entry}`, ({body: {name}}) => handleRes(addTag, name)())
 }
 
 module.exports = router

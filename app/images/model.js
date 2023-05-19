@@ -7,6 +7,7 @@ class Photo {
         this.url = url
 
         this.tags = []
+        this.filters = []
 
         this.lastChange = 'original'
         this.history = [
@@ -37,7 +38,6 @@ Photo.prototype.remove = async function () {
 }
 
 // Tags api integration
-
 Photo.prototype.addTag = function (tagId) {
     if (this.tags.includes(tagId)) return
 
@@ -91,9 +91,6 @@ Album.prototype.addPhoto = async function (photo) {
     this.photos.push(photo)
 }
 
-Album.prototype.getPhoto = function (id) {
-    return this.photos.filter(photo => photo.id === id)
-}
 Album.prototype.deletePhoto = function (id) {
     const initialLength = this.photos.length
 
