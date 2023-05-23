@@ -147,7 +147,7 @@ class NodeHttpServer {
 
             let path = ''
 
-            const url = rawUrl.toLowerCase()
+            const url = rawUrl//.toLowerCase()
             const params = {}
             const endpoint = url.split('/')?.reduce((acc, part) => {
                 const endpoints = acc?.endpoints

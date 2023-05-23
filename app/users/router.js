@@ -1,6 +1,6 @@
 const { handleRes, JSONResponse } = require('../helpers')
 
-const { getUsers, register, login } = require('./controller')
+const { getUsers, register, confirmAccount, login } = require('./controller')
 
 const router = (entry, server) => {
     server.get(`${entry}`, handleRes(getUsers))
@@ -16,6 +16,7 @@ const router = (entry, server) => {
             return JSONResponse(500, e)
         }
     })
+    server.get(`${entry}/confirm/:token`, async ({ params: { token } }) => await handleRes(confirmAccount, token)())
 
     server.post(`${entry}/login`, async ({ body: { email, password } }) => {
         try {
