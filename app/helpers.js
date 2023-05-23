@@ -8,11 +8,12 @@ const handleRes = (fn, ...params) => {
     })
 }
 
-const JSONResponse = (code, data) => ({
+const JSONResponse = (code, data, headers = {}) => ({
     code,
     body: JSON.stringify(data),
     headers: {
         'Content-Type': 'application/json',
+        ...headers,
     },
 })
 
