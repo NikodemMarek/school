@@ -3,7 +3,7 @@ const handleRes = (fn, ...params) => {
         try {
             return JSONResponse(200, await fn(...params))
         } catch (err) {
-            return JSONResponse(500, {err})
+            return JSONResponse(500, err)
         }
     })
 }

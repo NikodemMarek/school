@@ -134,12 +134,13 @@ class NodeHttpServer {
         )
     }
 
-    constructor() {
+    constructor(auth = () => true) {
         this.#server = http.createServer(async (req, res) => {
             const sendError = (statusCode, message) => {
                 res.statusCode = statusCode
                 res.end(message)
             }
+
             const method = req.method.toLowerCase()
             const [rawUrl, rawQuery] = decodeURIComponent(req.url).split('?')
             const query = Object.fromEntries(new URLSearchParams(rawQuery))
@@ -171,6 +172,9 @@ class NodeHttpServer {
             }, this.#endpoints)?.[method]
 
             if (!endpoint) path = url === '/' ? '/index.html' : url
+
+            if (!auth(req.headers.authorization, path))
+                return sendError(401, 'unauthorized')
 
             const form = formidable({multiples: true, keepExtensions: true})
             form.uploadDir = path_utils.join(__dirname, 'uploads')

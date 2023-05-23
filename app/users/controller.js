@@ -19,21 +19,15 @@ const createToken = (email) => {
 
     return token;
 }
-const verifyToken = (token) => {
-    if (!process.env.SECRET_KEY)
-        throw 'internal_server_error';
-
-    try {
-        const decoded = jwt.verify(token, process.env.SECRET_KEY);
-    }
-    catch (e) {
-        throw 'invalid_token';
-    }
-}
 
 const getUsers = () => users
 
 const register = async (name, lastName, email, password) => {
+    const exists = users.some(user => user.email === email);
+
+    if (exists)
+        throw 'user_already_exists';
+
     const encryptedPassword = await bcrypt.hash(password, 10);
 
     const user = new User(name, lastName, email, encryptedPassword);

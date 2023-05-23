@@ -1,7 +1,33 @@
+const NodeHttpServer = require('./NodeHttpServer')
+const jwt = require('jsonwebtoken')
+
 require('dotenv').config()
 
-const NodeHttpServer = require('./NodeHttpServer')
-const server = new NodeHttpServer()
+const server = new NodeHttpServer((auth, url) => {
+    if (url?.startsWith('/api/users'))
+        return true
+
+    if (auth?.startsWith('Bearer ')) {
+        const token = auth.split(' ')[1].trim()
+
+        if (!process.env.SECRET_KEY)
+            return false
+
+        try {
+
+            const tokenData = jwt.verify(token, process.env.SECRET_KEY)
+
+            if (!tokenData)
+                return false
+
+            return true
+        } catch (err) {
+            return false
+        }
+    }
+
+    return false
+})
 
 server.get('/api', ({}) => ({
     body: 'welcome to the api',
