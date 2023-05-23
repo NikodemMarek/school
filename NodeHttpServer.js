@@ -203,9 +203,7 @@ class NodeHttpServer {
                     ? await endpoint({files, query, body: reqBody, params})
                     : await sendFile(path)
 
-                res.writeHead(code || 200, {
-                    headers,
-                })
+                res.writeHead(code || 200, headers)
                 res.write(body)
                 res.end()
             } catch (err) {
