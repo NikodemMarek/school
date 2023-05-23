@@ -12,5 +12,6 @@ server.get('/api', ({}) => ({
 
 require('./app/images/router')('/api/photos', server)
 require('./app/tags/router')('/api/tags', server)
+require('./app/filters/router')('/api/filters', server)
 
 server.start(process.env.PORT)

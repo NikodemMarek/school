@@ -57,6 +57,18 @@ Photo.prototype.removeTag = function (tagId) {
     })
 }
 
+// Filters api integration
+Photo.prototype.addFilter = function (filterId) {
+    if (this.filters.includes(filterId)) return
+
+    this.filters.push(filterId)
+
+    this.history.push({
+        status: `added filter with id ${filterId}`,
+        timestamp: new Date(),
+    })
+}
+
 class Album {
     constructor(name) {
         this.id = Date.now()
