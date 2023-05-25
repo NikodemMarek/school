@@ -1,20 +1,35 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import Root from './root/Root.jsx'
 import {
     createBrowserRouter,
     RouterProvider,
 } from "react-router-dom"
+import { Provider } from 'react-redux'
+import store from './data/store.js'
+
+import Root from './Root.jsx'
+import Register from './auth/Register.jsx'
+import Login from './auth/Login.jsx'
 
 const router = createBrowserRouter([
     {
         path: "/",
         element: <Root />,
     },
+    {
+        path: "/auth/register",
+        element: <Register />,
+    },
+    {
+        path: "/auth/login",
+        element: <Login />,
+    },
 ])
 
 ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>
-        <RouterProvider router={router} />
+        <Provider store={store}>
+            <RouterProvider router={router} />
+        </Provider>
     </React.StrictMode>,
 )
