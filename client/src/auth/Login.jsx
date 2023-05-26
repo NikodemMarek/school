@@ -1,13 +1,14 @@
 import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
+import { Button, Center, Flex, FormControl, FormLabel, Heading, Input, Link } from '@chakra-ui/react'
 
 import { authActions } from '../data/store.js'
 import { login } from '../data/auth.js'
-import Input from '../components/Input.jsx'
 
 const Login = () => {
     const dispatch = useDispatch()
+    const navigate = useNavigate()
 
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
@@ -25,7 +26,7 @@ const Login = () => {
 
             dispatch(authActions.setToken(data.token))
 
-            navigate('/')
+            setTimeout(() => navigate('/'), 100)
         } catch (err) {
             if (err === 'user_not_found')
                 return setError('user not found')
@@ -33,13 +34,15 @@ const Login = () => {
     }
 
     return (
-        <div>
-            <h1>Login</h1>
+        <Flex direction="column" gap="2">
+            <Heading>Login</Heading>
             
-            <form onSubmit={onSubmit}>
-                <Input type="email" label="email" value={email} onChange={setEmail} />
+            <FormControl isInvalid={error}>
+                <FormLabel>email</FormLabel>
+                <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
 
-                <Input type="password" label="password" value={password} onChange={setPassword} />
+                <FormLabel>password</FormLabel>
+                <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
 
                 {error && <p
                     style={{
@@ -47,12 +50,12 @@ const Login = () => {
                         fontSize: '0.8rem',
                     }}
                 >{error}</p>}
+            </FormControl>
 
-                <button type="submit">login</button>
-            </form>
+            <Button onClick={onSubmit}>login</Button>
             
-            <Link to="/auth/register">register</Link>
-        </div>
+            <Link href="/auth/register">register</Link>
+        </Flex>
     )
 }
 

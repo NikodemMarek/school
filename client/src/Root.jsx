@@ -12,7 +12,7 @@ const Root = () => {
 
     useEffect(() => {
         if (!token)
-            navigate('/auth')
+            navigate('/auth/login')
     })
 
     return (

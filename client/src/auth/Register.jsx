@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { useDispatch } from 'react-redux'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import { authActions } from '../data/store.js'
 import { register } from '../data/auth.js'
-import Input  from '../components/Input.jsx'
+import { FormControl, FormLabel, Heading, Input, Link, Button, Flex } from '@chakra-ui/react'
 
 const Register = () => {
     const [name, setName] = useState('')
@@ -45,17 +45,22 @@ const Register = () => {
     }
 
     return (
-        <div>
-            <h1>register</h1>
+        <Flex direction="column" gap="2">
+            <Heading>register</Heading>
 
-            <form onSubmit={onSubmit}>
-                <Input type="text" placeholder="name" value={name} onChange={setName} />
-                <Input type="text" placeholder="last name" value={lastName} onChange={setLastName} />
+            <FormControl>
+                <FormLabel>first name</FormLabel>
+                <Input type="text" value={name} onChange={(e) => setName(e.target.value)} />
+                <FormLabel>last name</FormLabel>
+                <Input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} />
 
-                <Input type="email" placeholder="email" value={email} onChange={setEmail} />
+                <FormLabel>email</FormLabel>
+                <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
 
-                <Input type="password" placeholder="password" value={password} onChange={setPassword} />
-                <Input type="password" placeholder="password confirmation" value={passwordConfirmation} onChange={setPasswordConfirmation} />
+                <FormLabel>password</FormLabel>
+                <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                <FormLabel>password confirmation</FormLabel>
+                <Input type="password" value={passwordConfirmation} onChange={(e) => setPasswordConfirmation(e.target.value)} />
 
                 {error && <p
                     style={{
@@ -63,12 +68,12 @@ const Register = () => {
                         fontSize: '0.8rem',
                     }}
                 >{error}</p>}
+            </FormControl>
 
-                <button type="submit">register</button>
-            </form>
+            <Button onClick={onSubmit}>register</Button>
 
             <Link to="/auth/login">login</Link>
-        </div>
+        </Flex>
     );
 }
 
