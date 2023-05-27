@@ -184,7 +184,8 @@ class NodeHttpServer {
 
             if (!endpoint) path = url === '/' ? '/index.html' : url
 
-            if (!auth(req.headers.authorization, path)) {
+            const authResult = auth(req.headers.authorization, path)
+            if (!authResult) {
                 res.writeHead(401, {
                     ...corsHeaders,
                     'Content-Type': 'application/json',
@@ -223,7 +224,7 @@ class NodeHttpServer {
 
             try {
                 const {code, body, headers} = endpoint
-                    ? await endpoint({files, query, body: reqBody, params})
+                    ? await endpoint({files, query, body: reqBody, params, uid: authResult})
                     : await sendFile(path)
 
                 res.writeHead(code || 200, {

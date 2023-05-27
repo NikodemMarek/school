@@ -26,7 +26,7 @@ const Login = () => {
 
             dispatch(authActions.setToken(data))
 
-            setTimeout(() => navigate('/'), 100)
+            navigate('/')
         } catch (err) {
             if (err === 'user_not_found')
                 return setError('user not found')

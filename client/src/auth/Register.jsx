@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react'
-import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { FormControl, FormLabel, Heading, Input, Link, Button, Flex } from '@chakra-ui/react'
 
-import { authActions } from '../data/store'
 import { register } from './api'
 
 const Register = () => {
+    const navigate = useNavigate()
+
     const [name, setName] = useState('')
     const [lastName, setLastName] = useState('')
 
@@ -16,9 +16,6 @@ const Register = () => {
     const [passwordConfirmation, setPasswordConfirmation] = useState('')
 
     const [error, setError] = useState(undefined)
-
-    const dispatch = useDispatch()
-    const navigate = useNavigate()
 
     useEffect(() => {
         setError(undefined)
@@ -33,11 +30,9 @@ const Register = () => {
             return setError('passwords do not match')
 
         try {
-            const data = await register(name, lastName, email, password)
+            await register(name, lastName, email, password)
 
-            dispatch(authActions.setToken(data))
-
-            setTimeout(() => navigate('/'), 100)
+            navigate('/auth/login')
         } catch (err) {
             if (err === 'user_already_exists')
                 setError('user already exists')

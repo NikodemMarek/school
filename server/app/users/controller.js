@@ -49,9 +49,7 @@ const register = async (name, lastName, email, password) => {
 
     users.push(user)
 
-    const token = createToken(user.id)
-
-    return token
+    return 'success'
 }
 const confirmAccount = async (token) => {
     let id = null
@@ -73,7 +71,7 @@ const confirmAccount = async (token) => {
 
     user.confirmed = true
 
-    return "success"
+    return 'success'
 }
 
 const login = async (email, password) => {

@@ -3,6 +3,9 @@ const jwt = require('jsonwebtoken')
 
 require('dotenv').config()
 
+if (!process.env.SECRET_KEY)
+    throw new Error('SECRET_KEY is not defined')
+
 const server = new NodeHttpServer((auth, url) => {
     if ([
         '/api',
@@ -10,27 +13,22 @@ const server = new NodeHttpServer((auth, url) => {
         '/api/users/login',
         '/api/users/confirm',
     ].includes(url))
-        return true
+        return -1
 
     if (auth?.startsWith('Bearer ')) {
         const token = auth.split(' ')[1].trim()
 
-        if (!process.env.SECRET_KEY)
-            return false
-
         try {
             const tokenData = jwt.verify(token, process.env.SECRET_KEY)
 
-            if (!tokenData)
-                return false
-
-            return true
+            if (tokenData.id)
+                return tokenData.id
         } catch (err) {
-            return false
+            return undefined
         }
     }
 
-    return false
+    return undefined
 })
 
 server.get('/api', ({}) => ({
