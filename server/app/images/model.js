@@ -70,19 +70,19 @@ Photo.prototype.addFilter = function (filterId) {
 }
 
 class Album {
-    constructor(name) {
-        this.id = Date.now()
+    constructor(id, name) {
+        this.id = id
         this.name = name
 
         this.photos = []
     }
 
-    static get = (name) => {
-        const album = albums.find((album) => album.name === name)
+    static get = (id, name) => {
+        const album = albums.find((album) => album.id === id && album.name === name)
 
         if (album) return album
 
-        const newAlbum = new Album(name)
+        const newAlbum = new Album(id, name)
         albums.push(newAlbum)
 
         return newAlbum
@@ -101,15 +101,6 @@ Album.prototype.addPhoto = async function (photo) {
     )
 
     this.photos.push(photo)
-}
-
-Album.prototype.deletePhoto = function (id) {
-    const initialLength = this.photos.length
-
-    this.photos.filter(photo => photo.id === id).forEach(f => f.remove())
-    this.photos = this.photos.filter(photo => photo.id !== id)
-
-    return initialLength !== this.photos.length
 }
 
 let id = 0

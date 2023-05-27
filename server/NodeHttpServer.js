@@ -185,7 +185,7 @@ class NodeHttpServer {
             if (!endpoint) path = url === '/' ? '/index.html' : url
 
             const authResult = auth(req.headers.authorization, path)
-            if (!authResult) {
+            if (authResult === undefined) {
                 res.writeHead(401, {
                     ...corsHeaders,
                     'Content-Type': 'application/json',

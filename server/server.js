@@ -21,8 +21,7 @@ const server = new NodeHttpServer((auth, url) => {
         try {
             const tokenData = jwt.verify(token, process.env.SECRET_KEY)
 
-            if (tokenData.id)
-                return tokenData.id
+            return tokenData.id
         } catch (err) {
             return undefined
         }

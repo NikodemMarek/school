@@ -1,23 +1,37 @@
 const {albums, Album, Photo} = require('./model')
 const { getTagById } = require('../tags/controller')
 
-const getAll = () => albums
+const getAll = () => JSON.parse(JSON.stringify(albums))
 const getImageById = (id) => {
     for (const album of albums) {
         for (const photo of album.photos) {
-            if (photo.id === id) return photo
+            if (photo.id === id)
+                return JSON.parse(JSON.stringify(photo))
         }
     }
 
-    throw 'photo_not_found'
+    throw 'image_not_found'
+}
+const getMutableImage = (uid, id) => {
+    for (const album of albums) {
+        if (album.uid !== uid)
+            continue
+
+        for (const photo of album.photos) {
+            if (photo.id === id)
+                return photo
+        }
+    }
+
+    throw 'image_not_found'
 }
 
-const addImagesToAlbum = async (name, files) => {
+const addImagesToAlbum = async (uid, name, files) => {
     const photos = files.map(
         (file) => new Photo(file.originalName, file.path)
     )
 
-    const album = Album.get(name)
+    const album = Album.get(uid, name)
     for (const photo of photos) {
         await album.addPhoto(photo)
     }
@@ -25,10 +39,9 @@ const addImagesToAlbum = async (name, files) => {
     return 'success'
 }
 
-const deleteImage = (id) => {
-    albums.every(album => !album.deletePhoto(id))
+const deleteImage = (uid, id) => {
+    getMutableImage(uid, id).remove()
 
-    if (!albums.length) throw 'not_found'
     return 'success'
 }
 
@@ -44,19 +57,14 @@ const getImageTags = (id) => {
     }
 }
 
-const patchImageTags = (id, tagIds) => {
-    try {
-
-    const photo = getImageById(id)
+const patchImageTags = (uid, id, tagIds) => {
+    const photo = getMutableImage(uid, id)
 
     for (const tagId of tagIds) {
         photo.addTag(tagId)
     }
 
     return 'success'
-    } catch (err) {
-        console.log(err)
-    }
 }
 
 module.exports = {
