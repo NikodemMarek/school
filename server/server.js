@@ -14,7 +14,6 @@ const server = new NodeHttpServer((auth, url) => {
             return false
 
         try {
-
             const tokenData = jwt.verify(token, process.env.SECRET_KEY)
 
             if (!tokenData)

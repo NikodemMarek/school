@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-
-import { authActions } from '../data/store.js'
-import { register } from '../data/auth.js'
 import { FormControl, FormLabel, Heading, Input, Link, Button, Flex } from '@chakra-ui/react'
+
+import { authActions } from '../data/store'
+import { register } from './auth'
 
 const Register = () => {
     const [name, setName] = useState('')
@@ -35,7 +35,7 @@ const Register = () => {
         try {
             const data = await register(name, lastName, email, password)
 
-            dispatch(authActions.setToken(data.token))
+            dispatch(authActions.setToken(data))
 
             setTimeout(() => navigate('/'), 100)
         } catch (err) {

@@ -136,6 +136,17 @@ class NodeHttpServer {
 
     constructor(auth = () => true) {
         this.#server = http.createServer(async (req, res) => {
+            const corsHeaders = {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'OPTIONS, POST, GET',
+                'Access-Control-Max-Age': 2592000,
+            }
+            if (req.method === 'OPTIONS') {
+                res.writeHead(204, corsHeaders)
+                res.end()
+                return
+            }
+
             const sendError = (statusCode, message) => {
                 res.statusCode = statusCode
                 res.end(message)
@@ -173,8 +184,16 @@ class NodeHttpServer {
 
             if (!endpoint) path = url === '/' ? '/index.html' : url
 
-            if (!auth(req.headers.authorization, path))
-                return sendError(401, 'unauthorized')
+            if (!auth(req.headers.authorization, path)) {
+                res.writeHead(401, {
+                    ...corsHeaders,
+                    'Content-Type': 'application/json',
+                })
+                res.write(JSON.stringify('unauthorized'))
+                res.end()
+
+                return
+            }
 
             const form = formidable({multiples: true, keepExtensions: true})
             form.uploadDir = path_utils.join(__dirname, 'uploads')
@@ -207,7 +226,10 @@ class NodeHttpServer {
                     ? await endpoint({files, query, body: reqBody, params})
                     : await sendFile(path)
 
-                res.writeHead(code || 200, headers)
+                res.writeHead(code || 200, {
+                    ...corsHeaders,
+                    ...headers,
+                })
                 res.write(body)
                 res.end()
             } catch (err) {

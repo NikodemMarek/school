@@ -1,6 +1,6 @@
 const API_ENTRYPOINT = 'http://localhost:3000/api'
 
-const prepareData = (data) => {
+const objectToFormData = (data) => {
     const formData = new FormData()
 
     for (const key in data) {
@@ -10,8 +10,14 @@ const prepareData = (data) => {
     return formData
 }
 
-const get = async (url) => {
-    const response = await fetch(url)
+export { objectToFormData }
+
+const get = async (endpoint) => {
+    const response = await fetch(`${API_ENTRYPOINT}${endpoint}`, {
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+    })
     const data = await response.json()
 
     if (!response.ok)
@@ -23,7 +29,10 @@ const get = async (url) => {
 const post = async (endpoint, body) => {
     const response = await fetch(`${API_ENTRYPOINT}${endpoint}`, {
         method: 'POST',
-        body: prepareData(body),
+        body,
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
     })
     const data = await response.json()
 
@@ -36,7 +45,10 @@ const post = async (endpoint, body) => {
 const put = async (endpoint, body) => {
     const response = await fetch(`${API_ENTRYPOINT}${endpoint}`, {
         method: 'PUT',
-        body: prepareData(body),
+        body,
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
     })
     const data = await response.json()
 

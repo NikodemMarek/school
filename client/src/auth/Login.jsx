@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { Button, Center, Flex, FormControl, FormLabel, Heading, Input, Link } from '@chakra-ui/react'
+import { Button, Flex, FormControl, FormLabel, Heading, Input, Link } from '@chakra-ui/react'
 
-import { authActions } from '../data/store.js'
-import { login } from '../data/auth.js'
+import { authActions } from '../data/store'
+import { login } from './auth'
 
 const Login = () => {
     const dispatch = useDispatch()
@@ -24,7 +24,7 @@ const Login = () => {
         try {
             const data = await login(email, password)
 
-            dispatch(authActions.setToken(data.token))
+            dispatch(authActions.setToken(data))
 
             setTimeout(() => navigate('/'), 100)
         } catch (err) {
