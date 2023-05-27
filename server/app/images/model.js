@@ -20,7 +20,13 @@ class Photo {
 }
 
 Photo.prototype.move = async function (newPath) {
-    move(this.url, newPath)
+    move(
+        this.url,
+        path_utils.join(
+            root,
+            newPath,
+        )
+    )
 
     this.url = newPath
     this.history.push({
@@ -92,11 +98,9 @@ class Album {
 Album.prototype.addPhoto = async function (photo) {
     await photo.move(
         path_utils.join(
-            root,
-            'uploads',
-            'albums',
+            '/uploads',
             this.name,
-            path_utils.basename(photo.url)
+            photo.name,
         )
     )
 
@@ -104,7 +108,9 @@ Album.prototype.addPhoto = async function (photo) {
 }
 
 let id = 0
-let albums = []
+let albums = [
+    new Album(-1, 'profile_pictures'),
+]
 
 module.exports = {
     Photo,

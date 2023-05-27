@@ -28,7 +28,10 @@ const getMutableImage = (uid, id) => {
 
 const addImagesToAlbum = async (uid, name, files) => {
     const photos = files.map(
-        (file) => new Photo(file.originalName, file.path)
+        (file) => new Photo(
+            file.originalName,
+            file.path.replace(__dirname, '/'),
+        )
     )
 
     const album = Album.get(uid, name)

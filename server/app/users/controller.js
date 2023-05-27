@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 
 const { User, users } = require('./model')
+const { Album, Photo } = require('../images/model')
 
 const createToken = (id) => {
     const token = jwt.sign(
@@ -22,6 +23,7 @@ const getUsers = () => users.map(({ id, name, lastName, email, profilePicture })
     name,
     lastName,
     email,
+    profilePicture,
 }))
 const getUser = (id) => {
     const user = users.find(user => user.id === id)
@@ -101,10 +103,19 @@ const updateUser = (id, name, lastName) => {
 
     return 'success'
 }
-const updateProfilePicture = (id, path) => {
+const updateProfilePicture = (id, file) => {
     const user = getUser(id)
 
-    user.profilePicture = path
+    const picture = new Photo(
+        `${id}`,
+        file.path.replace(__dirname, '/'),
+    )
+
+    Album
+        .get(-1, 'profile_pictures')
+        .addPhoto(picture)
+
+    user.profilePicture = picture.id
 
     return 'success'
 }
