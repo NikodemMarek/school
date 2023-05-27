@@ -1,17 +1,17 @@
 const http = require('http')
-const fs = require('fs').promises
+const fs = require('fs')
 const formidable = require('formidable')
 const path_utils = require('path')
 
 const ServerError = (code, msg) => ({code, msg})
 
 const pathExists = async (path) =>
-    await fs
+    await fs.promises
         .access(path)
         .then(() => true)
         .catch(() => false)
 
-const sendFile = async (path) => {
+const sendFile = async (res, path) => {
     const extension = path_utils.extname(path)
 
     const contentType = {
@@ -28,27 +28,23 @@ const sendFile = async (path) => {
             mimeType: 'image/png',
         },
         '.jpg': {
-            mimeType: 'image/jpg',
+            mimeType: 'image/jpeg',
         },
     }[extension]
 
     if (!contentType)
         throw ServerError(400, `File of type '${extension}' is not supported!`)
 
-    const absolutePath = path_utils.join(__dirname, 'static', path)
+    const absolutePath = path_utils.join(__dirname, path)
 
     if (!(await pathExists(absolutePath)))
         throw ServerError(404, `File '${path}' not found!`)
 
-    const body = await fs.readFile(absolutePath, 'utf-8')
-
-    return {
-        code: 200,
-        body,
-        headers: {
-            'Content-Type': contentType.mimeType,
-        },
-    }
+    res.writeHead(200, {
+        'Content-Type': contentType.mimeType,
+        'Content-Length': fs.statSync(absolutePath).size,
+    })
+    fs.createReadStream(absolutePath).pipe(res)
 }
 
 class NodeHttpServer {
@@ -185,7 +181,7 @@ class NodeHttpServer {
             if (!endpoint) path = url === '/' ? '/index.html' : url
 
             const authResult = auth(req.headers.authorization, path)
-            if (authResult === undefined) {
+            if (endpoint && authResult === undefined) {
                 res.writeHead(401, {
                     ...corsHeaders,
                     'Content-Type': 'application/json',
@@ -223,16 +219,18 @@ class NodeHttpServer {
             )
 
             try {
-                const {code, body, headers} = endpoint
-                    ? await endpoint({files, query, body: reqBody, params, uid: authResult})
-                    : await sendFile(path)
+                if (endpoint) {
+                    const {code, body, headers} = await endpoint({files, query, body: reqBody, params, uid: authResult})
 
-                res.writeHead(code || 200, {
-                    ...corsHeaders,
-                    ...headers,
-                })
-                res.write(body)
-                res.end()
+                    res.writeHead(code || 200, {
+                        ...corsHeaders,
+                        ...headers,
+                    })
+                    res.write(body)
+                    res.end()
+                } else {
+                    await sendFile(res, path)
+                }
             } catch (err) {
                 console.error(err)
 

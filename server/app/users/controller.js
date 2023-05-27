@@ -107,7 +107,7 @@ const updateProfilePicture = (id, file) => {
     const user = getUser(id)
 
     const picture = new Photo(
-        `${id}`,
+        `${id}.jpg`,
         file.path.replace(__dirname, '/'),
     )
 
