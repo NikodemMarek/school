@@ -25,17 +25,23 @@ const getUsers = () => users.map(({ id, name, lastName, email, profilePicture })
     email,
     profilePicture,
 }))
-const getUser = (id) => {
+const getUserMutable = (id) => {
     const user = users.find(user => user.id === id)
 
     if (!user)
         throw 'user_not_found'
+
+    return user
+}
+const getUser = (id) => {
+    const user = getUserMutable(id)
 
     return {
         id: user.id,
         name: user.name,
         lastName: user.lastName,
         email: user.email,
+        profilePicture: user.profilePicture,
     }
 }
 
@@ -66,12 +72,7 @@ const confirmAccount = async (token) => {
         throw 'invalid_token'
     }
 
-    const user = users.find(user => user.id === id)
-
-    if (!user)
-        throw 'user_not_found'
-
-    user.confirmed = true
+    getUserMutable(id).confirmed = true
 
     return 'success'
 }
@@ -93,7 +94,7 @@ const login = async (email, password) => {
 }
 
 const updateUser = (id, name, lastName) => {
-    const user = getUser(id)
+    const user = getUserMutable(id)
 
     if (name)
         user.name = name
@@ -104,7 +105,7 @@ const updateUser = (id, name, lastName) => {
     return 'success'
 }
 const updateProfilePicture = (id, file) => {
-    const user = getUser(id)
+    const user = getUserMutable(id)
 
     const picture = new Photo(
         `${id}.jpg`,
@@ -121,7 +122,7 @@ const updateProfilePicture = (id, file) => {
 }
 
 module.exports = {
-    getUsers, getUser,
+    getUsers, getUserMutable, getUser,
     register, confirmAccount,
     login,
     updateUser, updateProfilePicture,

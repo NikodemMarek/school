@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import { getUser } from './api'
 import { useNavigate } from 'react-router-dom'
-import { Flex, Heading } from '@chakra-ui/react'
+import { Avatar, Flex, Heading } from '@chakra-ui/react'
+
+import { getUser } from './api'
+import { getImage } from '../images/api'
 
 const Profile = () => {
     const navigate = useNavigate()
@@ -9,21 +11,33 @@ const Profile = () => {
     const [user, setUser] = useState(null)
 
     useEffect(() => {
-        getUser()
-            .then((user) => setUser(user))
-            .catch((error) => {
+        (async () => {
+            try {
+                const user = await getUser()
+                const photo = await getImage(user.profilePicture)
+
+                setUser({ ...user, profilePhoto: photo.url })
+            } catch (error) {
                 if (error === 'unauthorized')
                     navigate('/auth/login', { replace: true })
-            })
+            }
+        })()
     }, []);
 
     return (
-        <Flex direction="column">
-            <Heading>profile</Heading>
+        <Flex
+            direction="row"
+            alignItems="center"
+            gap={4}
+            p={4}
+        >
+            <Avatar name={user?.name} src={`http://localhost:3000${user?.profilePhoto}`} size="2xl" />
 
-            <Heading>{user?.name} {user?.lastName}</Heading>
+            <Flex direction="column">
+                <Heading>{user?.name} {user?.lastName}</Heading>
 
-            <Heading>{user?.email}</Heading>
+                <Heading>{user?.email}</Heading>
+            </Flex>
         </Flex>
     )
 }

@@ -1,4 +1,7 @@
-import { post } from '../data/api'
+import { get, post } from '../data/api'
+
+const getImage = async (imageId) =>
+    await get(`/photos/${imageId}`)
 
 const uploadImages = async (album, images) => {
     const formData = new FormData()
@@ -10,4 +13,4 @@ const uploadImages = async (album, images) => {
     return await post('/photos', formData)
 }
 
-export { uploadImages }
+export { getImage, uploadImages }
