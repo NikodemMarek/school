@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { Button, Flex, FormControl, FormLabel, Heading, Input, Link } from '@chakra-ui/react'
 
 import { authActions } from '../data/store'
-import { login } from './auth'
+import { login } from './api'
 
 const Login = () => {
     const dispatch = useDispatch()

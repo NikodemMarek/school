@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { FormControl, FormLabel, Heading, Input, Link, Button, Flex } from '@chakra-ui/react'
 
 import { authActions } from '../data/store'
-import { register } from './auth'
+import { register } from './api'
 
 const Register = () => {
     const [name, setName] = useState('')
