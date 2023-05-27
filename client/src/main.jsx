@@ -4,13 +4,15 @@ import {
     createBrowserRouter,
     RouterProvider,
 } from "react-router-dom"
+import { ChakraProvider } from '@chakra-ui/react'
 import { Provider } from 'react-redux'
 import store from './data/store.js'
 
 import Root from './Root.jsx'
-import Register from './auth/Register.jsx'
-import Login from './auth/Login.jsx'
-import { ChakraProvider } from '@chakra-ui/react'
+
+import Register from './user/Register.jsx'
+import Login from './user/Login.jsx'
+
 import Upload from './images/Upload.jsx'
 
 const router = createBrowserRouter([

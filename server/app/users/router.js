@@ -3,8 +3,8 @@ const { handleRes, JSONResponse } = require('../helpers')
 const { getUsers, getUser, register, confirmAccount, login, updateUser, updateProfilePicture } = require('./controller')
 
 const router = (entry, server) => {
-    // server.get(`${entry}/all`, handleRes(getUsers))
-    server.get(`${entry}`, ({ uid }) => handleRes(getUser, uid)());
+    server.get(`${entry}`, handleRes(getUsers))
+    server.get(`${entry}/current`, ({ uid }) => handleRes(getUser, uid)());
 
     server.post(`${entry}/register`, ({ body: { name, lastName, email, password } }) => handleRes(register, name, lastName, email, password)())
     server.get(`${entry}/confirm/:token`, async ({ params: { token } }) => await handleRes(confirmAccount, token)())
