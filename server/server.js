@@ -4,7 +4,12 @@ const jwt = require('jsonwebtoken')
 require('dotenv').config()
 
 const server = new NodeHttpServer((auth, url) => {
-    if (url?.startsWith('/api/users'))
+    if ([
+        '/api',
+        '/api/users/register',
+        '/api/users/login',
+        '/api/users/confirm',
+    ].includes(url))
         return true
 
     if (auth?.startsWith('Bearer ')) {

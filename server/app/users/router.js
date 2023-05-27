@@ -1,9 +1,10 @@
 const { handleRes, JSONResponse } = require('../helpers')
 
-const { getUsers, register, confirmAccount, login } = require('./controller')
+const { getUsers, getUser, register, confirmAccount, login, updateUser, updateProfilePicture } = require('./controller')
 
 const router = (entry, server) => {
     server.get(`${entry}`, handleRes(getUsers))
+    server.get(`${entry}/:id`, ({ params: { id } }) => handleRes(getUser, parseInt(id))());
 
     server.post(`${entry}/register`, async ({ body: { name, lastName, email, password } }) => {
         try {
@@ -29,6 +30,8 @@ const router = (entry, server) => {
             return JSONResponse(500, e)
         }
     })
+
+    server.patch(`${entry}/:id`, async ({ params: { id }, body: { name, lastName } }) => await handleRes(updateUser, parseInt(id), name, lastName)())
 }
 
 module.exports = router

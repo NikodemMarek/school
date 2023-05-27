@@ -6,6 +6,7 @@ class User {
         this.email = email
         this.password = password
         this.confirmed = false
+        this.profilePicture = null
     }
 }
 
