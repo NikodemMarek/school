@@ -74,7 +74,7 @@ export class GameComponent {
 
   protected board: Array<Array<Mark>> = []
 
-  private ai: Opponent = new Opponent(this.x);
+  private ai: Opponent = new Opponent({ x: this.x, y: this.y });
 
   ngOnInit() {
     this.x = parseInt(this.x as any, 10);
@@ -92,6 +92,7 @@ export class GameComponent {
     if (!this.pointsLimit || this.pointsLimit < 0) this.pointsLimit = 0;
 
     this.board = JSON.parse(JSON.stringify(Array(this.y).fill(Array(this.x).fill(Mark.None))))
+    this.ai = new Opponent({ x: this.x, y: this.y });
   }
 
   private nextMark: Mark = Mark.O;
