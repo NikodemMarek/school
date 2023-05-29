@@ -97,6 +97,8 @@ export class GameComponent {
 
   private nextMark: Mark = Mark.O;
   public makeMove = (x: number, y: number) => {
+    if (this.board[y][x] !== Mark.None) return;
+
     this.setMark(x, y);
 
     if (this.gameOver) return;
