@@ -1,37 +1,20 @@
-import React, { useState, useEffect } from 'react'
-import { Box, Checkbox, Flex, Heading, Stack, Button } from '@chakra-ui/react'
-import { useDropzone } from 'react-dropzone'
+import React, { useState } from 'react'
+import { Checkbox, Flex, Heading, Stack, Button, Box } from '@chakra-ui/react'
 
 import { uploadImages } from './api'
+import Dropzone from './Dropzone'
 
 const Upload = () => {
-    const {
-        getRootProps,
-        getInputProps,
-        acceptedFiles,
-        fileRejections,
-    } = useDropzone({
-        multiple: true,
-        accept: {
-            "image/*": [],
-        },
-    })
     const [files, setFiles] = useState([])
     const [checked, setChecked] = useState([])
 
-    useEffect(() => {
-        const allFiles = [...files, ...acceptedFiles]
+    const addFiles = (newFiles) => {
+        const allFiles = [...files, ...newFiles]
         setFiles(allFiles)
 
-        const newChecked = [...checked, ...acceptedFiles.map(() => true)]
+        const newChecked = [...checked, ...newFiles.map(() => true)]
         setChecked(newChecked)
-    }, [acceptedFiles])
-
-    useEffect(() => {
-        fileRejections.map(({ file, errors }) => (
-            console.log(file, errors)
-        ))
-    }, [fileRejections])
+    }
 
     return (
         <Flex
@@ -39,26 +22,11 @@ const Upload = () => {
             gap="4"
             m="4"
         >
-            <Box
-                border="1px"
-                borderColor="gray.200"
-                borderRadius="md"
-                p="4"
-                h="200px"
-            >
-                <div
-                    style={{
-                        height: '100%',
-                        width: '100%',
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                    }}
-                    {...getRootProps({ className: 'dropzone' })}
-                >
-                    <input {...getInputProps()} />
-                    <p>drag 'n' drop images, or click to select</p>
-                </div>
+            <Box h="200px">
+                <Dropzone
+                    multiple={true}
+                    setAccepted={addFiles}
+                />
             </Box>
 
             <Heading as="h3" size="md">accepted files</Heading>

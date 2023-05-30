@@ -134,9 +134,11 @@ class NodeHttpServer {
         this.#server = http.createServer(async (req, res) => {
             const corsHeaders = {
                 'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': 'OPTIONS, POST, GET',
+                'Access-Control-Allow-Methods': 'POST, GET, PUT, OPTIONS, PATCH, DELETE',
                 'Access-Control-Max-Age': 2592000,
+                'Access-Control-Allow-Headers': '*',
             }
+
             if (req.method === 'OPTIONS') {
                 res.writeHead(204, corsHeaders)
                 res.end()

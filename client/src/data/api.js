@@ -42,9 +42,9 @@ const post = async (endpoint, body) => {
     return data
 }
 
-const put = async (endpoint, body) => {
+const patch = async (endpoint, body) => {
     const response = await fetch(`${API_ENTRYPOINT}${endpoint}`, {
-        method: 'PUT',
+        method: 'PATCH',
         body,
         headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -58,4 +58,4 @@ const put = async (endpoint, body) => {
     return data
 }
 
-export { get, post, put }
+export { get, post, patch }

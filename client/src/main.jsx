@@ -12,6 +12,7 @@ import Root from './Root.jsx'
 
 import Register from './user/Register.jsx'
 import Login from './user/Login.jsx'
+import Profile from './user/Profile.jsx'
 
 import Upload from './images/Upload.jsx'
 
@@ -27,6 +28,10 @@ const router = createBrowserRouter([
     {
         path: "/auth/login",
         element: <Login />,
+    },
+    {
+        path: "/profile",
+        element: <Profile />,
     },
     {
         path: "/images/upload",
