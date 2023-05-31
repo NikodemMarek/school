@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Avatar, Flex, FormControl, Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, Input, FormLabel, Box } from '@chakra-ui/react'
+import { Avatar, Button, Flex, Box, FormControl, FormLabel, Input } from '@chakra-ui/react'
 
 import { setUserData, setUserProfilePicture } from './api'
 import Dropzone from '../images/Dropzone'
 
-const EditProfile = ({ isOpen, onClose, user }) => {
+const EditProfile = ({ onSave, user }) => {
     const navigate = useNavigate()
 
     const [photo, setPhoto] = useState(null)
@@ -29,7 +29,7 @@ const EditProfile = ({ isOpen, onClose, user }) => {
             if (photo)
                 await setUserProfilePicture(photo)
 
-            onClose()
+            onSave()
         } catch (error) {
             if (error === 'unauthorized')
                 navigate('/auth/login', { replace: true })
@@ -38,55 +38,42 @@ const EditProfile = ({ isOpen, onClose, user }) => {
         }
     }
 
-    return (
-        <Modal
-            isOpen={isOpen}
-            onClose={onClose}
+    return (<>
+        <Flex
+            gap={4}
+            w="100%"
         >
-            <ModalOverlay />
-            <ModalContent>
-              <ModalHeader>edit your profile</ModalHeader>
-              <ModalCloseButton />
-              <ModalBody pb={6}>
-                <Flex>
-                    <Box
-                        w="160px"
-                        h="160px"
-                    >
-                        <Dropzone multiple={false} setAccepted={(photo) => setPhoto(photo[0])}>
-                            {
-                                photo
-                                    ? <>uploaded<br />{photo?.name}</>
-                                    : <Avatar name={user?.name} src={`http://localhost:3000${user?.profilePicture}`} size="2xl" />
-                            }
-                        </Dropzone>
-                    </Box>
+            <Box
+                w="160px"
+                h="160px"
+            >
+                <Dropzone multiple={false} setAccepted={(photo) => setPhoto(photo[0])}>
+                    {
+                        photo
+                            ? <>uploaded<br />{photo?.name}</>
+                            : <Avatar name={user?.name} src={user?.profilePicture} size="2xl" />
+                    }
+                </Dropzone>
+            </Box>
 
-                    <FormControl ml={6}>
-                        <FormLabel>first name</FormLabel>
-                        <Input type="text" value={name} onChange={(e) => setName(e.target.value)} />
+            <FormControl>
+                <FormLabel>first name</FormLabel>
+                <Input type="text" value={name} onChange={(e) => setName(e.target.value)} />
 
-                        <FormLabel>last name</FormLabel>
-                        <Input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} />
+                <FormLabel>last name</FormLabel>
+                <Input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} />
 
-                        {error && <p
-                            style={{
-                                color: 'red',
-                                fontSize: '0.8rem',
-                            }}
-                        >{error}</p>}
-                    </FormControl>
-                </Flex>
-              </ModalBody>
+                {error && <p
+                    style={{
+                        color: 'red',
+                        fontSize: '0.8rem',
+                    }}
+                >{error}</p>}
+            </FormControl>
+        </Flex>
 
-              <ModalFooter>
-                <Button onClick={onSubmit} mr={3} colorScheme="blue">save</Button>
-
-                <Button onClick={onClose}>cancel</Button>
-              </ModalFooter>
-            </ModalContent>
-          </Modal>
-    )
+        <Button onClick={onSubmit} mt={4} w="100%">save</Button>
+    </>)
 }
 
 export default EditProfile

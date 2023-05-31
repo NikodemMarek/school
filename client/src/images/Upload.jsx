@@ -1,12 +1,14 @@
 import React, { useState } from 'react'
-import { Checkbox, Flex, Heading, Stack, Button, Box } from '@chakra-ui/react'
+import { Checkbox, Flex, Heading, Stack, Button, Box, useBoolean, Spinner } from '@chakra-ui/react'
 
 import { uploadImages } from './api'
 import Dropzone from './Dropzone'
 
-const Upload = () => {
+const Upload = ({ onUpload }) => {
     const [files, setFiles] = useState([])
     const [checked, setChecked] = useState([])
+
+    const [isUploading, setIsUploading] = useBoolean(false)
 
     const addFiles = (newFiles) => {
         const allFiles = [...files, ...newFiles]
@@ -15,6 +17,17 @@ const Upload = () => {
         const newChecked = [...checked, ...newFiles.map(() => true)]
         setChecked(newChecked)
     }
+
+    if (isUploading)
+        return (
+            <Flex
+                align="center"
+                justify="center"
+                h="100%"
+            >
+                <Spinner size="xl" />
+            </Flex>
+        )
 
     return (
         <Flex
@@ -48,14 +61,20 @@ const Upload = () => {
                 </Stack>
             </>)}
 
-            <Button onClick={() => {
+            <Button onClick={async () => {
                 const filesToUpload = files.filter((_, i) => checked[i])
 
+                setIsUploading.on()
+
                 try {
-                    uploadImages(filesToUpload)
+                    await uploadImages(filesToUpload)
                 } catch (err) {
                     console.log(err)
                 }
+
+                setIsUploading.off()
+
+                onUpload()
             }}>
                 upload
             </Button>

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { Flex, Skeleton, Image as ChakraImage, IconButton, Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, useDisclosure } from '@chakra-ui/react'
+import { Flex, Skeleton, Image as ChakraImage, IconButton, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalCloseButton, useDisclosure } from '@chakra-ui/react'
 import { getAlbum } from './api'
 import { AddIcon } from '@chakra-ui/icons'
 
@@ -8,19 +8,17 @@ import Upload from './Upload'
 const Album = ({ album }) => {
     const [images, setImages] = React.useState(null)
 
+    const { isOpen, onOpen, onClose } = useDisclosure()
+
     useEffect(() => {
         (async () => {
             try {
-                const imgs = await getAlbum(album)
-                setImages(imgs.photos)
-                console.log(images)
+                setImages((await getAlbum(album)).photos)
             } catch (error) {
                 console.log(error)
             }
         })()
-    }, [])
-
-    const { isOpen, onOpen, onClose } = useDisclosure()
+    }, [isOpen])
 
     return (
         <>
@@ -52,7 +50,7 @@ const Album = ({ album }) => {
                     <ModalCloseButton />
 
                     <ModalBody>
-                        <Upload />
+                        <Upload onUpload={onClose} />
                     </ModalBody>
                 </ModalContent>
             </Modal>
@@ -70,11 +68,16 @@ const ImageLoading = ({ src, alt }) => {
     return (
         <Skeleton
             isLoaded={isLoaded}
-            fadeDuration={4}
             w='200px'
             h='200px'
         >
-            <ChakraImage boxSize='200px' src={img.src} alt={alt} borderRadius="md" />
+            <ChakraImage
+                src={img.src}
+                alt={alt}
+                boxSize="200px"
+                borderRadius="md"
+                fit="cover"
+            />
         </Skeleton>
     )
 }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Avatar, Button, Flex, Heading, Spinner, useDisclosure } from '@chakra-ui/react'
+import { Avatar, Button, Flex, Heading, Spinner, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, useDisclosure } from '@chakra-ui/react'
 
 import { getUserProfile } from './api'
 import EditProfile from './EditProfile'
@@ -42,7 +42,7 @@ const Profile = () => {
             gap={4}
             p={4}
         >
-            <Avatar name={user?.name} src={`http://localhost:3000${user?.profilePicture}`} size="2xl" />
+            <Avatar name={user?.name} src={user?.profilePicture} size="2xl" />
 
             <Flex direction="column">
                 <Heading>{user?.name} {user?.lastName}</Heading>
@@ -52,7 +52,21 @@ const Profile = () => {
 
             <Button onClick={onOpen}>edit</Button>
 
-            <EditProfile isOpen={isOpen} onClose={onClose} user={user} />
+            <Modal
+                isOpen={isOpen}
+                onClose={onClose}
+                size="xl"
+            >
+                <ModalOverlay />
+                <ModalContent>
+                    <ModalHeader>edit profile</ModalHeader>
+                    <ModalCloseButton />
+
+                    <ModalBody pb={6}>
+                        <EditProfile onSave={onClose} user={user} />
+                    </ModalBody>
+                </ModalContent>
+            </Modal>
         </Flex>
     )
 }
