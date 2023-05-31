@@ -22,17 +22,18 @@ const Root = () => {
         return <Heading>please login</Heading>
 
     return (
-        <Flex
-            direction="column"
-            p={4}
-            gap={4}
-        >
-            <Button onClick={() => dispatch(authActions.logout())}>logout</Button>
+            <Flex
+                direction="column"
+                p={4}
+                gap={4}
+                overflow="auto"
+            >
+                <Button onClick={() => dispatch(authActions.logout())}>logout</Button>
 
-            <Profile />
+                <Profile />
 
-            <Album album={0} />
-        </Flex>
+                <Album album={0} />
+            </Flex>
     )
 }
 

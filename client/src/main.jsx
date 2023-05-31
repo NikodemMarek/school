@@ -4,9 +4,11 @@ import {
     createBrowserRouter,
     RouterProvider,
 } from "react-router-dom"
-import { ChakraProvider } from '@chakra-ui/react'
+import { ChakraProvider, Flex } from '@chakra-ui/react'
 import { Provider } from 'react-redux'
 import store from './data/store.js'
+
+import Navbar from './Navbar.jsx'
 
 import Root from './Root.jsx'
 
@@ -14,12 +16,23 @@ import Register from './user/Register.jsx'
 import Login from './user/Login.jsx'
 import Profile from './user/Profile.jsx'
 
-import Upload from './images/Upload.jsx'
+const NavRoute = ({ children, active }) => {
+    return (
+        <Flex
+            direction="row"
+            height="100vh"
+            width="100vw"
+        >
+            <Navbar active={active} />
 
+            {children}
+        </Flex>
+    )
+}
 const router = createBrowserRouter([
     {
         path: "/",
-        element: <Root />,
+        element: <NavRoute active={0} children={<Root />} />,
     },
     {
         path: "/auth/register",
@@ -31,11 +44,7 @@ const router = createBrowserRouter([
     },
     {
         path: "/profile",
-        element: <Profile />,
-    },
-    {
-        path: "/images/upload",
-        element: <Upload />,
+        element: <NavRoute active={1} children={<Root />} />,
     },
 ])
 
