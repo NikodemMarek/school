@@ -1,4 +1,4 @@
-const {albums, Album, Photo} = require('./model')
+const { albums, Album, Photo } = require('./model')
 const { getTagById } = require('../tags/controller')
 
 const getAll = () => JSON.parse(JSON.stringify(albums))
@@ -14,7 +14,7 @@ const getImageById = (id) => {
 }
 const getMutableImage = (uid, id) => {
     for (const album of albums) {
-        if (album.uid !== uid)
+        if (album.id !== uid)
             continue
 
         for (const photo of album.photos) {
@@ -26,15 +26,24 @@ const getMutableImage = (uid, id) => {
     throw 'image_not_found'
 }
 
-const addImagesToAlbum = async (uid, name, files) => {
+const getAlbumById = (id) => {
+    for (const album of albums) {
+        if (album.id === id)
+            return album
+    }
+
+    throw 'album_not_found'
+}
+
+const addImagesToAlbum = async (id, files) => {
     const photos = files.map(
         (file) => new Photo(
             file.originalName,
-            file.path.replace(__dirname, '/'),
+            file.path,
         )
     )
 
-    const album = Album.get(uid, name)
+    const album = Album.get(id)
     for (const photo of photos) {
         await album.addPhoto(photo)
     }
@@ -71,7 +80,7 @@ const patchImageTags = (uid, id, tagIds) => {
 }
 
 module.exports = {
-    getAll, getImageById,
+    getAll, getImageById, getAlbumById,
     addImagesToAlbum,
     deleteImage,
     // Tags api integration

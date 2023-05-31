@@ -29,28 +29,30 @@ const Upload = () => {
                 />
             </Box>
 
-            <Heading as="h3" size="md">accepted files</Heading>
-            <Stack>
-                {files.map(({ path, size }, i) => (
-                    <Checkbox
-                        isChecked={checked[i]}
-                        onChange={(e) => {
-                            const newChecked = [...checked]
-                            newChecked[i] = e.target.checked
-                            setChecked(newChecked)
-                        }}
-                        key={i}
-                    >
-                        {path} - {size} bytes
-                    </Checkbox>
-                ))}
-            </Stack>
+            { files.length > 0 && (<>
+                <Heading as="h3" size="md">accepted files</Heading>
+                <Stack>
+                    {files.map(({ path, size }, i) => (
+                        <Checkbox
+                            isChecked={checked[i]}
+                            onChange={(e) => {
+                                const newChecked = [...checked]
+                                newChecked[i] = e.target.checked
+                                setChecked(newChecked)
+                            }}
+                            key={i}
+                        >
+                            {path} - {size} bytes
+                        </Checkbox>
+                    ))}
+                </Stack>
+            </>)}
 
             <Button onClick={() => {
                 const filesToUpload = files.filter((_, i) => checked[i])
 
                 try {
-                    uploadImages('add', filesToUpload)
+                    uploadImages(filesToUpload)
                 } catch (err) {
                     console.log(err)
                 }

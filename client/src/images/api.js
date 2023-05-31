@@ -1,16 +1,33 @@
-import { get, post } from '../data/api'
+import { get, post, pathToAccessUrl } from '../data/api'
 
-const getImage = async (imageId) =>
-    await get(`/photos/${imageId}`)
+const getImage = async (imageId) => {
+    const photo = await get(`/photos/${imageId}`)
 
-const uploadImages = async (album, images) => {
+    return {
+        ...photo,
+        url: pathToAccessUrl(photo.url)
+    }
+}
+
+const getAlbum = async (albumId) => {
+    const album = await get(`/photos/albums/${albumId}`)
+
+    return {
+        ...album,
+        photos: album.photos.map(photo => ({
+            ...photo,
+            url: pathToAccessUrl(photo.url)
+        }))
+    }
+}
+
+const uploadImages = async (images) => {
     const formData = new FormData()
 
-    formData.append('albumName', album)
-
-    images.forEach(image => formData.append(image.name, image, image.path))
+    images.forEach((image, index) => formData.append(`${index}-${image.name}`, image, image.path))
+    console.log(formData)
 
     return await post('/photos', formData)
 }
 
-export { getImage, uploadImages }
+export { getImage, getAlbum, uploadImages }

@@ -6,7 +6,7 @@ const getUser = async () =>
 
 const getUserProfile = async () => {
     const user = await getUser()
-    const photo = await getImage(user?.profilePicture)
+    const photo = user?.profilePicture ? await getImage(user?.profilePicture) : null
 
     return {
         name: user?.name,

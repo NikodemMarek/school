@@ -1,4 +1,5 @@
-const API_ENTRYPOINT = 'http://localhost:3000/api'
+const SERVER_URL = 'http://localhost:3000'
+const API_ENTRYPOINT = `${SERVER_URL}/api`
 
 const objectToFormData = (data) => {
     const formData = new FormData()
@@ -10,7 +11,10 @@ const objectToFormData = (data) => {
     return formData
 }
 
-export { objectToFormData }
+const pathToAccessUrl = (path) =>
+    `${SERVER_URL}${path}`
+
+export { objectToFormData, pathToAccessUrl }
 
 const get = async (endpoint) => {
     const response = await fetch(`${API_ENTRYPOINT}${endpoint}`, {

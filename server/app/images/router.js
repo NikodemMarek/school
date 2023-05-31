@@ -1,14 +1,16 @@
 const { handleRes } = require('../helpers')
 
-const {getAll, getImageById, addImagesToAlbum, deleteImage, getImageTags, patchImageTags, patchImageTag} = require('./controller')
+const {getAll, getImageById, getAlbumById, addImagesToAlbum, deleteImage, getImageTags, patchImageTags} = require('./controller')
 
 const router = (entry, server) => {
     server.get(`${entry}`, handleRes(getAll))
-    server.get(`${entry}/:id`, async ({ params: { id: rawId } }) => await handleRes(getImageById, parseInt(rawId))())
+    server.get(`${entry}/:id`, async ({ params: { id } }) => await handleRes(getImageById, parseInt(id))())
 
-    server.post(`${entry}`, async ({ body: { albumName }, files, uid }) => await handleRes(addImagesToAlbum, uid, albumName, files)())
+    server.get(`${entry}/albums/:id`, async ({ params: { id } }) => await handleRes(getAlbumById, parseInt(id))())
 
-    server.delete(`${entry}/:id`, async ({ params: { id: rawId }, uid }) => await handleRes(deleteImage, uid, parseInt(rawId))())
+    server.post(`${entry}`, async ({ files, uid }) => await handleRes(addImagesToAlbum, uid, files)())
+
+    server.delete(`${entry}/:id`, async ({ params: { id }, uid }) => await handleRes(deleteImage, uid, parseInt(id))())
 
     // Tags api integration
     server.get(`${entry}/:id/tags`, ({ params: { id } }) => handleRes(getImageTags, parseInt(id))())

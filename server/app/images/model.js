@@ -4,7 +4,7 @@ class Photo {
     constructor(name, url) {
         this.id = id++
         this.name = name
-        this.url = url
+        this.url = url.replace(root, '')
 
         this.tags = []
         this.filters = []
@@ -20,8 +20,11 @@ class Photo {
 }
 
 Photo.prototype.move = async function (newPath) {
-    move(
-        this.url,
+    await move(
+        path_utils.join(
+            root,
+            this.url,
+        ),
         path_utils.join(
             root,
             newPath,
@@ -76,19 +79,18 @@ Photo.prototype.addFilter = function (filterId) {
 }
 
 class Album {
-    constructor(id, name) {
+    constructor(id) {
         this.id = id
-        this.name = name
 
         this.photos = []
     }
 
-    static get = (id, name) => {
-        const album = albums.find((album) => album.id === id && album.name === name)
+    static get = (id) => {
+        const album = albums.find((album) => album.id === id)
 
         if (album) return album
 
-        const newAlbum = new Album(id, name)
+        const newAlbum = new Album(id)
         albums.push(newAlbum)
 
         return newAlbum
@@ -99,8 +101,8 @@ Album.prototype.addPhoto = async function (photo) {
     await photo.move(
         path_utils.join(
             '/uploads',
-            this.name,
-            photo.name,
+            `${this.id}`,
+            `${photo.id}-${photo.name}`,
         )
     )
 
@@ -109,7 +111,7 @@ Album.prototype.addPhoto = async function (photo) {
 
 let id = 0
 let albums = [
-    new Album(-1, 'profile_pictures'),
+    new Album(-1),
 ]
 
 module.exports = {
