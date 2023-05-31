@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
+import { Outlet, useNavigate } from 'react-router-dom'
 import { Flex, Heading, Button } from '@chakra-ui/react'
 
 import { authActions } from './data/store.js'
@@ -27,12 +27,11 @@ const Root = () => {
                 p={4}
                 gap={4}
                 overflow="auto"
+                width="100%"
             >
                 <Button onClick={() => dispatch(authActions.logout())}>logout</Button>
 
-                <Profile />
-
-                <Album album={0} />
+                <Outlet />
             </Flex>
     )
 }

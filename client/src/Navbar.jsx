@@ -8,7 +8,7 @@ import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 
-const Navbar = ({ active }) => {
+const Navbar = ({ children, active }) => {
     const navigate = useNavigate()
 
     const items = [
@@ -20,7 +20,7 @@ const Navbar = ({ active }) => {
         },
         {
             name: 'profile',
-            path: '/profile',
+            path: '/users/me',
             icon: <AccountCircleOutlinedIcon />,
             activeIcon: <AccountCircleIcon />,
         },
@@ -28,23 +28,31 @@ const Navbar = ({ active }) => {
 
     return (
         <Flex
-            direction="column"
-            padding={4}
-            gap={4}
+            direction="row"
+            height="100vh"
+            width="100vw"
         >
-            {items.map((item, i) => (
-                <Box
-                    key={item.name}
-                    color={active === i ? 'blue.500' : 'gray.500'}
-                    _hover={{
-                        color: 'blue.500',
-                    }}
-                    cursor="pointer"
-                    onClick={() => navigate(item.path)}
-                >
-                    {active === i ? item.activeIcon : item.icon}
-                </Box>
-            ))}
+            <Flex
+                direction="column"
+                padding={4}
+                gap={4}
+            >
+                {items.map((item, i) => (
+                    <Box
+                        key={item.name}
+                        color={active === i ? 'blue.500' : 'gray.500'}
+                        _hover={{
+                            color: 'blue.500',
+                        }}
+                        cursor="pointer"
+                        onClick={() => navigate(item.path)}
+                    >
+                        {active === i ? item.activeIcon : item.icon}
+                    </Box>
+                ))}
+            </Flex>
+
+            {children}
         </Flex>
     )
 }

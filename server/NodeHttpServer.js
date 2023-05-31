@@ -182,7 +182,7 @@ class NodeHttpServer {
 
             if (!endpoint) path = url === '/' ? '/index.html' : url
 
-            const authResult = auth(req.headers.authorization, path)
+            const authResult = auth(req.headers.authorization, path, method)
             if (endpoint && authResult === undefined) {
                 res.writeHead(401, {
                     ...corsHeaders,

@@ -6,6 +6,7 @@ const router = (entry, server) => {
     server.get(`${entry}`, handleRes(getAll))
     server.get(`${entry}/:id`, async ({ params: { id } }) => await handleRes(getImageById, parseInt(id))())
 
+    server.get(`${entry}/albums/me`, async ({ uid }) => await handleRes(getAlbumById, uid)())
     server.get(`${entry}/albums/:id`, async ({ params: { id } }) => await handleRes(getAlbumById, parseInt(id))())
 
     server.post(`${entry}`, async ({ files, uid }) => await handleRes(addImagesToAlbum, uid, files)())

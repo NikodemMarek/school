@@ -1,19 +1,19 @@
-import React, { useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Flex, Skeleton, Image as ChakraImage, IconButton, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalCloseButton, useDisclosure } from '@chakra-ui/react'
 import { getAlbum } from './api'
 import { AddIcon } from '@chakra-ui/icons'
 
 import Upload from './Upload'
 
-const Album = ({ album }) => {
-    const [images, setImages] = React.useState(null)
+const Album = ({ id }) => {
+    const [images, setImages] = useState(null)
 
     const { isOpen, onOpen, onClose } = useDisclosure()
 
     useEffect(() => {
         (async () => {
             try {
-                setImages((await getAlbum(album)).photos)
+                setImages((await getAlbum(id)).photos)
             } catch (error) {
                 console.log(error)
             }
@@ -26,12 +26,14 @@ const Album = ({ album }) => {
                 flexWrap='wrap'
                 gap={4}
             >
-                <IconButton
-                    icon={<AddIcon />}
-                    w='200px'
-                    h='200px'
-                    onClick={onOpen}
-                />
+                {id === 'me' && (
+                    <IconButton
+                        icon={<AddIcon />}
+                        w='200px'
+                        h='200px'
+                        onClick={onOpen}
+                    />
+                )}
 
                 {images && images.map((image, index) => (
                     <ImageLoading key={index} src={image.url} alt={image.name} />

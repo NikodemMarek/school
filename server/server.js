@@ -6,13 +6,18 @@ require('dotenv').config()
 if (!process.env.SECRET_KEY)
     throw new Error('SECRET_KEY is not defined')
 
-const server = new NodeHttpServer((auth, url) => {
-    if ([
-        '/api',
-        '/api/users/register',
-        '/api/users/login',
-        '/api/users/confirm',
-    ].includes(url))
+const server = new NodeHttpServer((auth, url, method) => {
+    if (
+        method === "get" && [
+            '/api',
+            '/api/users',
+            '/api/users/confirm',
+        ].includes(url)
+        || method === "post" && [
+            '/api/users/register',
+            '/api/users/login',
+        ].includes(url)
+    )
         return -1
 
     if (auth?.startsWith('Bearer ')) {

@@ -1,19 +1,28 @@
 import { objectToFormData, get, post, patch } from '../data/api'
 import { getImage } from '../images/api'
 
-const getUser = async () =>
-    await get('/users/current')
+const getUser = async (id) =>
+    await get(`/users/${id}`)
 
-const getUserProfile = async () => {
-    const user = await getUser()
+const getUserProfile = async (id) => {
+    const user = await getUser(id)
     const photo = user?.profilePicture ? await getImage(user?.profilePicture) : null
 
     return {
-        name: user?.name,
-        lastName: user?.lastName,
-        email: user?.email,
+        ...user,
         profilePicture: photo?.url,
+        id,
     }
+}
+
+const getUserProfiles = async () => {
+    const users = await get('/users')
+
+    for (const user of users) {
+        user.profilePicture = user?.profilePicture ? await getImage(user?.profilePicture) : null
+    }
+
+    return users
 }
 
 const setUserData = async (name, lastName) =>
@@ -32,4 +41,4 @@ const register = async (name, lastName, email, password) =>
 const login = async (email, password) =>
     await post('/users/login', objectToFormData({ email, password }))
 
-export { getUser, getUserProfile, setUserData, setUserProfilePicture, register, login }
+export { getUser, getUserProfile, getUserProfiles, setUserData, setUserProfilePicture, register, login }

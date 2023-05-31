@@ -3,36 +3,40 @@ import ReactDOM from 'react-dom/client'
 import {
     createBrowserRouter,
     RouterProvider,
+    useLoaderData,
 } from "react-router-dom"
-import { ChakraProvider, Flex } from '@chakra-ui/react'
+import { ChakraProvider } from '@chakra-ui/react'
 import { Provider } from 'react-redux'
 import store from './data/store.js'
-
-import Navbar from './Navbar.jsx'
 
 import Root from './Root.jsx'
 
 import Register from './user/Register.jsx'
 import Login from './user/Login.jsx'
-import Profile from './user/Profile.jsx'
+import Profiles from './user/Profiles.jsx'
+import User from './user/User.jsx'
+import Navbar from './Navbar.jsx'
 
 const NavRoute = ({ children, active }) => {
     return (
-        <Flex
-            direction="row"
-            height="100vh"
-            width="100vw"
-        >
-            <Navbar active={active} />
-
+        <Navbar active={active} >
             {children}
-        </Flex>
+        </Navbar>
     )
 }
+const ProfileRoute = () => {
+    const id = useLoaderData()
+    return (
+        <NavRoute active={1}>
+            <User id={id} />
+        </NavRoute>
+    )
+}
+
 const router = createBrowserRouter([
     {
         path: "/",
-        element: <NavRoute active={0} children={<Root />} />,
+        element: <NavRoute active={0} children={<Profiles />} />,
     },
     {
         path: "/auth/register",
@@ -43,8 +47,9 @@ const router = createBrowserRouter([
         element: <Login />,
     },
     {
-        path: "/profile",
-        element: <NavRoute active={1} children={<Root />} />,
+        path: "/users/:id",
+        element: <ProfileRoute />,
+        loader: ({ params }) => params.id,
     },
 ])
 

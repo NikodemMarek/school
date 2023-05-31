@@ -25,7 +25,6 @@ const uploadImages = async (images) => {
     const formData = new FormData()
 
     images.forEach((image, index) => formData.append(`${index}-${image.name}`, image, image.path))
-    console.log(formData)
 
     return await post('/photos', formData)
 }
