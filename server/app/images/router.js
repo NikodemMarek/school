@@ -15,8 +15,7 @@ const router = (entry, server) => {
 
     // Tags api integration
     server.get(`${entry}/:id/tags`, ({ params: { id } }) => handleRes(getImageTags, parseInt(id))())
-
-    server.patch(`${entry}/:id/tags`, ({ params: { id }, body: { tagIds }, uid }) => handleRes(patchImageTags, uid, parseInt(id), tagIds.slice(1, -1).split(',').map(tagId => parseInt(tagId)))())
+    server.post(`${entry}/:id/tags`, ({ params: { id }, body: { tagIds }, uid }) => handleRes(patchImageTags, uid, parseInt(id), tagIds.slice(1, -1).split(',').map(tagId => parseInt(tagId)))())
 }
 
 module.exports = router

@@ -8,10 +8,10 @@ if (!process.env.SECRET_KEY)
 
 const server = new NodeHttpServer((auth, url, method) => {
     if (
-        method === "get" && [
-            '/api',
-            '/api/users',
-            '/api/users/confirm',
+        method === "get" && ![
+            '/api/users/me',
+            '/api/photos/albums/me',
+            '/api/users/logout',
         ].includes(url)
         || method === "post" && [
             '/api/users/register',

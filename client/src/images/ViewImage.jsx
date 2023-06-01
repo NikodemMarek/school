@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react'
+import { Flex, Heading } from '@chakra-ui/react'
 
 import { getImage } from './api'
 import LoadingImage from './LoadingImage'
-import { Flex, Heading } from '@chakra-ui/react'
+import ImageTags from '../tags/ImageTags'
 
-const ViewImage = ({ id }) => {
+const ViewImage = ({ id, editable }) => {
     const [image, setImage] = useState(null)
 
     useEffect(() => {
@@ -25,6 +26,8 @@ const ViewImage = ({ id }) => {
             alignItems='center'
         >
             <LoadingImage src={image?.url} alt={image?.name} />
+
+            <ImageTags id={id} editable={editable} />
 
             <Heading>{image?.name}</Heading>
         </Flex>
