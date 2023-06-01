@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react'
-import { Flex, Skeleton, Image as ChakraImage, IconButton, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalCloseButton, useDisclosure } from '@chakra-ui/react'
+import { Flex, IconButton, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalCloseButton, useDisclosure } from '@chakra-ui/react'
 import { getAlbum } from './api'
 import { AddIcon } from '@chakra-ui/icons'
 
 import Upload from './Upload'
+import LoadingImage from './LoadingImage'
+import { Link } from 'react-router-dom'
 
 const Album = ({ id }) => {
     const [images, setImages] = useState(null)
@@ -36,7 +38,15 @@ const Album = ({ id }) => {
                 )}
 
                 {images && images.map((image, index) => (
-                    <ImageLoading key={index} src={image.url} alt={image.name} />
+                    <Link to={`/images/${image.id}`} key={index}>
+                        <LoadingImage
+                            src={image.url}
+                            alt={image.name}
+                            w='200px'
+                            h='200px'
+                            box='200px'
+                        />
+                    </Link>
                 ))}
             </Flex>
 
@@ -57,30 +67,6 @@ const Album = ({ id }) => {
                 </ModalContent>
             </Modal>
         </>
-    )
-}
-
-const ImageLoading = ({ src, alt }) => {
-    const [isLoaded, setIsLoaded] = React.useState(false)
-
-    const img = new Image()
-    img.onload = () => setIsLoaded(true)
-    img.src = src
-
-    return (
-        <Skeleton
-            isLoaded={isLoaded}
-            w='200px'
-            h='200px'
-        >
-            <ChakraImage
-                src={img.src}
-                alt={alt}
-                boxSize="200px"
-                borderRadius="md"
-                fit="cover"
-            />
-        </Skeleton>
     )
 }
 

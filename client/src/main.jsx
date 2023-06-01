@@ -15,8 +15,9 @@ import Login from './user/Login.jsx'
 import Profiles from './user/Profiles.jsx'
 import User from './user/User.jsx'
 import Navbar from './Navbar.jsx'
+import ViewImage from './images/ViewImage.jsx'
 
-const AuthCheck = ({ children }) => {
+const AuthNavbar = ({ children, active }) => {
     const token = useSelector((state) => state.auth.token)
 
     const navigate = useNavigate()
@@ -26,32 +27,34 @@ const AuthCheck = ({ children }) => {
             navigate('/auth/login')
     })
 
-    return children
-}
-const NavRoute = ({ children, active }) => {
     return (
-        <AuthCheck>
-            <Navbar active={active} >
-                {children}
-            </Navbar>
-        </AuthCheck>
+        <Navbar active={active} >
+            {children}
+        </Navbar>
     )
 }
+
 const ProfileRoute = () => {
     const id = useLoaderData()
     return (
-        <AuthCheck>
-            <NavRoute active={1}>
-                <User id={id} />
-            </NavRoute>
-        </AuthCheck>
+        <AuthNavbar active={1}>
+            <User id={id} />
+        </AuthNavbar>
+    )
+}
+const ImageRoute = () => {
+    const id = useLoaderData()
+    return (
+        <AuthNavbar>
+            <ViewImage id={id} />
+        </AuthNavbar>
     )
 }
 
 const router = createBrowserRouter([
     {
         path: "/",
-        element: <NavRoute active={0} children={<Profiles />} />,
+        element: <AuthNavbar active={0} children={<Profiles />} />,
     },
     {
         path: "/auth/register",
@@ -64,6 +67,11 @@ const router = createBrowserRouter([
     {
         path: "/users/:id",
         element: <ProfileRoute />,
+        loader: ({ params }) => params.id,
+    },
+    {
+        path: "/images/:id",
+        element: <ImageRoute />,
         loader: ({ params }) => params.id,
     },
 ])
