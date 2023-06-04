@@ -11,7 +11,7 @@ const getUserProfile = async (id) => {
     return {
         ...user,
         profilePicture: photo?.url,
-        id,
+        id: id
     }
 }
 
@@ -26,13 +26,13 @@ const getUserProfiles = async () => {
 }
 
 const setUserData = async (name, lastName) =>
-    await post('/users/current/profile', objectToFormData({ name, lastName }))
+    await post('/users/me/profile', objectToFormData({ name, lastName }))
 
 const setUserProfilePicture = async (image) => {
     const formData = new FormData()
     formData.append(image.name, image, image.path)
 
-    await post('/users/current/pic', formData)
+    await post('/users/me/pic', formData)
 }
 
 const register = async (name, lastName, email, password) =>

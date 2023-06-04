@@ -34,10 +34,10 @@ const AuthNavbar = ({ children, active }) => {
     )
 }
 
-const ProfileRoute = () => {
+const ProfileRoute = ({ active }) => {
     const id = useLoaderData()
     return (
-        <AuthNavbar active={1}>
+        <AuthNavbar active={active}>
             <User id={id} />
         </AuthNavbar>
     )
@@ -45,7 +45,7 @@ const ProfileRoute = () => {
 const ImageRoute = () => {
     const id = useLoaderData()
     return (
-        <AuthNavbar>
+        <AuthNavbar active={0}>
             <ViewImage id={id} />
         </AuthNavbar>
     )
@@ -65,8 +65,13 @@ const router = createBrowserRouter([
         element: <Login />,
     },
     {
+        path: "/users/me",
+        element: <ProfileRoute active={1} />,
+        loader: () => "me",
+    },
+    {
         path: "/users/:id",
-        element: <ProfileRoute />,
+        element: <ProfileRoute active={0} />,
         loader: ({ params }) => params.id,
     },
     {
