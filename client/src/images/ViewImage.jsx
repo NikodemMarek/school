@@ -5,7 +5,7 @@ import { getImage } from './api'
 import LoadingImage from './LoadingImage'
 import ImageTags from '../tags/ImageTags'
 
-const ViewImage = ({ id, editable }) => {
+const ViewImage = ({ id }) => {
     const [image, setImage] = useState(null)
 
     useEffect(() => {
@@ -23,15 +23,27 @@ const ViewImage = ({ id, editable }) => {
             w='100%'
             flexDir='column'
             gap={4}
-            alignItems='center'
+            align='center'
         >
             <LoadingImage src={image?.url} alt={image?.name} />
-
-            <ImageTags id={id} editable={editable} />
 
             <Heading>{image?.name}</Heading>
         </Flex>
     )
 }
 
+const ViewImageWithTags = ({ id, editable }) => {
+    return (
+        <Flex
+            w='100%'
+            flexDir='column'
+        >
+            <ViewImage id={id} />
+
+            <ImageTags id={id} editable={editable} />
+        </Flex>
+    )
+}
+
 export default ViewImage
+export { ViewImageWithTags }

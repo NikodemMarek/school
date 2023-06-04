@@ -15,7 +15,7 @@ import Login from './user/Login.jsx'
 import Profiles from './user/Profiles.jsx'
 import User from './user/User.jsx'
 import Navbar from './Navbar.jsx'
-import ViewImage from './images/ViewImage.jsx'
+import { ViewImageWithTags } from './images/ViewImage.jsx'
 
 const AuthNavbar = ({ children, active }) => {
     const token = useSelector((state) => state.auth.token)
@@ -46,7 +46,7 @@ const ImageRoute = () => {
     const id = useLoaderData()
     return (
         <AuthNavbar active={0}>
-            <ViewImage id={id} />
+            <ViewImageWithTags id={id} />
         </AuthNavbar>
     )
 }

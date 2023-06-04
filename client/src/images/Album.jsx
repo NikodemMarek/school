@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react'
-import { Flex, IconButton, Box, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalCloseButton, useDisclosure } from '@chakra-ui/react'
-import { AddIcon } from '@chakra-ui/icons'
+import { Flex, IconButton, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalCloseButton, useDisclosure, useBoolean } from '@chakra-ui/react'
 import { Link } from 'react-router-dom'
 
+import { AddIcon } from '@chakra-ui/icons'
 import EditIcon from '@mui/icons-material/Edit';
+import FilterBAndWIcon from '@mui/icons-material/FilterBAndW';
 
 import { getAlbum } from './api'
 import Upload from './Upload'
 import LoadingImage from './LoadingImage'
-import ViewImage from './ViewImage'
+import { ViewImageWithTags } from './ViewImage'
+import ViewImageWithFilters from './FilterImage'
 
 const Album = ({ id }) => {
     const editable = id === 'me'
@@ -28,7 +30,9 @@ const Album = ({ id }) => {
     }, [isOpen])
 
     const [editId, setEditId] = useState(null)
-    const { isOpen: isOpenEdit, onOpen: onOpenEdit, onClose: onCloseEdit } = useDisclosure()
+
+    const { isOpen: isOpenTags, onOpen: onOpenTags, onClose: onCloseTags } = useDisclosure()
+    const { isOpen: isOpenFilters, onOpen: onOpenFilters, onClose: onCloseFilters } = useDisclosure()
 
     return (
         <>
@@ -46,29 +50,21 @@ const Album = ({ id }) => {
                 )}
 
                 {images && images.map((image, index) => (
-                    <Box key={index} pos='relative'>
-                        {editable && (
-                            <IconButton
-                                pos='absolute'
-                                right='0'
-                                icon={<EditIcon />}
-                                onClick={() => {
-                                    setEditId(image.id)
-                                    onOpenEdit()
-                                }}
-                            />
-                        )}
-
-                        <Link to={`/images/${image.id}`}>
-                            <LoadingImage
-                                src={image.url}
-                                alt={image.name}
-                                w='200px'
-                                h='200px'
-                                box='200px'
-                            />
-                        </Link>
-                    </Box>
+                    <AlbumImage
+                        key={index}
+                        id={image.id}
+                        url={image.url}
+                        name={image.name}
+                        editable={editable}
+                        openTags={() => {
+                            setEditId(image.id)
+                            onOpenTags()
+                        }}
+                        openFilters={() => {
+                            setEditId(image.id)
+                            onOpenFilters()
+                        }}
+                    />
                 ))}
             </Flex>
 
@@ -90,22 +86,80 @@ const Album = ({ id }) => {
             </Modal>
 
             <Modal
-                isOpen={isOpenEdit}
-                onClose={onCloseEdit}
+                isOpen={isOpenTags}
+                onClose={onCloseTags}
                 size='xl'
                 isCentered
             >
                 <ModalOverlay />
                 <ModalContent>
-                    <ModalHeader>edit image</ModalHeader>
+                    <ModalHeader>edit tags</ModalHeader>
                     <ModalCloseButton />
 
                     <ModalBody>
-                        <ViewImage id={editId} editable={editable} />
+                        <ViewImageWithTags id={editId} editable={editable} />
+                    </ModalBody>
+                </ModalContent>
+            </Modal>
+
+            <Modal
+                isOpen={isOpenFilters}
+                onClose={onCloseFilters}
+                size='xl'
+                isCentered
+            >
+                <ModalOverlay />
+                <ModalContent>
+                    <ModalHeader>apply filter</ModalHeader>
+                    <ModalCloseButton />
+
+                    <ModalBody>
+                        <ViewImageWithFilters id={editId} />
                     </ModalBody>
                 </ModalContent>
             </Modal>
         </>
+    )
+}
+
+const AlbumImage = ({ id, url, name, editable, openTags, openFilters }) => {
+    const [menuVisible, setMenuVisible] = useBoolean(false)
+
+    return (
+        <Flex onMouseEnter={setMenuVisible.on} onMouseLeave={setMenuVisible.off} position='relative'>
+            <Link to={`/images/${id}`}>
+                <LoadingImage
+                    src={url}
+                    alt={name}
+                    w='200px'
+                    h='200px'
+                    box='200px'
+                />
+            </Link>
+
+            <Flex
+                direction='column'
+                gap={1}
+                padding={1}
+                position='absolute'
+                right='0'
+                display={menuVisible ? 'flex' : 'none'}
+            >
+                {editable && (
+                    <IconButton
+                        right='0'
+                        icon={<EditIcon />}
+                        onClick={openTags}
+                    />
+                )}
+
+                <IconButton
+                    right='0'
+                    icon={<FilterBAndWIcon />}
+                    onClick={openFilters}
+                />
+            </Flex>
+        </Flex>
     )
 }
 

@@ -50,7 +50,8 @@ const ImageTags = ({ id, editable }) => {
             w='100%'
             gap={2}
             flexWrap='wrap'
-            alignItems='center'
+            align='center'
+            padding={4}
         >
             {tags && tags.map((tag, index) => (
                 <Tag

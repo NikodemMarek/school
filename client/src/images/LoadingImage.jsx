@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Skeleton, Image as ChakraImage } from '@chakra-ui/react'
 
-const LoadingImage = ({ src, alt, w, h, box }) => {
+const LoadingImage = ({ src, alt, w, h, box, filter }) => {
     const [isLoaded, setIsLoaded] = useState(false)
 
     const img = new Image()
@@ -20,6 +20,7 @@ const LoadingImage = ({ src, alt, w, h, box }) => {
                 boxSize={box}
                 borderRadius="md"
                 fit="cover"
+                filter={filter}
             />
         </Skeleton>
     )
