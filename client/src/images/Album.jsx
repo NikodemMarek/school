@@ -18,6 +18,7 @@ const Album = ({ id }) => {
     const [images, setImages] = useState(null)
 
     const { isOpen, onOpen, onClose } = useDisclosure()
+    const { isOpen: isOpenFilters, onOpen: onOpenFilters, onClose: onCloseFilters } = useDisclosure()
 
     useEffect(() => {
         (async () => {
@@ -27,12 +28,11 @@ const Album = ({ id }) => {
                 console.log(error)
             }
         })()
-    }, [isOpen])
+    }, [isOpen, isOpenFilters])
 
     const [editId, setEditId] = useState(null)
 
     const { isOpen: isOpenTags, onOpen: onOpenTags, onClose: onCloseTags } = useDisclosure()
-    const { isOpen: isOpenFilters, onOpen: onOpenFilters, onClose: onCloseFilters } = useDisclosure()
 
     return (
         <>

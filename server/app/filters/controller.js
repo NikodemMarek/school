@@ -26,11 +26,26 @@ const applyFilter = async (uid, id, filter, props) => {
 
         if (filter === 'rotate') {
             const { angle } = props
-
-            console.log('rotate', angle)
-
             img = img.rotate(parseInt(angle))
+        } else if (filter === 'resize') {
+            const { width, height } = props
+            img = img.resize(parseInt(width), parseInt(height))
+        } else if (filter === 'crop') {
+            const { width, height, left, top } = props
+            img = img.extract({ width: parseInt(width), height: parseInt(height), left: parseInt(left), top: parseInt(top) })
+        } else if (filter === 'grayscale') {
+            img = img.grayscale()
+        } else if (filter === 'negate') {
+            img = img.negate()
+        } else if (filter === 'flip') {
+            img = img.flip()
+        } else if (filter === 'flop') {
+            img = img.flop()
+        } else if (filter === 'tint') {
+            const { r, g, b } = props
+            img = img.tint({ r: parseInt(r), g: parseInt(g), b: parseInt(b) })
         }
+            
 
         await img.toFile(path_utils.join(root, 'uploads', 'filtered.jpg'))
 
