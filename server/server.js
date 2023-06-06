@@ -1,5 +1,7 @@
 const NodeHttpServer = require('./NodeHttpServer')
+
 const jwt = require('jsonwebtoken')
+const users = require('./app/users/model').users
 
 require('dotenv').config()
 
@@ -25,6 +27,17 @@ const server = new NodeHttpServer((auth, url, method) => {
 
         try {
             const tokenData = jwt.verify(token, process.env.SECRET_KEY)
+
+            if (!tokenData)
+                return undefined
+
+            if (tokenData.confirmation === true)
+                return undefined
+
+            const user = users.find(user => user.id === tokenData.id)
+
+            if (!user || !user.confirmed)
+                return undefined
 
             return tokenData.id
         } catch (err) {

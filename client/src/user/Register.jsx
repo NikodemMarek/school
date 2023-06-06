@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { FormControl, FormLabel, Heading, Input, Link, Button, Flex } from '@chakra-ui/react'
+import { Link as RouterLink } from 'react-router-dom'
+import { FormControl, FormLabel, Heading, Input, Link, Button, Flex, Alert, AlertIcon, AlertTitle, AlertDescription } from '@chakra-ui/react'
 
 import { register } from './api'
 
 const Register = () => {
-    const navigate = useNavigate()
-
     const [name, setName] = useState('')
     const [lastName, setLastName] = useState('')
 
@@ -21,6 +19,8 @@ const Register = () => {
         setError(undefined)
     }, [name, lastName, email, password, passwordConfirmation])
 
+    const [confirmationToken, setConfirmationToken] = useState(null)
+
     const onSubmit = async (e) => {
         e.preventDefault()
 
@@ -30,9 +30,10 @@ const Register = () => {
             return setError('passwords do not match')
 
         try {
-            await register(name, lastName, email, password)
+            const confirmationToken = await register(name, lastName, email, password)
+            setConfirmationToken(confirmationToken)
 
-            navigate('/auth/login')
+            setTimeout(() => setConfirmationToken(null), 3600000)
         } catch (err) {
             if (err === 'user_already_exists')
                 setError('user already exists')
@@ -56,18 +57,27 @@ const Register = () => {
                 <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
                 <FormLabel>password confirmation</FormLabel>
                 <Input type="password" value={passwordConfirmation} onChange={(e) => setPasswordConfirmation(e.target.value)} />
-
-                {error && <p
-                    style={{
-                        color: 'red',
-                        fontSize: '0.8rem',
-                    }}
-                >{error}</p>}
             </FormControl>
 
             <Button onClick={onSubmit}>register</Button>
 
-            <Link to="/auth/login">login</Link>
+            {error && (
+                <Alert status='error'>
+                  <AlertIcon />
+                  <AlertTitle>invalid input</AlertTitle>
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+            )}
+
+            {confirmationToken && (
+                <Alert status='success'>
+                  <AlertIcon />
+                  <AlertTitle>account created</AlertTitle>
+                  <AlertDescription>please confirm your account by clicking <Link href={`http://localhost:3000/api/users/confirm/${confirmationToken}`} isExternal>here</Link></AlertDescription>
+                </Alert>
+            )}
+
+            <RouterLink to="/auth/login">login</RouterLink>
         </Flex>
     );
 }

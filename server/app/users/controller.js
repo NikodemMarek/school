@@ -4,14 +4,19 @@ const jwt = require('jsonwebtoken')
 const { User, users } = require('./model')
 const { Album, Photo } = require('../images/model')
 
-const createToken = (id) => {
+const createToken = (id, confirmation = false) => {
+    const payload = confirmation ? {
+        id,
+        confirmation: true,
+    } : {
+        id,
+    }
+
     const token = jwt.sign(
-        {
-            id,
-        },
+        payload,
         process.env.SECRET_KEY,
         {
-            expiresIn: "24h"
+            expiresIn: confirmation ? '1m' : '1d',
         }
     )
 
@@ -46,10 +51,14 @@ const getUser = (id) => {
 }
 
 const register = async (name, lastName, email, password) => {
-    const exists = users.some(user => user.email === email)
+    const exists = users.find(user => user.email === email)
 
-    if (exists)
-        throw 'user_already_exists'
+    if (exists) {
+        if (exists.confirmed)
+            throw 'user_already_exists'
+
+        return createToken(exists.id, true)
+    }
 
     const encryptedPassword = await bcrypt.hash(password, 10)
 
@@ -57,14 +66,15 @@ const register = async (name, lastName, email, password) => {
 
     users.push(user)
 
-    return 'success'
+    return createToken(user.id, true)
 }
 const confirmAccount = async (token) => {
     let id = null
 
     try {
         const res = jwt.verify(token, process.env.SECRET_KEY)
-        if (!res)
+
+        if (!res || !res.confirmation)
             throw 'invalid_token'
 
         id = res.id
@@ -82,6 +92,9 @@ const login = async (email, password) => {
 
     if (!user)
         throw 'user_not_found'
+
+    if (!user.confirmed)
+        throw 'user_not_confirmed'
 
     const isPasswordCorrect = await bcrypt.compare(password, user.password)
 

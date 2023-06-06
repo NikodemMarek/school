@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react'
+import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { Avatar, Button, Flex, Heading, SkeletonCircle, SkeletonText, Box, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, useDisclosure } from '@chakra-ui/react'
+import { Avatar, Button, Flex, Heading, SkeletonCircle, SkeletonText, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, useDisclosure } from '@chakra-ui/react'
 
+import { authActions } from '../data/store'
 import { getUserProfile } from './api'
 import EditProfile from './EditProfile'
 
 const Profile = ({ id }) => {
+    const dispatch = useDispatch()
     const navigate = useNavigate()
 
     const [user, setUser] = useState(null)
@@ -17,6 +20,7 @@ const Profile = ({ id }) => {
             try {
                 setUser(await getUserProfile(id))
             } catch (error) {
+                console.log('fasdfasdf', error)
                 if (error === 'unauthorized')
                     navigate('/auth/login', { replace: true })
             }
@@ -41,6 +45,10 @@ const Profile = ({ id }) => {
 
                 {id === 'me' && (<>
                     <Button onClick={onOpen}>edit</Button>
+                    <Button onClick={() => {
+                        dispatch(authActions.logout())
+                        navigate('/auth/login', { replace: true })
+                    }}>logout</Button>
 
                     <Modal
                         isOpen={isOpen}
