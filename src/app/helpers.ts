@@ -3,9 +3,13 @@ import * as xml2js from 'xml2js';
 
 const DATA_URL = '/assets/czasopisma.xml';
 
-class MagazinesDB {
-    public czasopisma: Magazie[] = [];
+const MAGAZINE_ASSETS_URL = 'http://atarionline.pl/biblioteka/czasopisma/img/'
+const PUBLICATION_ASSETS_URL = 'http://atarionline.pl/biblioteka/czasopisma/'
 
+class MagazinesDB {
+    public czasopisma: Magazine[] = [];
+
+    public get = () => this.czasopisma;
     public getNames = () => this.czasopisma
         .map(czasopismo => czasopismo.name);
     public getMagazine = (name: string) => this.czasopisma
@@ -18,11 +22,12 @@ class MagazinesDB {
     private load = () =>
         this.http.get(DATA_URL, { responseType: 'text' })
             .subscribe(data => {
-                const rawCzasopisma = this.convertToJSON(data).czasopisma
+                const rawMagazines = this.convertToJSON(data).czasopisma
 
-                this.czasopisma = Object.entries(rawCzasopisma).reduce((acc, [name, value]) => {
+                this.czasopisma = Object.entries(rawMagazines).reduce((acc, [name, value]) => {
                     if (name === 'zmienne' || name === 'lata')
                         return acc;
+
 
                     const publications = Object.values(value as any[])
                         .map(publication => new Publication(
@@ -30,7 +35,7 @@ class MagazinesDB {
                             publication.numer,
                             parseInt(publication.stron),
 
-                            publication.miniaturka,
+                            PUBLICATION_ASSETS_URL + '/' + name + '/' + publication.miniaturka,
                             publication.format,
                             publication.plik,
 
@@ -39,17 +44,24 @@ class MagazinesDB {
                             publication.skan,
                             publication.wydawca,
                         ));
-                    const czasopismo = new Magazie(
+                        console.log(publications)
+                    const czasopismo = new Magazine(
                         name,
-                        rawCzasopisma.zmienne[name].src,
-                        rawCzasopisma.lata[name].split(',')
-                            .map((year: string) => parseInt(year.trim())),
-                        publications
+                        MAGAZINE_ASSETS_URL + rawMagazines.zmienne[name].src,
+                        rawMagazines.lata[name].split(',')
+                            .map((year: string) => new Year(
+                                year,
+                                publications.filter(publication =>
+                                    publication?.number?.startsWith(year)
+                                    || year === 'nr specjalne' && publication?.number?.includes('nn')
+                                    // TODO: add other special cases here
+                                )
+                            )),
                     )
 
                     acc.push(czasopismo);
                     return acc;
-                }, [] as Magazie[])
+                }, [] as Magazine[])
             });
 
     private convertToJSON = (xml: string) => {
@@ -62,13 +74,23 @@ class MagazinesDB {
     }
 }
 
-class Magazie {
+class Magazine {
     constructor(
         public name: string,
         public thumbnail: string,
-        public years: string[] = [],
-        public publications: Publication[]
+        public years: Year[],
     ) {}
+
+    public getYears = () => this.years;
+}
+
+class Year {
+    constructor(
+        public year: string,
+        public publications: Publication[],
+    ) {}
+
+    public getPublications = () => this.publications;
 }
 
 class Publication {
@@ -88,4 +110,4 @@ class Publication {
     ) {}
 }
 
-export { MagazinesDB as Czasopisma };
+export { MagazinesDB, Magazine, Publication };

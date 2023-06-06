@@ -1,20 +1,33 @@
 import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import { Czasopisma } from './helpers';
+import { Magazine, MagazinesDB } from './helpers';
 
 @Component({
     selector: 'app-root',
     template: `
-        {{ czasopisma.getMagazine('Avax') | json }}
+        <app-magazines
+            *ngIf="db && !selectedMagazine"
+            [db]="db"
+            (onMagazineClick)="onMagazineClick($event)"
+        />
+
+        <app-magazine
+            *ngIf="selectedMagazine"
+            [magazine]="selectedMagazine"
+        />
     `,
     styles: [`
     `],
 })
 export class AppComponent {
-    protected czasopisma: Czasopisma
+    protected db: MagazinesDB
 
 	constructor(private http: HttpClient) {
-        this.czasopisma = new Czasopisma(this.http);
+        this.db = new MagazinesDB(this.http);
     }
+
+    protected selectedMagazine: Magazine | null = null
+    protected onMagazineClick = (magazine: Magazine) =>
+        this.selectedMagazine = magazine;
 }
