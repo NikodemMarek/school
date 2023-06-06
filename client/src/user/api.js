@@ -19,7 +19,7 @@ const getUserProfiles = async () => {
     const users = await get('/users')
 
     for (const user of users) {
-        user.profilePicture = user?.profilePicture ? await getImage(user?.profilePicture) : null
+        user.profilePicture = user?.profilePicture ? (await getImage(user?.profilePicture))?.url : null
     }
 
     return users
