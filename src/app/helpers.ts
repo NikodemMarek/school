@@ -110,4 +110,4 @@ class Publication {
     ) {}
 }
 
-export { MagazinesDB, Magazine, Publication };
+export { MagazinesDB, Magazine, Year, Publication };

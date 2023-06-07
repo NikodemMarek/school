@@ -8,6 +8,7 @@ import { AppComponent } from './app.component';
 import { AppMainNoroutes } from './app.main_noroutes';
 import { AppMagazines } from './app.magazines';
 import { AppMagazine } from './app.magazine';
+import { AppYear } from './app.year';
 import { AppPublication } from './app.publication';
 
 @NgModule({
@@ -16,6 +17,7 @@ import { AppPublication } from './app.publication';
         AppMainNoroutes,
         AppMagazines,
         AppMagazine,
+        AppYear,
         AppPublication,
     ],
     imports: [

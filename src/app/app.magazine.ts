@@ -21,17 +21,10 @@ import { Magazine } from './helpers';
 
         <div id="years">
             <ng-container *ngFor="let year of magazine?.years">
-                <div
-                    class="year"
+                <app-year
+                    [year]="year"
                     *ngIf="showYears.has(year?.year || '')"
-                >
-                    <h2>{{ year?.year }}</h2>
-
-                    <app-publication
-                        *ngFor="let publication of year?.publications"
-                        [publication]="publication"
-                    />
-                </div>
+                />
             </ng-container>
         </div>
     `,
@@ -51,11 +44,6 @@ import { Magazine } from './helpers';
         #years {
             display: flex;
             flex-direction: row;
-            gap: 1rem;
-        }
-        .year {
-            display: flex;
-            flex-direction: column;
             gap: 1rem;
         }
     `],
