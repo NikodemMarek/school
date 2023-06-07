@@ -1,33 +1,43 @@
 import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import { Magazine, MagazinesDB } from './helpers';
+import { default as db } from './helpers';
 
 @Component({
     selector: 'app-main-noroutes',
     template: `
         <app-magazines
-            *ngIf="db && !selectedMagazine"
-            [db]="db"
+            *ngIf="db && !selectedMagazine && !selectedYear"
             (onMagazineClick)="onMagazineClick($event)"
         />
 
         <app-magazine
-            *ngIf="selectedMagazine"
+            *ngIf="selectedMagazine && !selectedYear"
             [magazine]="selectedMagazine"
+            (onYearClick)="onYearClick($event)"
+        />
+
+        <app-year
+            *ngIf="selectedYear"
+            [magazine]="selectedMagazine"
+            [year]="selectedYear"
         />
     `,
     styles: [`
     `],
 })
 export class AppMainNoroutes {
-    protected db: MagazinesDB
-
-	constructor(private http: HttpClient) {
-        this.db = new MagazinesDB(this.http);
+    protected db = db;
+    constructor(private http: HttpClient) { }
+    ngOnInit() {
+        db.init(this.http)
     }
 
-    protected selectedMagazine: Magazine | null = null
-    protected onMagazineClick = (magazine: Magazine) =>
+    protected selectedMagazine: string | undefined = undefined;
+    protected onMagazineClick = (magazine: string) =>
         this.selectedMagazine = magazine;
+
+    protected selectedYear: string | undefined = undefined;
+    protected onYearClick = (year: string) =>
+        this.selectedYear = year;
 }

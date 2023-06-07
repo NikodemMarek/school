@@ -1,6 +1,6 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 
-import { Magazine, MagazinesDB } from './helpers';
+import { default as db } from './helpers';
 
 @Component({
     selector: 'app-magazines',
@@ -8,7 +8,7 @@ import { Magazine, MagazinesDB } from './helpers';
         <div
             class="magazine"
             *ngFor="let magazine of db?.get()"
-            (click)="onMagazineClick.emit(magazine)"
+            (click)="onMagazineClick.emit(magazine?.name)"
         >
             <img
                 [src]="magazine.thumbnail" 
@@ -33,7 +33,7 @@ import { Magazine, MagazinesDB } from './helpers';
     `],
 })
 export class AppMagazines {
-    @Input() db: MagazinesDB | null = null
+    protected db = db;
 
-    @Output() onMagazineClick = new EventEmitter<Magazine>()
+    @Output() onMagazineClick = new EventEmitter<string>()
 }
