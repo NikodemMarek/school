@@ -1,33 +1,11 @@
 import { Component } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-
-import { Magazine, MagazinesDB } from './helpers';
 
 @Component({
     selector: 'app-root',
     template: `
-        <app-magazines
-            *ngIf="db && !selectedMagazine"
-            [db]="db"
-            (onMagazineClick)="onMagazineClick($event)"
-        />
-
-        <app-magazine
-            *ngIf="selectedMagazine"
-            [magazine]="selectedMagazine"
-        />
+        <app-main-noroutes />
     `,
     styles: [`
     `],
 })
-export class AppComponent {
-    protected db: MagazinesDB
-
-	constructor(private http: HttpClient) {
-        this.db = new MagazinesDB(this.http);
-    }
-
-    protected selectedMagazine: Magazine | null = null
-    protected onMagazineClick = (magazine: Magazine) =>
-        this.selectedMagazine = magazine;
-}
+export class AppComponent {}
