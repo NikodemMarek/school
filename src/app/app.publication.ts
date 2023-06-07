@@ -29,6 +29,12 @@ import { Publication } from './helpers';
             align-items: center;
             gap: 1rem;
         }
+
+        .info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
     `],
 })
 export class AppPublication {
