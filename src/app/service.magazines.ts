@@ -70,7 +70,7 @@ class MagazinesParser {
             publication.numer,
             parseInt(publication.stron),
 
-            PUBLICATION_ASSETS_URL + '/' + name + '/' + publication.miniaturka,
+            PUBLICATION_ASSETS_URL + name + '/' + publication.miniaturka,
             publication.format,
             publication.plik,
 

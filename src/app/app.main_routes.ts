@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { Router } from '@angular/router';
+import { MagazinesService } from './service.magazines';
 
 @Component({
     selector: 'app-main-routes',
@@ -25,9 +26,24 @@ import { Router } from '@angular/router';
             (back)="onBackClick(true)"
         />
     `,
+    providers: [
+        MagazinesService,
+    ],
 })
 export class AppMainRoutes {
-	constructor(private router: Router) { }
+	constructor(
+        private router: Router,
+        private db: MagazinesService,
+    ) { }
+    ngOnInit() {
+        this.db.init().then(() => {
+            if (this.magazine && !this.db.magazines.map(m => m.name).includes(this.magazine!))
+                return this.onBackClick(false);
+
+            if (this.magazine && this.year && !this.db.getMagazine(this.magazine!)!.years.map(y => y.year).includes(this.year!))
+                return this.onBackClick(true)
+        })
+    }
 
     @Input() magazine: string | undefined = undefined;
     @Input() year: string | undefined = undefined;
