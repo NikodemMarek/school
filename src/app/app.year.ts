@@ -8,16 +8,18 @@ import { Year, default as db } from './helpers';
     template: `
         <h2>{{ show?.year }}</h2>
 
-        <app-publication
-            *ngFor="let publication of show?.publications"
-            [publication]="publication"
-        />
+        <div id="publications">
+            <app-publication
+                *ngFor="let publication of show?.publications"
+                [publication]="publication"
+            />
+        </div>
     `,
     styles: [`
-        :host {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
+        #publications {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            grid-gap: 1rem;
         }
     `],
 })
