@@ -73,7 +73,6 @@ const MagazineDB = {
                     acc.push(czasopismo);
                     return acc;
                 }, [] as Magazine[])
-                console.log(this.magazines);
 
                 this.loaded = true;
             })

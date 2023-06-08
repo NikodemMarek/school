@@ -4,6 +4,8 @@ import { Router } from '@angular/router';
 @Component({
     selector: 'app-main-routes',
     template: `
+        <app-clock />
+
         <app-magazines
             *ngIf="!magazine && !year"
             (onMagazineClick)="onMagazineClick($event)"

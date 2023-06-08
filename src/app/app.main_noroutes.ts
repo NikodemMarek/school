@@ -6,27 +6,31 @@ import { default as db } from './helpers';
 @Component({
     selector: 'app-main-noroutes',
     template: `
+        <app-clock />
+
         <app-income
             *ngIf="!isSecretIncome"
             (onSecretIncome)="isSecretIncome = true"
         />
 
-        <app-magazines
-            *ngIf="isSecretIncome && db && !selectedMagazine && !selectedYear"
-            (onMagazineClick)="onMagazineClick($event)"
-        />
+        <ng-container *ngIf="isSecretIncome">
+            <app-magazines
+                *ngIf="db && !selectedMagazine && !selectedYear"
+                (onMagazineClick)="onMagazineClick($event)"
+            />
 
-        <app-magazine
-            *ngIf="isSecretIncome && selectedMagazine && !selectedYear"
-            [magazine]="selectedMagazine"
-            (onYearClick)="onYearClick($event)"
-        />
+            <app-magazine
+                *ngIf="selectedMagazine && !selectedYear"
+                [magazine]="selectedMagazine"
+                (onYearClick)="onYearClick($event)"
+            />
 
-        <app-year
-            *ngIf="isSecretIncome && selectedYear"
-            [magazine]="selectedMagazine"
-            [year]="selectedYear"
-        />
+            <app-year
+                *ngIf="selectedYear"
+                [magazine]="selectedMagazine"
+                [year]="selectedYear"
+            />
+        </ng-container>
     `,
     styles: [`
     `],

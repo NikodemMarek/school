@@ -16,6 +16,7 @@ import { AppYear } from './app.year';
 import { AppPublication } from './app.publication';
 
 import { AppIncome } from './app.income';
+import { AppClock } from './app.clock';
 
 @NgModule({
     declarations: [
@@ -30,6 +31,7 @@ import { AppIncome } from './app.income';
         AppPublication,
 
         AppIncome,
+        AppClock,
     ],
     imports: [
         BrowserModule,
