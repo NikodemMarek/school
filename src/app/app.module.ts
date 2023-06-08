@@ -1,9 +1,10 @@
-import { NgModule } from '@angular/core';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 
 import { AppRoutingModule } from './app-routing.module';
+import { MagazinesService } from './service.magazines';
 
 import { AppComponent } from './app.component';
 
@@ -39,7 +40,15 @@ import { AppClock } from './app.clock';
         HttpClientModule,
         FormsModule,
     ],
-    providers: [],
+    providers: [
+        MagazinesService,
+        {
+            provide: APP_INITIALIZER,
+            useFactory: (service: MagazinesService) => () => service.init(),
+            deps: [MagazinesService],
+            multi: true,
+        }
+    ],
     bootstrap: [AppComponent]
 })
 export class AppModule { }

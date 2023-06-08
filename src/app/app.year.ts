@@ -1,7 +1,6 @@
 import { Component, Input } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 
-import { Year, default as db } from './helpers';
+import { Year, MagazinesService } from './service.magazines';
 
 @Component({
     selector: 'app-year',
@@ -22,15 +21,17 @@ import { Year, default as db } from './helpers';
             grid-gap: 1rem;
         }
     `],
+    providers: [
+        MagazinesService,
+    ],
 })
 export class AppYear {
-    private db = db;
-    constructor(private http: HttpClient) { }
+    constructor(private db: MagazinesService) { }
     ngOnInit() {
         if (!this.magazine || !this.year)
             return;
 
-        db.init(this.http).then(() => {
+        this.db.init().then(() => {
             if (!this.magazine || !this.year)
                 return;
 

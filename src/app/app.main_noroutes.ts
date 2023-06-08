@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 
-import { default as db } from './helpers';
+import { MagazinesService } from './service.magazines';
 
 @Component({
     selector: 'app-main-noroutes',
@@ -15,7 +14,7 @@ import { default as db } from './helpers';
 
         <ng-container *ngIf="isSecretIncome">
             <app-magazines
-                *ngIf="db && !selectedMagazine && !selectedYear"
+                *ngIf="!selectedMagazine && !selectedYear"
                 (onMagazineClick)="onMagazineClick($event)"
             />
 
@@ -26,22 +25,22 @@ import { default as db } from './helpers';
             />
 
             <app-year
-                *ngIf="selectedYear"
+                *ngIf="selectedMagazine && selectedYear"
                 [magazine]="selectedMagazine"
                 [year]="selectedYear"
             />
         </ng-container>
     `,
-    styles: [`
-    `],
+    providers: [
+        MagazinesService,
+    ],
 })
 export class AppMainNoroutes {
     protected isSecretIncome = false;
 
-    protected db = db;
-    constructor(private http: HttpClient) { }
+    constructor(private db: MagazinesService) { }
     ngOnInit() {
-        db.init(this.http)
+        this.db.init();
     }
 
     protected selectedMagazine: string | undefined = undefined;

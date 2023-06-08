@@ -1,8 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 
-import { default as db } from './helpers';
-import { Magazine } from './helpers';
+import { Magazine, MagazinesService } from './service.magazines';
 
 @Component({
     selector: 'app-magazine',
@@ -25,17 +23,19 @@ import { Magazine } from './helpers';
             gap: 1rem;
         }
     `],
+    providers: [
+        MagazinesService,
+    ],
 })
 export class AppMagazine {
-    private db = db;
-    constructor(private http: HttpClient) { }
+    constructor(private db: MagazinesService) { }
     ngOnInit() {
-        db.init(this.http).then(() => {
+        this.db.init().then(() => {
             if (!this.magazine)
                 return;
 
             this.show = this.db
-                ?.getMagazine(this.magazine!)
+                .getMagazine(this.magazine!)
         })
     }
 

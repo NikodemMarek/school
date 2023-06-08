@@ -23,8 +23,6 @@ import { Router } from '@angular/router';
             [year]="year"
         />
     `,
-    styles: [`
-    `],
 })
 export class AppMainRoutes {
 	constructor(private router: Router) { }

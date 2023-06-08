@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 
-import { Publication } from './helpers';
+import { Publication } from './service.magazines';
 
 @Component({
     selector: 'app-publication',

@@ -1,7 +1,6 @@
 import { Component, EventEmitter, Output } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 
-import { default as db, Magazine } from './helpers';
+import { Magazine, MagazinesService } from './service.magazines';
 
 @Component({
     selector: 'app-magazines',
@@ -32,10 +31,12 @@ import { default as db, Magazine } from './helpers';
             width: 100%;
         }
     `],
+    providers: [
+        MagazinesService,
+    ],
 })
 export class AppMagazines {
-    protected db = db;
-    constructor(private http: HttpClient) { }
+    constructor(private db: MagazinesService) { }
     ngOnInit() {
         const order = [
             'Atari_Age', 'Komputer',
@@ -46,12 +47,10 @@ export class AppMagazines {
             'IKS',
         ]
 
-        db.init(this.http).then(() => {
+        this.db.init().then(() => {
             this.show = this.db
-                .get()
+                .magazines
                 .sort((a, b) => order.indexOf(a.name) - order.indexOf(b.name))
-
-                console.log(this.show)
         })
     }
 
