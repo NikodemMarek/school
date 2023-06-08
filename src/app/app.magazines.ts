@@ -1,13 +1,14 @@
 import { Component, EventEmitter, Output } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
-import { default as db } from './helpers';
+import { default as db, Magazine } from './helpers';
 
 @Component({
     selector: 'app-magazines',
     template: `
         <div
             class="magazine"
-            *ngFor="let magazine of db?.get()"
+            *ngFor="let magazine of show"
             (click)="onMagazineClick.emit(magazine?.name)"
         >
             <img
@@ -34,6 +35,27 @@ import { default as db } from './helpers';
 })
 export class AppMagazines {
     protected db = db;
+    constructor(private http: HttpClient) { }
+    ngOnInit() {
+        const order = [
+            'Atari_Age', 'Komputer',
+            'Atari_club', 'Moje_Atari',
+            'Avax', 'POKE',
+            'Bajtek', 'STEfan',
+            'Desktop_Info', 'Swiat_Atari',
+            'IKS',
+        ]
+
+        db.init(this.http).then(() => {
+            this.show = this.db
+                .get()
+                .sort((a, b) => order.indexOf(a.name) - order.indexOf(b.name))
+
+                console.log(this.show)
+        })
+    }
+
+    protected show: Magazine[] | undefined = undefined;
 
     @Output() onMagazineClick = new EventEmitter<string>()
 }
