@@ -6,19 +6,24 @@ import { default as db } from './helpers';
 @Component({
     selector: 'app-main-noroutes',
     template: `
+        <app-income
+            *ngIf="!isSecretIncome"
+            (onSecretIncome)="isSecretIncome = true"
+        />
+
         <app-magazines
-            *ngIf="db && !selectedMagazine && !selectedYear"
+            *ngIf="isSecretIncome && db && !selectedMagazine && !selectedYear"
             (onMagazineClick)="onMagazineClick($event)"
         />
 
         <app-magazine
-            *ngIf="selectedMagazine && !selectedYear"
+            *ngIf="isSecretIncome && selectedMagazine && !selectedYear"
             [magazine]="selectedMagazine"
             (onYearClick)="onYearClick($event)"
         />
 
         <app-year
-            *ngIf="selectedYear"
+            *ngIf="isSecretIncome && selectedYear"
             [magazine]="selectedMagazine"
             [year]="selectedYear"
         />
@@ -27,6 +32,8 @@ import { default as db } from './helpers';
     `],
 })
 export class AppMainNoroutes {
+    protected isSecretIncome = false;
+
     protected db = db;
     constructor(private http: HttpClient) { }
     ngOnInit() {

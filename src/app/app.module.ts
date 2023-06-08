@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
 
 import { AppRoutingModule } from './app-routing.module';
 
@@ -14,6 +15,8 @@ import { AppMagazine } from './app.magazine';
 import { AppYear } from './app.year';
 import { AppPublication } from './app.publication';
 
+import { AppIncome } from './app.income';
+
 @NgModule({
     declarations: [
         AppComponent,
@@ -25,11 +28,14 @@ import { AppPublication } from './app.publication';
         AppMagazine,
         AppYear,
         AppPublication,
+
+        AppIncome,
     ],
     imports: [
         BrowserModule,
         AppRoutingModule,
         HttpClientModule,
+        FormsModule,
     ],
     providers: [],
     bootstrap: [AppComponent]
