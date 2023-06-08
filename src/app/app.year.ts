@@ -31,9 +31,26 @@ export class AppYear {
             return;
 
         db.init(this.http).then(() => {
-            this.show = this.db
-                ?.getMagazine(this.magazine!)
-                ?.getYear(this.year!);
+            if (!this.magazine || !this.year)
+                return;
+
+            if (this.year === 'all')
+                this.show = this.db
+                    ?.getMagazine(this.magazine!)
+                    ?.getYears()
+                    .reduce((acc, year) => {
+                        const publications = year.publications;
+
+                        if (acc.publications.some(p => publications.includes(p)))
+                            return acc;
+
+                        acc.publications = acc.publications.concat(publications);
+                        return acc;
+                    }, new Year('all', []));
+            else
+                this.show = this.db
+                    ?.getMagazine(this.magazine!)
+                    ?.getYear(this.year!);
         })
     }
 

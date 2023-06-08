@@ -13,6 +13,10 @@ import { Magazine } from './helpers';
         >
             {{ year?.year }}
         </button>
+
+        <button (click)="onYearClick.emit('all')">
+            wszystkie
+        </button>
     `,
     styles: [`
         :host {
