@@ -15,12 +15,14 @@ import { Router } from '@angular/router';
             *ngIf="magazine && !year"
             [magazine]="magazine"
             (onYearClick)="onYearClick($event)"
+            (back)="onBackClick(false)"
         />
 
         <app-year
             *ngIf="magazine && year"
             [magazine]="magazine"
             [year]="year"
+            (back)="onBackClick(true)"
         />
     `,
 })
@@ -31,10 +33,17 @@ export class AppMainRoutes {
     @Input() year: string | undefined = undefined;
 
     protected selectedMagazine: string | undefined = undefined;
-    protected onMagazineClick = (magazine: string) =>
+    protected onMagazineClick = (magazine: string | undefined) =>
         this.router.navigate([magazine]);
 
     protected selectedYear: string | undefined = undefined;
     protected onYearClick = (year: string) =>
         this.router.navigate([this.magazine, year]);
+
+    protected onBackClick = (toYears: boolean) => {
+        if (toYears)
+            this.router.navigate([this.magazine]);
+        else
+            this.router.navigate(['/']);
+    }
 }

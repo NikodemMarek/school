@@ -22,12 +22,14 @@ import { MagazinesService } from './service.magazines';
                 *ngIf="selectedMagazine && !selectedYear"
                 [magazine]="selectedMagazine"
                 (onYearClick)="onYearClick($event)"
+                (back)="onBackClick(false)"
             />
 
             <app-year
                 *ngIf="selectedMagazine && selectedYear"
                 [magazine]="selectedMagazine"
                 [year]="selectedYear"
+                (back)="onBackClick(true)"
             />
         </ng-container>
     `,
@@ -50,4 +52,11 @@ export class AppMainNoroutes {
     protected selectedYear: string | undefined = undefined;
     protected onYearClick = (year: string) =>
         this.selectedYear = year;
+
+    protected onBackClick = (toYears: boolean) => {
+        if (toYears)
+            this.selectedYear = undefined;
+        else
+            this.selectedMagazine = undefined;
+    }
 }

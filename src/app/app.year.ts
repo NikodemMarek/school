@@ -1,10 +1,12 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 import { Year, MagazinesService } from './service.magazines';
 
 @Component({
     selector: 'app-year',
     template: `
+        <button (click)="back.emit()">back</button>
+
         <h2>{{ show?.year }}</h2>
 
         <div id="publications">
@@ -57,6 +59,7 @@ export class AppYear {
 
     @Input() magazine: string | undefined = undefined;
     @Input() year: string | undefined = undefined;
-
     protected show: Year | undefined = undefined;
+
+    @Output() back = new EventEmitter<void>()
 }

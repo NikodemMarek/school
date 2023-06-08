@@ -5,6 +5,10 @@ import { Magazine, MagazinesService } from './service.magazines';
 @Component({
     selector: 'app-magazine',
     template: `
+        <button (click)="back.emit()">back</button>
+
+        <h2>{{ show?.name }}</h2>
+
         <button
             *ngFor="let year of show?.years"
             (click)="onYearClick.emit(year?.year || '')"
@@ -43,4 +47,6 @@ export class AppMagazine {
     protected show: Magazine | undefined = undefined;
 
     @Output() onYearClick = new EventEmitter<string>()
+
+    @Output() back = new EventEmitter<void>()
 }
